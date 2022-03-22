@@ -4,6 +4,9 @@
 package org.intellij.sdk.project.model;
 
 import com.intellij.xdebugger.frame.XFullValueEvaluator;
+import com.intellij.xdebugger.frame.XValue;
+import com.intellij.xdebugger.frame.XValueNode;
+import com.intellij.xdebugger.frame.XValuePlace;
 import com.intellij.xdebugger.frame.presentation.XValuePresentation;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodePresentationConfigurator;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValuePresentationUtil;
@@ -51,6 +54,8 @@ public class XTestValueNode extends XValueNodePresentationConfigurator.Configura
 //      throw new AssertionError("Waiting timed out");
     }
   }
+
+
 
   @Override
   public String toString() {

@@ -34,27 +34,14 @@ import java.util.concurrent.Semaphore;
 import java.util.function.BiFunction;
 
 public class ShowDebuggers extends AnAction {
-    private static final long TIMEOUT_MS = 3_000;
 
     @Override
     public void actionPerformed(@NotNull final AnActionEvent event) {
         XDebuggerManager manager = XDebuggerManager.getInstance(event.getProject());
-
         var frame = manager.getCurrentSession().getCurrentStackFrame();
-        var children = XDebuggerTestUtil.collectChildren(frame);
-
-        List<XTestValueNode> computedNodes = new ArrayList<>();
-
-        for (var xValue : children) {
-            try {
-                computedNodes.add(XDebuggerTestUtil.computePresentation(xValue));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
+        var node = new XTestCompositeNode();
+        frame.computeChildren(node);
         System.out.println("Done");
-
     }
 
     @Override
