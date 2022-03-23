@@ -27,22 +27,13 @@ import com.intellij.xdebugger.frame.XValueChildrenList;
 import com.intellij.xdebugger.frame.XValuePlace;
 
 public class XTestCompositeNode extends XTestContainer<XValue> implements XCompositeNode {
-    public XValueChildrenList myChildren;
-    List<XTestCompositeNode> properties = new ArrayList<>();
     @Override
     public void addChildren(@NotNull XValueChildrenList children, boolean last) {
-        myChildren = children;
-
-
+        final List<XValue> list = new ArrayList<>();
         for (int i = 0; i < children.size(); i++) {
-            XTestValueNode presentation = new XTestValueNode();
-            XTestCompositeNode childrenNode = new XTestCompositeNode();
-            XValue value = children.getValue(i);
-            waitFor(25_000);
-            value.computePresentation(presentation, XValuePlace.TREE);
-            waitFor(25_000);
-            System.out.println("child: "+ value + ",children: "+ children.getValue(0) + ", presentation " + presentation);
+            list.add(children.getValue(i));
         }
+        addChildren(list, last);
     }
 
     @Override

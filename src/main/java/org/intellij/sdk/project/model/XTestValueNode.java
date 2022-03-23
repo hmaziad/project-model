@@ -4,9 +4,6 @@
 package org.intellij.sdk.project.model;
 
 import com.intellij.xdebugger.frame.XFullValueEvaluator;
-import com.intellij.xdebugger.frame.XValue;
-import com.intellij.xdebugger.frame.XValueNode;
-import com.intellij.xdebugger.frame.XValuePlace;
 import com.intellij.xdebugger.frame.presentation.XValuePresentation;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodePresentationConfigurator;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValuePresentationUtil;
@@ -18,47 +15,43 @@ import java.util.concurrent.Semaphore;
 import java.util.function.BiFunction;
 
 public class XTestValueNode extends XValueNodePresentationConfigurator.ConfigurableXValueNodeImpl {
-  public @Nullable Icon myIcon;
-  public @NotNull String myName;
-  public @Nullable String myType;
-  public @NotNull String myValue;
-  public boolean myHasChildren;
+    public @Nullable Icon myIcon;
+    public @NotNull String myName;
+    public @Nullable String myType;
+    public @NotNull String myValue;
+    public boolean myHasChildren;
 
-  public XFullValueEvaluator myFullValueEvaluator;
+    public XFullValueEvaluator myFullValueEvaluator;
 
-  private final Semaphore myFinished = new Semaphore(0);
+    private final Semaphore myFinished = new Semaphore(0);
 
-  @Override
-  public void applyPresentation(@Nullable Icon icon,
-                                @NotNull XValuePresentation valuePresentation,
-                                boolean hasChildren) {
-    myIcon = icon;
-    myType = valuePresentation.getType();
-    myValue = XValuePresentationUtil.computeValueText(valuePresentation);
-    myHasChildren = hasChildren;
-
-    myFinished.release();
-  }
-
-  @Override
-  public void setFullValueEvaluator(@NotNull XFullValueEvaluator fullValueEvaluator) {
-    myFullValueEvaluator = fullValueEvaluator;
-  }
-
-  public void waitFor(long timeoutInMillis) {
-    waitFor(timeoutInMillis, XDebuggerTestUtil::waitFor);
-  }
-  public void waitFor(long timeoutInMillis, BiFunction<? super Semaphore, ? super Long, Boolean> waitFunction) {
-    if (!waitFunction.apply(myFinished, timeoutInMillis)) {
-      System.out.println("We timed out");
-//      throw new AssertionError("Waiting timed out");
+    @Override
+    public void applyPresentation(@Nullable Icon icon,
+        @NotNull XValuePresentation valuePresentation,
+        boolean hasChildren) {
+        myIcon = icon;
+        myType = valuePresentation.getType();
+        myValue = XValuePresentationUtil.computeValueText(valuePresentation);
+        myHasChildren = hasChildren;
+        myFinished.release();
     }
-  }
 
+    @Override
+    public void setFullValueEvaluator(@NotNull XFullValueEvaluator fullValueEvaluator) {
+        myFullValueEvaluator = fullValueEvaluator;
+    }
 
+    public void waitFor(long timeoutInMillis) {
+        waitFor(timeoutInMillis, XDebuggerTestUtil::waitFor);
+    }
+    public void waitFor(long timeoutInMillis, BiFunction<? super Semaphore, ? super Long, Boolean> waitFunction) {
+        if (!waitFunction.apply(myFinished, timeoutInMillis)) {
+            throw new AssertionError("Waiting timed out");
+        }
+    }
 
-  @Override
-  public String toString() {
-    return myName + "{" + myType + "} = " + myValue + ", hasChildren = " + myHasChildren;
-  }
+    @Override
+    public String toString() {
+        return myName + "{" + myType + "} = " + myValue + ", hasChildren = " + myHasChildren;
+    }
 }

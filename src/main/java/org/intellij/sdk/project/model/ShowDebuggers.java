@@ -39,9 +39,15 @@ public class ShowDebuggers extends AnAction {
     public void actionPerformed(@NotNull final AnActionEvent event) {
         XDebuggerManager manager = XDebuggerManager.getInstance(event.getProject());
         var frame = manager.getCurrentSession().getCurrentStackFrame();
-        var node = new XTestCompositeNode();
-        frame.computeChildren(node);
-        System.out.println("Done");
+        printChildren(frame);
+    }
+
+    private void printChildren(XValueContainer frame) {
+        List<XValue> children = XDebuggerTestUtil.collectChildren(frame);
+        for (XValue child : children) {
+            System.out.println("Child: " + child + ", Presentation: " + XDebuggerTestUtil.computePresentation(child));
+            printChildren(child);
+        }
     }
 
     @Override
