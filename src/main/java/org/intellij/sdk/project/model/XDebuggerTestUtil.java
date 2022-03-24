@@ -32,10 +32,15 @@ import com.intellij.xdebugger.impl.breakpoints.XBreakpointUtil;
 import com.intellij.xdebugger.impl.breakpoints.XExpressionImpl;
 import com.intellij.xdebugger.impl.frame.XStackFrameContainerEx;
 import one.util.streamex.StreamEx;
+
+import org.bouncycastle.jcajce.provider.asymmetric.x509.PKIXCertPath;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.concurrency.Promise;
 
+import java.security.Timestamp;
+import java.security.cert.CertPath;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
@@ -48,11 +53,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 public class XDebuggerTestUtil {
-  public static final int TIMEOUT_MS = 25_000;
+  public static final int TIMEOUT_MS = 25000;
 //  public static final int TIMEOUT_MS = 2500;
 
   XDebuggerTestUtil() {
   }
+
+    public static void print(String message) {
+        System.out.println(new SimpleDateFormat("HH.mm.ss:ms").format(new Date()) + ": " + message);
+    }
 
   @Nullable
   public static Promise<List<? extends XLineBreakpointType.XLineBreakpointVariant>>
@@ -295,7 +304,10 @@ public class XDebuggerTestUtil {
     long remaining = timeoutInMillis;
     do {
       try {
-        return semaphore.tryAcquire(remaining, TimeUnit.MILLISECONDS);
+          print("Trying to acquire: " + semaphore);
+          boolean isAcquired = semaphore.tryAcquire(remaining, TimeUnit.MILLISECONDS);
+          print("Has acquired: " + semaphore + ": " + isAcquired);
+          return isAcquired;
       }
       catch (InterruptedException ignored) {
         remaining = end - System.currentTimeMillis();

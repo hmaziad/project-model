@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.Semaphore;
 import java.util.function.BiFunction;
 
+import static org.intellij.sdk.project.model.XDebuggerTestUtil.print;
 import static org.junit.Assert.*;
 
 public class XTestEvaluationCallback extends XEvaluationCallbackBase {
@@ -33,13 +34,17 @@ public class XTestEvaluationCallback extends XEvaluationCallbackBase {
   @Override
   public void evaluated(@NotNull XValue result) {
     myResult = result;
-    myFinished.release();
+      print("Releasing in evaulated..." + myFinished);
+      myFinished.release();
+      print("Released in evaulated..." + myFinished);
   }
 
   @Override
   public void errorOccurred(@NotNull String errorMessage) {
     myErrorMessage = errorMessage;
-    myFinished.release();
+      print("Releasing in errorOccured..." + myFinished);
+      myFinished.release();
+      print("Released in errorOccured..." + myFinished);
   }
 
   public Pair<XValue, String> waitFor(long timeoutInMilliseconds) {

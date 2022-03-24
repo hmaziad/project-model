@@ -2,6 +2,9 @@
 
 package org.intellij.sdk.project.model;
 
+
+import static org.intellij.sdk.project.model.XDebuggerTestUtil.print;
+
 import com.intellij.debugger.engine.JavaStackFrame;
 import com.intellij.debugger.ui.impl.watch.NodeManagerImpl;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -30,7 +33,13 @@ import javax.swing.*;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.BiFunction;
 
 public class ShowDebuggers extends AnAction {
@@ -39,13 +48,26 @@ public class ShowDebuggers extends AnAction {
     public void actionPerformed(@NotNull final AnActionEvent event) {
         XDebuggerManager manager = XDebuggerManager.getInstance(event.getProject());
         var frame = manager.getCurrentSession().getCurrentStackFrame();
-        printChildren(frame);
+        try {
+            printChildren(frame);
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void printChildren(XValueContainer frame) {
+    private void printChildren(XValueContainer frame) throws ExecutionException, InterruptedException, TimeoutException {
         List<XValue> children = XDebuggerTestUtil.collectChildren(frame);
+        print("Received children: "+ children);
+//        ExecutorService executor = Executors.newFixedThreadPool(1);
+
         for (XValue child : children) {
-            System.out.println("Child: " + child + ", Presentation: " + XDebuggerTestUtil.computePresentation(child));
+//            Future<XTestValueNode>  valueNodeFuture =executor.submit(() -> XDebuggerTestUtil.computePresentation(child));
+//            print("Child: " + child + ", Presentation: " + valueNodeFuture.get(25000, TimeUnit.MILLISECONDS).myValue);
+//            print("Child: " + child );
             printChildren(child);
         }
     }

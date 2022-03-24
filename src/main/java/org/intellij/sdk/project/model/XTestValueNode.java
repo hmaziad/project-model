@@ -3,6 +3,8 @@
  */
 package org.intellij.sdk.project.model;
 
+import static org.intellij.sdk.project.model.XDebuggerTestUtil.print;
+
 import com.intellij.xdebugger.frame.XFullValueEvaluator;
 import com.intellij.xdebugger.frame.presentation.XValuePresentation;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodePresentationConfigurator;
@@ -33,7 +35,9 @@ public class XTestValueNode extends XValueNodePresentationConfigurator.Configura
         myType = valuePresentation.getType();
         myValue = XValuePresentationUtil.computeValueText(valuePresentation);
         myHasChildren = hasChildren;
+        print("Releasing in applyPresentation..." + myFinished);
         myFinished.release();
+        print("Is Released in applyPresentation" + myFinished);
     }
 
     @Override
@@ -45,8 +49,10 @@ public class XTestValueNode extends XValueNodePresentationConfigurator.Configura
         waitFor(timeoutInMillis, XDebuggerTestUtil::waitFor);
     }
     public void waitFor(long timeoutInMillis, BiFunction<? super Semaphore, ? super Long, Boolean> waitFunction) {
+        print("Try acquire for "+ myFinished);
         if (!waitFunction.apply(myFinished, timeoutInMillis)) {
-            throw new AssertionError("Waiting timed out");
+            print("throwing erro couldjn't acquire " + myFinished);
+            throw new AssertionError("Waiting timed out" + this);
         }
     }
 

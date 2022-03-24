@@ -1,6 +1,8 @@
 // Copyright 2000-2019 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file.
 package org.intellij.sdk.project.model;
 
+import static org.intellij.sdk.project.model.XDebuggerTestUtil.print;
+
 import com.intellij.openapi.util.Pair;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.util.SmartList;
@@ -20,11 +22,17 @@ public class XTestContainer<T> {
 
   public void addChildren(List<? extends T> children, boolean last) {
     myChildren.addAll(children);
-    if (last) myFinished.release();
+    if (last) {
+        print("Releasing in addChildren..." + myFinished);
+        myFinished.release();
+        print("Is Released in addChildren" + myFinished);
+    };
   }
 
   public void tooManyChildren(int remaining) {
-    myFinished.release();
+      print("Releasing on too many addChildren..." + myFinished);
+      myFinished.release();
+      print("Released on too many addChildren..." + myFinished);
   }
 
   public void setMessage(@NotNull String message, Icon icon, @NotNull final SimpleTextAttributes attributes, @Nullable XDebuggerTreeNodeHyperlink link) {
@@ -36,7 +44,9 @@ public class XTestContainer<T> {
 
   public void setErrorMessage(@NotNull String errorMessage) {
     myErrorMessage = errorMessage;
+    print("Releasing on set error Message..."+ myFinished);
     myFinished.release();
+    print("Released on set error Message..."+ myFinished);
   }
 
   @NotNull
@@ -46,8 +56,9 @@ public class XTestContainer<T> {
 
   @NotNull
   public Pair<List<T>, String> waitFor(long timeoutMs, BiFunction<? super Semaphore, ? super Long, Boolean> waitFunction) {
-    if (!waitFunction.apply(myFinished, timeoutMs)) {
-      throw new AssertionError("Waiting timed out");
+      print("Try acquire for "+ myFinished);
+      if (!waitFunction.apply(myFinished, timeoutMs)) {
+      throw new AssertionError("Waiting timed out" + this);
     }
 
     return Pair.create(myChildren, myErrorMessage);
