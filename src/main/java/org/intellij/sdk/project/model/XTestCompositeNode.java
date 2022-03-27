@@ -34,7 +34,10 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
         print("Adding children: " + children);
         List<XValue> items = new ArrayList<>();
         for (int i = 0; i < children.size(); i++) {
-            items.add(children.getValue(i));
+            XValue value = children.getValue(i);
+            items.add(value);
+            XTestValueNode presentation = new XTestValueNode();
+            value.computePresentation(presentation, XValuePlace.TREE);
         }
         addChildren(items, last);
     }
