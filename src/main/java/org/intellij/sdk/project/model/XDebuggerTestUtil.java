@@ -60,7 +60,9 @@ public class XDebuggerTestUtil {
   }
 
     public static void print(String message) {
-        System.out.println(new SimpleDateFormat("HH.mm.ss:ms").format(new Date()) + ": " + message);
+        System.out.println(new SimpleDateFormat("HH.mm.ss:ms").format(new Date())
+            + "|" + Thread.currentThread().getName() + Thread.currentThread().getId()
+            + ": " + message);
     }
 
   @Nullable

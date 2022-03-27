@@ -17,6 +17,8 @@ package org.intellij.sdk.project.model;
 
 //import com.intellij.xdebugger.XTestContainer;
 
+import static org.intellij.sdk.project.model.XDebuggerTestUtil.print;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,11 +31,12 @@ import com.intellij.xdebugger.frame.XValuePlace;
 public class XTestCompositeNode extends XTestContainer<XValue> implements XCompositeNode {
     @Override
     public void addChildren(@NotNull XValueChildrenList children, boolean last) {
-        final List<XValue> list = new ArrayList<>();
+        print("Adding children: " + children);
+        List<XValue> items = new ArrayList<>();
         for (int i = 0; i < children.size(); i++) {
-            list.add(children.getValue(i));
+            items.add(children.getValue(i));
         }
-        addChildren(list, last);
+        addChildren(items, last);
     }
 
     @Override
