@@ -32,6 +32,7 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
             XValue childValue = children.getValue(i);
 
             if(!(childValue.toString().equals("value")) && !(childValue.toString().equals("hash")) && !(childValue.toString().equals("coder"))) {
+                System.out.println(Thread.currentThread().getName()+ ": Entered addChildren");
 
                 XTestCompositeNode childNode = new XTestCompositeNode();
                 childValue.computeChildren(childNode);

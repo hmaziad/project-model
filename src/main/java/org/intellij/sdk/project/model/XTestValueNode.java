@@ -37,7 +37,9 @@ public class XTestValueNode extends XValueNodePresentationConfigurator.Configura
     myValue = XValuePresentationUtil.computeValueText(valuePresentation);
     myHasChildren = hasChildren;
 
-    System.out.println(childNode + " = " + this);
+        if (!myValue.startsWith("Collecting data")) {
+            System.out.println(Thread.currentThread().getName() + ": " + childNode + " = " + this);
+        }
 
   }
 
@@ -48,6 +50,6 @@ public class XTestValueNode extends XValueNodePresentationConfigurator.Configura
 
   @Override
   public String toString() {
-    return Optional.ofNullable(myName).orElse("") + "{"+Optional.ofNullable(myType).orElse("") + "} " + myValue;
+    return "{"+Optional.ofNullable(myType).orElse("") + "} " + myValue;
   }
 }
