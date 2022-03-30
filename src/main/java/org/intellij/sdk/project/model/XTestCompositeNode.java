@@ -25,12 +25,8 @@ import com.intellij.xdebugger.frame.XValueChildrenList;
 import com.intellij.xdebugger.frame.XValuePlace;
 
 public class XTestCompositeNode extends XTestContainer<XValue> implements XCompositeNode {
-    public XValueChildrenList myChildren;
     @Override
     public void addChildren(@NotNull XValueChildrenList children, boolean last) {
-        myChildren = children;
-
-
         for (int i = 0; i < children.size(); i++) {
             XTestCompositeNode childrenNode = new XTestCompositeNode();
             XValue value = children.getValue(i);
@@ -38,16 +34,7 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
 
             if(!(value.toString().equals("value")) && !(value.toString().equals("hash")) && !(value.toString().equals("coder"))) {
                 value.computeChildren(childrenNode);
-                var future = CompletableFuture.runAsync(() -> {
-                    value.computePresentation(presentation, XValuePlace.TREE);
-                });
-                try {
-                    future.get();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
+                value.computePresentation(presentation, XValuePlace.TREE);
                 System.out.println("child: "+ value);
             }
         }
