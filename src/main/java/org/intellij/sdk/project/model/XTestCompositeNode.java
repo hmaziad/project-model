@@ -23,7 +23,7 @@ import com.intellij.xdebugger.frame.XCompositeNode;
 import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.frame.XValueChildrenList;
 import com.intellij.xdebugger.frame.XValuePlace;
-
+// Collecting data\u2026
 public class XTestCompositeNode extends XTestContainer<XValue> implements XCompositeNode {
     @Override
     public void addChildren(@NotNull XValueChildrenList children, boolean last) {
