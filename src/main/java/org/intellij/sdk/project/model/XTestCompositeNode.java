@@ -15,8 +15,8 @@
  */
 package org.intellij.sdk.project.model;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.jetbrains.annotations.NotNull;
 import com.intellij.xdebugger.frame.XCompositeNode;
@@ -25,17 +25,19 @@ import com.intellij.xdebugger.frame.XValueChildrenList;
 import com.intellij.xdebugger.frame.XValuePlace;
 // Collecting data\u2026
 public class XTestCompositeNode extends XTestContainer<XValue> implements XCompositeNode {
+    Map<XTestCompositeNode, XTestValueNode> valuePerNode = new HashMap<>();
     @Override
     public void addChildren(@NotNull XValueChildrenList children, boolean last) {
         for (int i = 0; i < children.size(); i++) {
-            XTestCompositeNode childrenNode = new XTestCompositeNode();
-            XValue value = children.getValue(i);
-            XTestValueNode presentation = new XTestValueNode();
+            XValue childValue = children.getValue(i);
 
-            if(!(value.toString().equals("value")) && !(value.toString().equals("hash")) && !(value.toString().equals("coder"))) {
-                value.computeChildren(childrenNode);
-                value.computePresentation(presentation, XValuePlace.TREE);
-                System.out.println("child: "+ value);
+            if(!(childValue.toString().equals("value")) && !(childValue.toString().equals("hash")) && !(childValue.toString().equals("coder"))) {
+
+                XTestCompositeNode childNode = new XTestCompositeNode();
+                childValue.computeChildren(childNode);
+
+                XTestValueNode presentation = new XTestValueNode(childValue);
+                childValue.computePresentation(presentation, XValuePlace.TREE);
             }
         }
     }

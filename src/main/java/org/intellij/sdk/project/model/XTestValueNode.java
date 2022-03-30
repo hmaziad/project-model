@@ -3,27 +3,32 @@
  */
 package org.intellij.sdk.project.model;
 
+import java.util.Optional;
+
+import javax.swing.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import com.intellij.xdebugger.frame.XFullValueEvaluator;
 import com.intellij.xdebugger.frame.XValue;
-import com.intellij.xdebugger.frame.XValueNode;
-import com.intellij.xdebugger.frame.XValuePlace;
 import com.intellij.xdebugger.frame.presentation.XValuePresentation;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodePresentationConfigurator;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValuePresentationUtil;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-
-public class XTestValueNode extends XValueNodePresentationConfigurator.ConfigurableXValueNodeImpl {
+public class XTestValueNode extends XValueNodePresentationConfigurator.ConfigurableXValueNodeImpl{
   public @Nullable Icon myIcon;
   public @NotNull String myName;
   public @Nullable String myType;
   public @NotNull String myValue;
   public boolean myHasChildren;
   public XFullValueEvaluator myFullValueEvaluator;
+  private XValue childNode;
 
-  @Override
+
+  public XTestValueNode(XValue childNode) {
+      this.childNode = childNode;
+  }
+
+    @Override
   public void applyPresentation(@Nullable Icon icon,
                                 @NotNull XValuePresentation valuePresentation,
                                 boolean hasChildren) {
@@ -32,7 +37,8 @@ public class XTestValueNode extends XValueNodePresentationConfigurator.Configura
     myValue = XValuePresentationUtil.computeValueText(valuePresentation);
     myHasChildren = hasChildren;
 
-      System.out.println("Presentation: " + this);
+    System.out.println(childNode + " = " + this);
+
   }
 
   @Override
@@ -42,6 +48,6 @@ public class XTestValueNode extends XValueNodePresentationConfigurator.Configura
 
   @Override
   public String toString() {
-    return myName + "{" + myType + "} = " + myValue + ", hasChildren = " + myHasChildren;
+    return Optional.ofNullable(myName).orElse("") + "{"+Optional.ofNullable(myType).orElse("") + "} " + myValue;
   }
 }
