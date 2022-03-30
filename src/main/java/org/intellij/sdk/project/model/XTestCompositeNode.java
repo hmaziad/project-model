@@ -15,14 +15,8 @@
  */
 package org.intellij.sdk.project.model;
 
-//import com.intellij.xdebugger.XTestContainer;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.RunnableFuture;
 
 import org.jetbrains.annotations.NotNull;
 import com.intellij.xdebugger.frame.XCompositeNode;

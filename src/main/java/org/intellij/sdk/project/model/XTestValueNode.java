@@ -14,8 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.concurrent.Semaphore;
-import java.util.function.BiFunction;
 
 public class XTestValueNode extends XValueNodePresentationConfigurator.ConfigurableXValueNodeImpl {
   public @Nullable Icon myIcon;
@@ -23,10 +21,7 @@ public class XTestValueNode extends XValueNodePresentationConfigurator.Configura
   public @Nullable String myType;
   public @NotNull String myValue;
   public boolean myHasChildren;
-
   public XFullValueEvaluator myFullValueEvaluator;
-
-  private final Semaphore myFinished = new Semaphore(0);
 
   @Override
   public void applyPresentation(@Nullable Icon icon,
@@ -38,25 +33,12 @@ public class XTestValueNode extends XValueNodePresentationConfigurator.Configura
     myHasChildren = hasChildren;
 
       System.out.println("Presentation: " + this);
-    myFinished.release();
   }
 
   @Override
   public void setFullValueEvaluator(@NotNull XFullValueEvaluator fullValueEvaluator) {
     myFullValueEvaluator = fullValueEvaluator;
   }
-
-  public void waitFor(long timeoutInMillis) {
-    waitFor(timeoutInMillis, XDebuggerTestUtil::waitFor);
-  }
-  public void waitFor(long timeoutInMillis, BiFunction<? super Semaphore, ? super Long, Boolean> waitFunction) {
-    if (!waitFunction.apply(myFinished, timeoutInMillis)) {
-      System.out.println("We timed out");
-//      throw new AssertionError("Waiting timed out");
-    }
-  }
-
-
 
   @Override
   public String toString() {

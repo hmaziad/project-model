@@ -33,8 +33,8 @@
   <vendor url="https://plugins.jetbrains.com">IntelliJ Platform SDK</vendor>
 
   <actions>
-    <action id="ProjectModel.SourceRoots" class="org.intellij.sdk.project.model.ShowDebuggers"
-            text="Show Debuggers"
+    <action id="ProjectModel.SourceRoots" class="org.intellij.sdk.project.model.SnapDebugger"
+            text="Snap Debugger"
             description="Shows debuggers"
             icon="SdkIcons.Sdk_default_icon">
       <add-to-group group-id="ToolsMenu" anchor="first"/>

@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.function.BiFunction;
 
-public class ShowDebuggers extends AnAction {
+public class SnapDebugger extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull final AnActionEvent event) {
