@@ -37,6 +37,7 @@ public class XTestValueNode extends XValueNodePresentationConfigurator.Configura
     myValue = XValuePresentationUtil.computeValueText(valuePresentation);
     myHasChildren = hasChildren;
 
+      System.out.println("Presentation: " + this);
     myFinished.release();
   }
 
