@@ -14,9 +14,9 @@ public class SnapDebugger extends AnAction {
     public void actionPerformed(@NotNull final AnActionEvent event) {
         XDebuggerManager manager = XDebuggerManager.getInstance(event.getProject());
         XStackFrame frame = manager.getCurrentSession().getCurrentStackFrame();
-        XTestCompositeNode node = new XTestCompositeNode();
+        XTestCompositeNode node = new XTestCompositeNode(null);
         frame.computeChildren(node);
-        System.out.println("Done");
+        System.out.println(Thread.currentThread().getName() + ": Done");
     }
 
     @Override
