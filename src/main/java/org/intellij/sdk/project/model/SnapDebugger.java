@@ -2,6 +2,8 @@
 
 package org.intellij.sdk.project.model;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -14,8 +16,7 @@ public class SnapDebugger extends AnAction {
     public void actionPerformed(@NotNull final AnActionEvent event) {
         XDebuggerManager manager = XDebuggerManager.getInstance(event.getProject());
         XStackFrame frame = manager.getCurrentSession().getCurrentStackFrame();
-        XTestCompositeNode node = new XTestCompositeNode(null);
-        frame.computeChildren(node);
+        CompletableFuture.runAsync(() -> new ComputeChildrenService(frame).execute());
         System.out.println(Thread.currentThread().getName() + ": Done");
     }
 
