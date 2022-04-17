@@ -14,6 +14,7 @@ import com.intellij.xdebugger.frame.presentation.XValuePresentation;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodePresentationConfigurator;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValuePresentationUtil;
 
+// here we are in UI thread
 public class XTestValueNode extends XValueNodePresentationConfigurator.ConfigurableXValueNodeImpl{
   public @Nullable Icon myIcon;
   public @NotNull String myName;

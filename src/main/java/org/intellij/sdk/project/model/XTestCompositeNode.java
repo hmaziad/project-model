@@ -26,6 +26,8 @@ import com.intellij.xdebugger.frame.XValueChildrenList;
 import com.intellij.xdebugger.frame.XValuePlace;
 
 // Collecting data\u2026
+// here we are in DebuggerManagerThread
+
 public class XTestCompositeNode extends XTestContainer<XValue> implements XCompositeNode {
     private final XValue parent;
     public XTestCompositeNode(XValue parent) {
