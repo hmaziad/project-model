@@ -1,11 +1,15 @@
 package org.intellij.sdk.project.model;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import com.intellij.xdebugger.frame.XValue;
-import com.intellij.xdebugger.frame.XValueChildrenList;
 import com.intellij.xdebugger.frame.XValueContainer;
 import com.intellij.xdebugger.frame.XValuePlace;
 
@@ -22,27 +26,42 @@ public class ComputeChildrenService implements Task {
     }
 
     private void computeChildren(XValueContainer container) {
-        CompletableFuture<XValueChildrenList> cf = new CompletableFuture<>();
-        XTestCompositeNode node = new XTestCompositeNode(cf);
-        container.computeChildren(node);
-        List<XValue> children = getChildren(cf.join());
-        System.out.println(Thread.currentThread().getName() + ": " + children);
+        System.out.println("Inside Thread: " + Thread.currentThread().getName());
+        Queue<XValueContainer> queue = new LinkedList<>();
+        queue.add(container);
+        int depth = 0;
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                XValueContainer current = queue.poll();
+                CompletableFuture<List<XValue>> nodeFuture = new CompletableFuture<>();
+                XTestCompositeNode node = new XTestCompositeNode(nodeFuture);
+                current.computeChildren(node);
+                List<XValue> children = new ArrayList<>();
+                try {
+                    children = nodeFuture.get(1, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (TimeoutException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(Thread.currentThread().getName() + ": " + children);
+                for (XValue child : children) {
+                    if (!child.toString().equals("hash") && !child.toString().equals("coder") && !child.toString().equals("value")) {
+                        CompletableFuture valueFuture = new CompletableFuture();
+                        XTestValueNode valueNode = new XTestValueNode(valueFuture);
+                        child.computePresentation(valueNode, XValuePlace.TREE);
+                        valueFuture.join();
+                        queue.add(child);
+                    }
+                }
+                System.out.println("Depth: " + depth++ + ", Queue size: " + queue.size());
 
-        for (var child : children) {
-            if (!child.toString().equals("hash") && !child.toString().equals("coder") && !child.toString().equals("value")) {
-                CompletableFuture.runAsync(() -> computeChildren(child));
             }
+            System.out.println("Queue size outside loop: " + queue.size());
         }
     }
 
-
-    private List<XValue> getChildren(XValueChildrenList children) {
-        List<XValue> values = new ArrayList<>();
-        for (int i = 0; i < children.size(); i++) {
-            XValue value = children.getValue(i);
-            value.computePresentation(new XTestValueNode(), XValuePlace.TREE);
-            values.add(value);
-        }
-        return values;
-    }
 }

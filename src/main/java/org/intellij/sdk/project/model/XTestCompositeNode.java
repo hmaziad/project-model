@@ -15,6 +15,8 @@
  */
 package org.intellij.sdk.project.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.jetbrains.annotations.NotNull;
@@ -26,16 +28,16 @@ import com.intellij.xdebugger.frame.XValueChildrenList;
 // here we are in DebuggerManagerThread
 
 public class XTestCompositeNode extends XTestContainer<XValue> implements XCompositeNode {
-    private CompletableFuture<XValueChildrenList> children;
+    private CompletableFuture<List<XValue>> children;
 
-    public XTestCompositeNode(CompletableFuture<XValueChildrenList> children) {
+    public XTestCompositeNode(CompletableFuture<List<XValue>> children) {
         this.children = children;
     }
 
     @Override
     public void addChildren(@NotNull XValueChildrenList children, boolean last) {
-        System.out.println(Thread.currentThread().getName());
-        this.children.complete(children);
+        System.out.println(Thread.currentThread().getName() + ": " + getChildren(children));
+        this.children.complete(getChildren(children));
 //        System.out.println(Thread.currentThread().getName() + ", Parent: " + Optional.ofNullable(parent).orElse(null) + ", Children " + getChildren(children) + ", last: " + last);
 
 
@@ -52,7 +54,15 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
     }
 
 
-
+    private List<XValue> getChildren(XValueChildrenList children) {
+        List<XValue> values = new ArrayList<>();
+        for (int i = 0; i < children.size(); i++) {
+            XValue value = children.getValue(i);
+            //            value.computePresentation(new XTestValueNode(), XValuePlace.TREE);
+            values.add(value);
+        }
+        return values;
+    }
     @Override
     public void setAlreadySorted(boolean alreadySorted) {
     }

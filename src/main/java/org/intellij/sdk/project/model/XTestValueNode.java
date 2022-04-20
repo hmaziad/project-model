@@ -4,6 +4,7 @@
 package org.intellij.sdk.project.model;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
@@ -15,12 +16,17 @@ import com.intellij.xdebugger.impl.ui.tree.nodes.XValuePresentationUtil;
 
 // here we are in UI thread
 public class XTestValueNode extends XValueNodePresentationConfigurator.ConfigurableXValueNodeImpl {
+    private final CompletableFuture future1;
     public @Nullable Icon myIcon;
     public @NotNull String myName;
     public @Nullable String myType;
     public @NotNull String myValue;
     public boolean myHasChildren;
     public XFullValueEvaluator myFullValueEvaluator;
+
+    public XTestValueNode(CompletableFuture future1) {
+        this.future1 = future1;
+    }
     //  private XValue childNode;
 
     @Override
@@ -32,6 +38,7 @@ public class XTestValueNode extends XValueNodePresentationConfigurator.Configura
 
         if (!myValue.startsWith("Collecting data")) {
             System.out.println(Thread.currentThread().getName() + ": " + myValue);
+            future1.complete(null);
         }
 
     }
