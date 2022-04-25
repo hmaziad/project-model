@@ -27,6 +27,7 @@ import com.intellij.xdebugger.frame.XValueChildrenList;
 // Collecting data\u2026
 // here we are in DebuggerManagerThread
 
+
 public class XTestCompositeNode extends XTestContainer<XValue> implements XCompositeNode {
     private CompletableFuture<List<XValue>> children;
 
@@ -38,19 +39,19 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
     public void addChildren(@NotNull XValueChildrenList children, boolean last) {
         System.out.println(Thread.currentThread().getName() + ": " + getChildren(children));
         this.children.complete(getChildren(children));
-//        System.out.println(Thread.currentThread().getName() + ", Parent: " + Optional.ofNullable(parent).orElse(null) + ", Children " + getChildren(children) + ", last: " + last);
+        //        System.out.println(Thread.currentThread().getName() + ", Parent: " + Optional.ofNullable(parent).orElse(null) + ", Children " + getChildren(children) + ", last: " + last);
 
 
-//        for (int i = 0; i < children.size(); i++) {
-//            XValue childValue = children.getValue(i);
-//            XValue myChildValue = new MyXValue(childValue);
-//            if (!childValue.toString().equals("hash") && !childValue.toString().equals("coder") && !childValue.toString().equals("value")) {
-//                XTestCompositeNode childNode = new XTestCompositeNode(childValue);
-//                childValue.computeChildren(childNode);
-//                XTestValueNode presentation = new XTestValueNode(childValue);
-//                childValue.computePresentation(presentation, XValuePlace.TREE);
-//            }
-//        }
+        //        for (int i = 0; i < children.size(); i++) {
+        //            XValue childValue = children.getValue(i);
+        //            XValue myChildValue = new MyXValue(childValue);
+        //            if (!childValue.toString().equals("hash") && !childValue.toString().equals("coder") && !childValue.toString().equals("value")) {
+        //                XTestCompositeNode childNode = new XTestCompositeNode(childValue);
+        //                childValue.computeChildren(childNode);
+        //                XTestValueNode presentation = new XTestValueNode(childValue);
+        //                childValue.computePresentation(presentation, XValuePlace.TREE);
+        //            }
+        //        }
     }
 
 
@@ -63,6 +64,7 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
         }
         return values;
     }
+
     @Override
     public void setAlreadySorted(boolean alreadySorted) {
     }
