@@ -60,7 +60,7 @@ public class ComputeChildrenService implements Task {
                 System.out.println("Depth: " + depth++ + ", Queue size: " + queue.size());
 
             }
-            System.out.println("Queue size outside loop: " + queue.size());
+            System.out.println("Queue size outside loop: " + queue.size() + "," + depth++);
         }
     }
 
