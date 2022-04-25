@@ -57,7 +57,6 @@ public class ComputeChildrenService implements Task {
                         queue.add(child);
                     }
                 }
-                System.out.println("Depth: " + depth++ + ", Queue size: " + queue.size());
 
             }
             System.out.println("Queue size outside loop: " + queue.size() + "," + depth++);
