@@ -35,11 +35,10 @@ public class ComputeChildrenService implements Task {
             for (int i = 0; i < size; i++) {
                 XValueContainer current = queue.poll();
                 CompletableFuture<List<XValue>> nodeFuture = new CompletableFuture<>();
-                XTestCompositeNode node = new XTestCompositeNode(nodeFuture);
+                XTestCompositeNode node = new XTestCompositeNode(nodeFuture,queue);
                 current.computeChildren(node);
-                List<XValue> children = new ArrayList<>();
-                try {
-                    children = nodeFuture.get(1, TimeUnit.SECONDS);
+//                List<XValue> children = new ArrayList<>();
+                try { nodeFuture.get(5, TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (ExecutionException e) {
@@ -47,14 +46,16 @@ public class ComputeChildrenService implements Task {
                 } catch (TimeoutException e) {
                     e.printStackTrace();
                 }
-                System.out.println(Thread.currentThread().getName() + ": " + children);
-                for (XValue child : children) {
+                ArrayList<XValueContainer> xValueContainers = new ArrayList<>(queue);
+                System.out.println(Thread.currentThread().getName() + ": " + xValueContainers);
+                for (XValueContainer child2 : xValueContainers) {
+                    XValue child = (XValue) child2;
                     if (!child.toString().equals("hash") && !child.toString().equals("coder") && !child.toString().equals("value")) {
                         CompletableFuture valueFuture = new CompletableFuture();
                         XTestValueNode valueNode = new XTestValueNode(valueFuture);
                         child.computePresentation(valueNode, XValuePlace.TREE);
                         valueFuture.join();
-                        queue.add(child);
+//                        queue.add(child);
                     }
                 }
 

@@ -17,12 +17,14 @@ package org.intellij.sdk.project.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 
 import org.jetbrains.annotations.NotNull;
 import com.intellij.xdebugger.frame.XCompositeNode;
 import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.frame.XValueChildrenList;
+import com.intellij.xdebugger.frame.XValueContainer;
 
 // Collecting data\u2026
 // here we are in DebuggerManagerThread
@@ -30,15 +32,22 @@ import com.intellij.xdebugger.frame.XValueChildrenList;
 
 public class XTestCompositeNode extends XTestContainer<XValue> implements XCompositeNode {
     private CompletableFuture<List<XValue>> children;
+    private Queue<XValueContainer> queue;
 
-    public XTestCompositeNode(CompletableFuture<List<XValue>> children) {
+    public XTestCompositeNode(CompletableFuture<List<XValue>> children, Queue<XValueContainer> queue) {
         this.children = children;
+        this.queue = queue;
     }
 
     @Override
     public void addChildren(@NotNull XValueChildrenList children, boolean last) {
         System.out.println(Thread.currentThread().getName() + ": " + getChildren(children));
-        this.children.complete(getChildren(children));
+        if (getChildren(children).size() > 0) {
+            queue.addAll(getChildren(children));
+        }
+        if (last) {
+            this.children.complete(getChildren(children));
+        }
         //        System.out.println(Thread.currentThread().getName() + ", Parent: " + Optional.ofNullable(parent).orElse(null) + ", Children " + getChildren(children) + ", last: " + last);
 
 
