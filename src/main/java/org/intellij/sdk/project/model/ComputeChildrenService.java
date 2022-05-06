@@ -35,32 +35,34 @@ public class ComputeChildrenService implements Task {
             for (int i = 0; i < size; i++) {
                 XValueContainer current = queue.poll();
                 CompletableFuture<List<XValue>> nodeFuture = new CompletableFuture<>();
-                XTestCompositeNode node = new XTestCompositeNode(nodeFuture,queue);
+                XTestCompositeNode node = new XTestCompositeNode(nodeFuture, queue);
                 current.computeChildren(node);
-//                List<XValue> children = new ArrayList<>();
-                try { nodeFuture.get(5, TimeUnit.SECONDS);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                } catch (TimeoutException e) {
-                    e.printStackTrace();
-                }
-                ArrayList<XValueContainer> xValueContainers = new ArrayList<>(queue);
-                System.out.println(Thread.currentThread().getName() + ": " + xValueContainers);
-                for (XValueContainer child2 : xValueContainers) {
+                waitForResolving(nodeFuture);
+                ArrayList<XValueContainer> childrenContainers = new ArrayList<>(queue);
+                System.out.println(Thread.currentThread().getName() + ": " + childrenContainers);
+                for (XValueContainer child2 : childrenContainers) {
                     XValue child = (XValue) child2;
                     if (!child.toString().equals("hash") && !child.toString().equals("coder") && !child.toString().equals("value")) {
                         CompletableFuture valueFuture = new CompletableFuture();
                         XTestValueNode valueNode = new XTestValueNode(valueFuture);
                         child.computePresentation(valueNode, XValuePlace.TREE);
                         valueFuture.join();
-//                        queue.add(child);
                     }
                 }
-
             }
             System.out.println("Queue size outside loop: " + queue.size() + "," + depth++);
+        }
+    }
+
+    private void waitForResolving(CompletableFuture<List<XValue>> nodeFuture) {
+        try {
+            nodeFuture.get(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (TimeoutException e) {
+            e.printStackTrace();
         }
     }
 

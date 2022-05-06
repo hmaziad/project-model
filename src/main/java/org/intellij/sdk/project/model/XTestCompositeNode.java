@@ -41,26 +41,19 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
 
     @Override
     public void addChildren(@NotNull XValueChildrenList children, boolean last) {
-        System.out.println(Thread.currentThread().getName() + ": " + getChildren(children));
-        if (getChildren(children).size() > 0) {
-            queue.addAll(getChildren(children));
-        }
+        System.out.println(Thread.currentThread().getName() + ": " + getChildren(children) + ", is last: " + last);
+        addChildrenToQueue(queue, children);
         if (last) {
-            this.children.complete(getChildren(children));
+            this.children.complete(null);
         }
-        //        System.out.println(Thread.currentThread().getName() + ", Parent: " + Optional.ofNullable(parent).orElse(null) + ", Children " + getChildren(children) + ", last: " + last);
+    }
 
-
-        //        for (int i = 0; i < children.size(); i++) {
-        //            XValue childValue = children.getValue(i);
-        //            XValue myChildValue = new MyXValue(childValue);
-        //            if (!childValue.toString().equals("hash") && !childValue.toString().equals("coder") && !childValue.toString().equals("value")) {
-        //                XTestCompositeNode childNode = new XTestCompositeNode(childValue);
-        //                childValue.computeChildren(childNode);
-        //                XTestValueNode presentation = new XTestValueNode(childValue);
-        //                childValue.computePresentation(presentation, XValuePlace.TREE);
-        //            }
-        //        }
+    private void addChildrenToQueue(Queue<XValueContainer> queue, XValueChildrenList children) {
+        for (var child : getChildren(children)) {
+            if (!child.toString().equals("hash") && !child.toString().equals("coder") && !child.toString().equals("value")) {
+                queue.add(child);
+            }
+        }
     }
 
 
