@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.intellij.debugger.engine.JavaValue;
 import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.frame.XValueContainer;
 import com.intellij.xdebugger.frame.XValuePlace;
@@ -58,8 +59,18 @@ public class ComputeChildrenService implements Task {
     }
 
     private void print(XTestCompositeNode node, String tab) {
-        System.out.println(tab + node.container.toString() + ": " + node.value);
+        System.out.println(tab + node.container.toString()+ getNodeId(node.container) + " " + node.value);
         node.children.stream().forEach(child -> print(child, tab + "\t"));
+    }
+
+    private String getNodeId(XValueContainer container) {
+        if (container instanceof JavaValue) {
+            String idLabel = ((JavaValue) container).getDescriptor().getIdLabel();
+            if (idLabel != null) {
+                return " " + idLabel;
+            }
+        }
+        return "";
     }
 
     private void waitForResolving(CompletableFuture<List<XValue>> nodeFuture) {
