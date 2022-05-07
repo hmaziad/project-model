@@ -31,12 +31,20 @@ import com.intellij.xdebugger.frame.XValueContainer;
 
 
 public class XTestCompositeNode extends XTestContainer<XValue> implements XCompositeNode {
-    private CompletableFuture<List<XValue>> children;
-    private Queue<XValueContainer> queue;
+    CompletableFuture<List<XValue>> future;
+    private Queue<XTestCompositeNode> queue;
+    XValueContainer container;
+    String value;
+    List<XTestCompositeNode> children = new ArrayList<>();
 
-    public XTestCompositeNode(CompletableFuture<List<XValue>> children, Queue<XValueContainer> queue) {
-        this.children = children;
+//    public XTestCompositeNode(CompletableFuture future, Queue<XValueContainer> queue, String name) {
+//        this.future = future;
+//        this.name = name;
+//    }
+
+    public XTestCompositeNode(Queue<XTestCompositeNode> queue, XValueContainer container) {
         this.queue = queue;
+        this.container = container;
     }
 
     @Override
@@ -44,16 +52,22 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
         System.out.println(Thread.currentThread().getName() + ": " + getChildren(children) + ", is last: " + last);
         addChildrenToQueue(queue, children);
         if (last) {
-            this.children.complete(null);
+            this.future.complete(null);
         }
     }
 
-    private void addChildrenToQueue(Queue<XValueContainer> queue, XValueChildrenList children) {
+    private void addChildrenToQueue(Queue<XTestCompositeNode> queue, XValueChildrenList children) {
         for (var child : getChildren(children)) {
             if (!child.toString().equals("hash") && !child.toString().equals("coder") && !child.toString().equals("value")) {
-                queue.add(child);
+                XTestCompositeNode childComposite = new XTestCompositeNode(queue, child);
+                addChild(childComposite);
+                queue.add(childComposite);
             }
         }
+    }
+
+    public void addChild(XTestCompositeNode child) {
+        this.children.add(child);
     }
 
 

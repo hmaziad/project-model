@@ -17,6 +17,7 @@ import com.intellij.xdebugger.impl.ui.tree.nodes.XValuePresentationUtil;
 // here we are in UI thread
 public class XTestValueNode extends XValueNodePresentationConfigurator.ConfigurableXValueNodeImpl {
     private final CompletableFuture future1;
+    private XTestCompositeNode compositeNode;
     public @Nullable Icon myIcon;
     public @NotNull String myName;
     public @Nullable String myType;
@@ -24,8 +25,9 @@ public class XTestValueNode extends XValueNodePresentationConfigurator.Configura
     public boolean myHasChildren;
     public XFullValueEvaluator myFullValueEvaluator;
 
-    public XTestValueNode(CompletableFuture future1) {
+    public XTestValueNode(CompletableFuture future1, XTestCompositeNode compositeNode) {
         this.future1 = future1;
+        this.compositeNode = compositeNode;
     }
     //  private XValue childNode;
 
@@ -38,6 +40,7 @@ public class XTestValueNode extends XValueNodePresentationConfigurator.Configura
 
         if (!myValue.startsWith("Collecting data")) {
             System.out.println(Thread.currentThread().getName() + ": " + myValue);
+            compositeNode.value = myValue;
             future1.complete(null);
         }
 
