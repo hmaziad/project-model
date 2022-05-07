@@ -3,6 +3,7 @@
  */
 package org.intellij.sdk.project.model;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -10,6 +11,7 @@ import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.xdebugger.frame.XFullValueEvaluator;
+import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.frame.presentation.XValuePresentation;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodePresentationConfigurator;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValuePresentationUtil;
@@ -18,6 +20,7 @@ import com.intellij.xdebugger.impl.ui.tree.nodes.XValuePresentationUtil;
 public class XTestValueNode extends XValueNodePresentationConfigurator.ConfigurableXValueNodeImpl {
     private final CompletableFuture future1;
     private XTestCompositeNode compositeNode;
+    private CompletableFuture<List<XValue>> future;
     public @Nullable Icon myIcon;
     public @NotNull String myName;
     public @Nullable String myType;
@@ -25,9 +28,10 @@ public class XTestValueNode extends XValueNodePresentationConfigurator.Configura
     public boolean myHasChildren;
     public XFullValueEvaluator myFullValueEvaluator;
 
-    public XTestValueNode(CompletableFuture future1, XTestCompositeNode compositeNode) {
+    public XTestValueNode(CompletableFuture future1, XTestCompositeNode compositeNode, CompletableFuture<List<XValue>> future) {
         this.future1 = future1;
         this.compositeNode = compositeNode;
+        this.future = future;
     }
     //  private XValue childNode;
 
@@ -39,9 +43,13 @@ public class XTestValueNode extends XValueNodePresentationConfigurator.Configura
         myHasChildren = hasChildren;
 
         if (!myValue.startsWith("Collecting data")) {
-            System.out.println(Thread.currentThread().getName() + ": " + myValue);
+            System.out.println(Thread.currentThread().getName() + ": " + myValue + ", hasChildren" + myHasChildren);
             compositeNode.value = myValue;
             future1.complete(null);
+        }
+
+        if (!hasChildren) {
+            future.complete(null);
         }
 
     }

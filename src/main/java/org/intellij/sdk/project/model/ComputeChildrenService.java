@@ -37,7 +37,6 @@ public class ComputeChildrenService implements Task {
             int size = queue.size();
             for (int i = 0; i < size; i++) {
                 XTestCompositeNode current = queue.poll();
-                current.future = new CompletableFuture<>();
                 current.container.computeChildren(current);
                 waitForResolving(current.future);
                 List<XTestCompositeNode> childrenContainers = new ArrayList<>(queue);
@@ -45,7 +44,7 @@ public class ComputeChildrenService implements Task {
                 for (XTestCompositeNode childCompositeNode : childrenContainers) {
                     XValue child = (XValue) childCompositeNode.container;
                     CompletableFuture valueFuture = new CompletableFuture();
-                    XTestValueNode valueNode = new XTestValueNode(valueFuture, childCompositeNode);
+                    XTestValueNode valueNode = new XTestValueNode(valueFuture, childCompositeNode, childCompositeNode.future);
                     child.computePresentation(valueNode, XValuePlace.TREE);
                     valueFuture.join();
                 }
@@ -54,7 +53,7 @@ public class ComputeChildrenService implements Task {
         }
 
         System.out.println("Completed Everything");
-
+        System.out.println();
         print(rootComposite, "");
     }
 

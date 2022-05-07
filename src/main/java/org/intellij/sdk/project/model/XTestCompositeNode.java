@@ -30,7 +30,7 @@ import com.intellij.xdebugger.frame.XValueContainer;
 // here we are in DebuggerManagerThread
 
 public class XTestCompositeNode extends XTestContainer<XValue> implements XCompositeNode {
-    CompletableFuture<List<XValue>> future;
+    CompletableFuture<List<XValue>> future = new CompletableFuture<>();
     private Queue<XTestCompositeNode> queue;
     XValueContainer container;
     String value;
