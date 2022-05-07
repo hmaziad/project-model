@@ -21,6 +21,7 @@ import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 
 import org.jetbrains.annotations.NotNull;
+import com.intellij.debugger.engine.JavaValue;
 import com.intellij.xdebugger.frame.XCompositeNode;
 import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.frame.XValueChildrenList;
@@ -35,6 +36,7 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
     XValueContainer container;
     String value;
     List<XTestCompositeNode> children = new ArrayList<>();
+    String nodeId = "";
 
     public XTestCompositeNode(Queue<XTestCompositeNode> queue, XValueContainer container) {
         this.queue = queue;
@@ -80,5 +82,17 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
 
     @Override
     public void setAlreadySorted(boolean alreadySorted) {
+    }
+
+    public void retrieveNodeId() {
+        System.out.println("Entered node id");
+        if (container instanceof JavaValue) {
+            System.out.println("is instance of java");
+            String idLabel = ((JavaValue) container).getDescriptor().getIdLabel();
+            System.out.println("label " +  idLabel);
+            if (idLabel != null) {
+                nodeId =  idLabel;
+            }
+        }
     }
 }
