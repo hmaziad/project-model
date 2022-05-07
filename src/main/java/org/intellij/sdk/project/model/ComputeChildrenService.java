@@ -1,9 +1,11 @@
 package org.intellij.sdk.project.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -28,6 +30,7 @@ public class ComputeChildrenService implements Task {
     private void computeChildren(XValueContainer container) {
         System.out.println("Inside Thread: " + Thread.currentThread().getName());
         Queue<XTestCompositeNode> queue = new LinkedList<>();
+        Set<Integer> calculateChildrenIds = new HashSet<>();
         XTestCompositeNode rootComposite = new XTestCompositeNode(queue, container);
         queue.add(rootComposite);
         int depth = 0;
@@ -36,10 +39,14 @@ public class ComputeChildrenService implements Task {
             int size = queue.size();
             for (int i = 0; i < size; i++) {
                 XTestCompositeNode current = queue.poll();
+                current.retrieveNodeIdAndRef();
+                if (current.ref != 0 && calculateChildrenIds.contains(current.ref)) {
+                    continue;
+                }
                 current.container.computeChildren(current);
-//                waitForResolving(current.future);
                 current.future.join();
-                current.retrieveNodeId();
+                current.retrieveNodeIdAndRef();
+                calculateChildrenIds.add(current.ref);
                 List<XTestCompositeNode> childrenContainers = new ArrayList<>(queue);
                 System.out.println(Thread.currentThread().getName() + ": " + childrenContainers);
                 for (XTestCompositeNode childCompositeNode : childrenContainers) {
@@ -59,7 +66,7 @@ public class ComputeChildrenService implements Task {
     }
 
     private void print(XTestCompositeNode node, String tab) {
-        System.out.println(tab + node.container.toString()+ " "+ node.nodeId + " " + node.value);
+        System.out.println(tab + node.container.toString() + " " + node.nodeId + " " + node.value);
         node.children.stream().forEach(child -> print(child, tab + "\t"));
     }
 

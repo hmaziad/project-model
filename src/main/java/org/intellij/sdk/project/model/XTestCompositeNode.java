@@ -22,6 +22,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.jetbrains.annotations.NotNull;
 import com.intellij.debugger.engine.JavaValue;
+import com.intellij.debugger.ui.impl.watch.ValueDescriptorImpl;
 import com.intellij.xdebugger.frame.XCompositeNode;
 import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.frame.XValueChildrenList;
@@ -29,7 +30,6 @@ import com.intellij.xdebugger.frame.XValueContainer;
 
 // Collecting data\u2026
 // here we are in DebuggerManagerThread
-
 public class XTestCompositeNode extends XTestContainer<XValue> implements XCompositeNode {
     CompletableFuture<List<XValue>> future = new CompletableFuture<>();
     private Queue<XTestCompositeNode> queue;
@@ -37,6 +37,7 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
     String value;
     List<XTestCompositeNode> children = new ArrayList<>();
     String nodeId = "";
+    int ref;
 
     public XTestCompositeNode(Queue<XTestCompositeNode> queue, XValueContainer container) {
         this.queue = queue;
@@ -54,7 +55,8 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
 
     private void addChildrenToQueue(Queue<XTestCompositeNode> queue, XValueChildrenList children) {
         for (var child : getChildren(children)) {
-            if (isNotStringUselessChildren(child)) {
+            var isNotStringUselessChildren = !child.toString().equals("hash") && !child.toString().equals("coder") && !child.toString().equals("value");
+            if (isNotStringUselessChildren) {
                 XTestCompositeNode childComposite = new XTestCompositeNode(queue, child);
                 addChild(childComposite);
                 queue.add(childComposite);
@@ -62,14 +64,9 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
         }
     }
 
-    private boolean isNotStringUselessChildren(XValue child) {
-        return !child.toString().equals("hash") && !child.toString().equals("coder") && !child.toString().equals("value");
-    }
-
     public void addChild(XTestCompositeNode child) {
         this.children.add(child);
     }
-
 
     private List<XValue> getChildren(XValueChildrenList children) {
         List<XValue> values = new ArrayList<>();
@@ -84,15 +81,21 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
     public void setAlreadySorted(boolean alreadySorted) {
     }
 
-    public void retrieveNodeId() {
+    public void retrieveNodeIdAndRef() {
         System.out.println("Entered node id");
         if (container instanceof JavaValue) {
             System.out.println("is instance of java");
-            String idLabel = ((JavaValue) container).getDescriptor().getIdLabel();
-            System.out.println("label " +  idLabel);
-            if (idLabel != null) {
-                nodeId =  idLabel;
+            ValueDescriptorImpl descriptor = ((JavaValue) container).getDescriptor();
+            if (descriptor.getIdLabel() != null) {
+                nodeId = descriptor.getIdLabel();
+                System.out.println("node id " + nodeId);
             }
+
+            if (descriptor.getValue() != null) {
+                this.ref = descriptor.getValue().hashCode();
+                System.out.println("ref " + ref);
+            }
+
         }
     }
 }
