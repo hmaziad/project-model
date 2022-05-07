@@ -7,14 +7,14 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.frame.XValueContainer;
 import com.intellij.xdebugger.frame.XValuePlace;
 
+import groovy.util.logging.Slf4j;
+
+@Slf4j
 public class ComputeChildrenService implements Task {
     private final XValueContainer container;
 
@@ -62,24 +62,15 @@ public class ComputeChildrenService implements Task {
 
         System.out.println("Completed Everything");
         System.out.println();
-        print(rootComposite, "");
+        print(rootComposite);
+    }
+
+    private void print(XTestCompositeNode node) {
+        print(node, "");
     }
 
     private void print(XTestCompositeNode node, String tab) {
         System.out.println(tab + node.container.toString() + " " + node.nodeId + " " + node.value);
         node.children.stream().forEach(child -> print(child, tab + "\t"));
     }
-
-    private void waitForResolving(CompletableFuture<List<XValue>> nodeFuture) {
-        try {
-            nodeFuture.get(5, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
-    }
-
 }

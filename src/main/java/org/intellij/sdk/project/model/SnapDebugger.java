@@ -16,7 +16,8 @@ public class SnapDebugger extends AnAction {
     public void actionPerformed(@NotNull final AnActionEvent event) {
         XDebuggerManager manager = XDebuggerManager.getInstance(event.getProject());
         XStackFrame frame = manager.getCurrentSession().getCurrentStackFrame();
-        CompletableFuture.runAsync(() -> new ComputeChildrenService(frame).execute());
+        ComputeChildrenService computeChildrenService = new ComputeChildrenService(frame);
+        CompletableFuture.runAsync(computeChildrenService::execute);
         System.out.println(Thread.currentThread().getName() + ": Done"); // AWT-EventQueue-0
     }
 
