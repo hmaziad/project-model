@@ -29,18 +29,12 @@ import com.intellij.xdebugger.frame.XValueContainer;
 // Collecting data\u2026
 // here we are in DebuggerManagerThread
 
-
 public class XTestCompositeNode extends XTestContainer<XValue> implements XCompositeNode {
     CompletableFuture<List<XValue>> future;
     private Queue<XTestCompositeNode> queue;
     XValueContainer container;
     String value;
     List<XTestCompositeNode> children = new ArrayList<>();
-
-//    public XTestCompositeNode(CompletableFuture future, Queue<XValueContainer> queue, String name) {
-//        this.future = future;
-//        this.name = name;
-//    }
 
     public XTestCompositeNode(Queue<XTestCompositeNode> queue, XValueContainer container) {
         this.queue = queue;
@@ -58,12 +52,16 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
 
     private void addChildrenToQueue(Queue<XTestCompositeNode> queue, XValueChildrenList children) {
         for (var child : getChildren(children)) {
-            if (!child.toString().equals("hash") && !child.toString().equals("coder") && !child.toString().equals("value")) {
+            if (isNotStringUselessChildren(child)) {
                 XTestCompositeNode childComposite = new XTestCompositeNode(queue, child);
                 addChild(childComposite);
                 queue.add(childComposite);
             }
         }
+    }
+
+    private boolean isNotStringUselessChildren(XValue child) {
+        return !child.toString().equals("hash") && !child.toString().equals("coder") && !child.toString().equals("value");
     }
 
     public void addChild(XTestCompositeNode child) {
@@ -75,7 +73,6 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
         List<XValue> values = new ArrayList<>();
         for (int i = 0; i < children.size(); i++) {
             XValue value = children.getValue(i);
-            //            value.computePresentation(new XTestValueNode(), XValuePlace.TREE);
             values.add(value);
         }
         return values;

@@ -36,21 +36,17 @@ public class ComputeChildrenService implements Task {
             int size = queue.size();
             for (int i = 0; i < size; i++) {
                 XTestCompositeNode current = queue.poll();
-                CompletableFuture nodeFuture = new CompletableFuture<>();
-//                XTestCompositeNode node = new XTestCompositeNode(nodeFuture, queue, current.toString());
-                current.future = nodeFuture;
+                current.future = new CompletableFuture<>();
                 current.container.computeChildren(current);
-                waitForResolving(nodeFuture);
-                ArrayList<XTestCompositeNode> childrenContainers = new ArrayList<>(queue);
+                waitForResolving(current.future);
+                List<XTestCompositeNode> childrenContainers = new ArrayList<>(queue);
                 System.out.println(Thread.currentThread().getName() + ": " + childrenContainers);
-                for (XTestCompositeNode child2 : childrenContainers) {
-                    XValue child = (XValue) child2.container;
-                    if (!child.toString().equals("hash") && !child.toString().equals("coder") && !child.toString().equals("value")) {
-                        CompletableFuture valueFuture = new CompletableFuture();
-                        XTestValueNode valueNode = new XTestValueNode(valueFuture, child2);
-                        child.computePresentation(valueNode, XValuePlace.TREE);
-                        valueFuture.join();
-                    }
+                for (XTestCompositeNode childCompositeNode : childrenContainers) {
+                    XValue child = (XValue) childCompositeNode.container;
+                    CompletableFuture valueFuture = new CompletableFuture();
+                    XTestValueNode valueNode = new XTestValueNode(valueFuture, childCompositeNode);
+                    child.computePresentation(valueNode, XValuePlace.TREE);
+                    valueFuture.join();
                 }
             }
             System.out.println("Queue size outside loop: " + queue.size() + "," + depth++);
@@ -62,8 +58,8 @@ public class ComputeChildrenService implements Task {
     }
 
     private void print(XTestCompositeNode node, String tab) {
-        System.out.println(tab + node.container.toString() +": " + node.value);
-        node.children.stream().forEach(child -> print(child,tab + "\t"));
+        System.out.println(tab + node.container.toString() + ": " + node.value);
+        node.children.stream().forEach(child -> print(child, tab + "\t"));
     }
 
     private void waitForResolving(CompletableFuture<List<XValue>> nodeFuture) {
