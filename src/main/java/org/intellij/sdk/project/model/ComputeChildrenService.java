@@ -1,9 +1,8 @@
 package org.intellij.sdk.project.model;
 
-import java.util.ArrayList;
+import java.util.ArrayDeque;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -29,36 +28,39 @@ public class ComputeChildrenService {
     }
 
     private void computeChildren(XValueContainer container) {
-        log.debug("STARTING");
-        Queue<XTestCompositeNode> queue = new LinkedList<>();
-        Set<Integer> calculateChildrenIds = new HashSet<>();
-        XTestCompositeNode rootComposite = new XTestCompositeNode(queue, container);
-        queue.add(rootComposite);
+        Queue<XTestCompositeNode> nodesQueue = new ArrayDeque<>();
+        Set<Integer> childrenRefs = new HashSet<>();
+        XTestCompositeNode rootNode = new XTestCompositeNode(nodesQueue, container);
+        nodesQueue.add(rootNode);
 
-        while (!queue.isEmpty()) {
-            int size = queue.size();
-            for (int i = 0; i < size; i++) {
-                XTestCompositeNode current = queue.poll();
-                current.retrieveNodeIdAndRef();
-                if (current.getRef() != 0 && calculateChildrenIds.contains(current.getRef())) {
+        while (!nodesQueue.isEmpty()) {
+            int nodesQueueSize = nodesQueue.size();
+            for (int i = 0; i < nodesQueueSize; i++) {
+                XTestCompositeNode currentNode = nodesQueue.poll();
+                Objects.requireNonNull(currentNode, "Pulled node from Queue is null").retrieveNodeIdAndRef();
+                // checks for loops in graph
+                if (currentNode.getRef() != 0 && childrenRefs.contains(currentNode.getRef())) {
                     continue;
                 }
-                current.getContainer().computeChildren(current);
-                current.getFuture().join();
-                current.retrieveNodeIdAndRef();
-                calculateChildrenIds.add(current.getRef());
-                List<XTestCompositeNode> childrenContainers = new ArrayList<>(queue);
-                for (XTestCompositeNode childCompositeNode : childrenContainers) {
-                    XValue child = (XValue) childCompositeNode.getContainer();
-                    CompletableFuture valueFuture = new CompletableFuture();
-                    XTestValueNode valueNode = new XTestValueNode(valueFuture, childCompositeNode, childCompositeNode.getFuture());
-                    child.computePresentation(valueNode, XValuePlace.TREE);
-                    valueFuture.join();
+                computeChildren(currentNode);
+                childrenRefs.add(currentNode.getRef());
+                for (XTestCompositeNode childNode : nodesQueue) {
+                    XValue childValue = (XValue) childNode.getContainer();
+                    CompletableFuture noChildrenFuture = new CompletableFuture();
+                    XTestValueNode valueNode = new XTestValueNode(noChildrenFuture, childNode.getFuture(), childNode);
+                    childValue.computePresentation(valueNode, XValuePlace.TREE);
+                    noChildrenFuture.join();
                 }
             }
         }
 
-        print(rootComposite);
+        print(rootNode);
+    }
+
+    private void computeChildren(XTestCompositeNode currentNode) {
+        currentNode.getContainer().computeChildren(currentNode);
+        currentNode.getFuture().join();
+        currentNode.retrieveNodeIdAndRef();
     }
 
     private void print(XTestCompositeNode node) {

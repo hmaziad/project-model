@@ -17,9 +17,9 @@ import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodePresentationConfigura
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValuePresentationUtil;
 
 public class XTestValueNode extends XValueNodePresentationConfigurator.ConfigurableXValueNodeImpl {
-    private final CompletableFuture future1;
+    private final CompletableFuture childNodeFuture;
     private XTestCompositeNode compositeNode;
-    private CompletableFuture<List<XValue>> future;
+    private CompletableFuture<List<XValue>> noChildrenFuture;
     public @Nullable Icon myIcon;
     public @NotNull String myName;
     public @Nullable String myType;
@@ -27,10 +27,10 @@ public class XTestValueNode extends XValueNodePresentationConfigurator.Configura
     public boolean myHasChildren;
     public XFullValueEvaluator myFullValueEvaluator;
 
-    public XTestValueNode(CompletableFuture future1, XTestCompositeNode compositeNode, CompletableFuture<List<XValue>> future) {
-        this.future1 = future1;
+    public XTestValueNode(CompletableFuture childNodeFuture, CompletableFuture<List<XValue>> noChildrenFuture, XTestCompositeNode compositeNode) {
+        this.childNodeFuture = childNodeFuture;
+        this.noChildrenFuture = noChildrenFuture;
         this.compositeNode = compositeNode;
-        this.future = future;
     }
 
     @Override
@@ -42,11 +42,11 @@ public class XTestValueNode extends XValueNodePresentationConfigurator.Configura
 
         if (!myValue.startsWith("Collecting data")) {
             compositeNode.setValue(myValue);
-            future1.complete(null);
+            childNodeFuture.complete(null);
         }
 
         if (!hasChildren) {
-            future.complete(null);
+            noChildrenFuture.complete(null);
         }
 
     }
