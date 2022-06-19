@@ -10,6 +10,9 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.xdebugger.XDebuggerManager;
 import com.intellij.xdebugger.frame.XStackFrame;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class SnapDebugger extends AnAction {
 
     @Override

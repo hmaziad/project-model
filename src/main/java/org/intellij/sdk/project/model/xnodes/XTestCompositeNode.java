@@ -50,7 +50,6 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
 
     @Override
     public void addChildren(@NotNull XValueChildrenList children, boolean last) {
-        System.out.println(Thread.currentThread().getName() + ": " + getChildren(children) + ", is last: " + last);
         addChildrenToQueue(queue, children);
         if (last) {
             this.future.complete(null);
@@ -86,20 +85,14 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
     }
 
     public void retrieveNodeIdAndRef() {
-        System.out.println("Entered node id");
         if (container instanceof JavaValue) {
-            System.out.println("is instance of java");
             ValueDescriptorImpl descriptor = ((JavaValue) container).getDescriptor();
             if (descriptor.getIdLabel() != null) {
                 nodeId = descriptor.getIdLabel();
-                System.out.println("node id " + nodeId);
             }
-
             if (descriptor.getValue() != null) {
                 this.ref = descriptor.getValue().hashCode();
-                System.out.println("ref " + ref);
             }
-
         }
     }
 }

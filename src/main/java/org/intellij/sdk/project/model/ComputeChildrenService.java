@@ -14,7 +14,7 @@ import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.frame.XValueContainer;
 import com.intellij.xdebugger.frame.XValuePlace;
 
-import groovy.util.logging.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ComputeChildrenService {
@@ -29,6 +29,7 @@ public class ComputeChildrenService {
     }
 
     private void computeChildren(XValueContainer container) {
+        log.debug("STARTING");
         Queue<XTestCompositeNode> queue = new LinkedList<>();
         Set<Integer> calculateChildrenIds = new HashSet<>();
         XTestCompositeNode rootComposite = new XTestCompositeNode(queue, container);

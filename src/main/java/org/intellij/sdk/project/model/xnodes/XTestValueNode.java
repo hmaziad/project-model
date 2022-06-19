@@ -41,7 +41,6 @@ public class XTestValueNode extends XValueNodePresentationConfigurator.Configura
         myHasChildren = hasChildren;
 
         if (!myValue.startsWith("Collecting data")) {
-            System.out.println(Thread.currentThread().getName() + ": " + myValue + ", hasChildren" + myHasChildren);
             compositeNode.setValue(myValue);
             future1.complete(null);
         }
