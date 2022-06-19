@@ -2,30 +2,37 @@
 
 package org.intellij.sdk.project.model;
 
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.Project;
+import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
-import com.intellij.xdebugger.frame.XStackFrame;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SnapDebugger extends AnAction {
 
+    private static final String PROJECT_NOT_FOUND_ERROR_MESSAGE = "Please open a project to use this feature";
+    private static final String START_DEBUGGER_ERROR_MESSAGE = "Please start debugger to use this feature";
+
     @Override
     public void actionPerformed(@NotNull final AnActionEvent event) {
-        XDebuggerManager manager = XDebuggerManager.getInstance(event.getProject());
-        XStackFrame frame = manager.getCurrentSession().getCurrentStackFrame();
-        ComputeChildrenService computeChildrenService = new ComputeChildrenService(frame);
+        Project project = Objects.requireNonNull(event.getProject(), PROJECT_NOT_FOUND_ERROR_MESSAGE);
+        XDebuggerManager manager = XDebuggerManager.getInstance(project);
+        XDebugSession currentSession = manager.getCurrentSession();
+        XDebugSession session = Objects.requireNonNull(currentSession, START_DEBUGGER_ERROR_MESSAGE);
+        ComputeChildrenService computeChildrenService = new ComputeChildrenService(session.getCurrentStackFrame());
         CompletableFuture.runAsync(computeChildrenService::execute);
     }
 
     @Override
     public void update(@NotNull final AnActionEvent event) {
-        boolean visibility = event.getProject() != null;
+        boolean visibility = Objects.nonNull(event.getProject());
         event.getPresentation().setEnabled(visibility);
         event.getPresentation().setVisible(visibility);
     }
