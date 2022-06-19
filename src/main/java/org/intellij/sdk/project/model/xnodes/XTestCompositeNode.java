@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.intellij.sdk.project.model;
+package org.intellij.sdk.project.model.xnodes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,16 +28,20 @@ import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.frame.XValueChildrenList;
 import com.intellij.xdebugger.frame.XValueContainer;
 
+import lombok.Getter;
+import lombok.Setter;
+
 // Collecting data\u2026
-// here we are in DebuggerManagerThread
+@Getter
+@Setter
 public class XTestCompositeNode extends XTestContainer<XValue> implements XCompositeNode {
-    CompletableFuture<List<XValue>> future = new CompletableFuture<>();
+    private CompletableFuture<List<XValue>> future = new CompletableFuture<>();
     private Queue<XTestCompositeNode> queue;
-    XValueContainer container;
-    String value;
-    List<XTestCompositeNode> children = new ArrayList<>();
-    String nodeId = "";
-    int ref;
+    private XValueContainer container;
+    private String value;
+    private List<XTestCompositeNode> children = new ArrayList<>();
+    private String nodeId = "";
+    private int ref;
 
     public XTestCompositeNode(Queue<XTestCompositeNode> queue, XValueContainer container) {
         this.queue = queue;

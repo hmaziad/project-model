@@ -8,6 +8,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
+import org.intellij.sdk.project.model.xnodes.XTestValueNode;
 import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.frame.XValueContainer;
 import com.intellij.xdebugger.frame.XValuePlace;
@@ -37,18 +39,18 @@ public class ComputeChildrenService {
             for (int i = 0; i < size; i++) {
                 XTestCompositeNode current = queue.poll();
                 current.retrieveNodeIdAndRef();
-                if (current.ref != 0 && calculateChildrenIds.contains(current.ref)) {
+                if (current.getRef() != 0 && calculateChildrenIds.contains(current.getRef())) {
                     continue;
                 }
-                current.container.computeChildren(current);
-                current.future.join();
+                current.getContainer().computeChildren(current);
+                current.getFuture().join();
                 current.retrieveNodeIdAndRef();
-                calculateChildrenIds.add(current.ref);
+                calculateChildrenIds.add(current.getRef());
                 List<XTestCompositeNode> childrenContainers = new ArrayList<>(queue);
                 for (XTestCompositeNode childCompositeNode : childrenContainers) {
-                    XValue child = (XValue) childCompositeNode.container;
+                    XValue child = (XValue) childCompositeNode.getContainer();
                     CompletableFuture valueFuture = new CompletableFuture();
-                    XTestValueNode valueNode = new XTestValueNode(valueFuture, childCompositeNode, childCompositeNode.future);
+                    XTestValueNode valueNode = new XTestValueNode(valueFuture, childCompositeNode, childCompositeNode.getFuture());
                     child.computePresentation(valueNode, XValuePlace.TREE);
                     valueFuture.join();
                 }
@@ -63,7 +65,7 @@ public class ComputeChildrenService {
     }
 
     private void print(XTestCompositeNode node, String tab) {
-        System.out.println(tab + node.container.toString() + " " + node.nodeId + " " + node.value);
-        node.children.stream().forEach(child -> print(child, tab + "\t"));
+        System.out.println(tab + node.getContainer().toString() + " " + node.getNodeId() + " " + node.getValue());
+        node.getChildren().stream().forEach(child -> print(child, tab + "\t"));
     }
 }
