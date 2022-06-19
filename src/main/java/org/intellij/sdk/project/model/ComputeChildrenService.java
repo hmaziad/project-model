@@ -15,25 +15,22 @@ import com.intellij.xdebugger.frame.XValuePlace;
 import groovy.util.logging.Slf4j;
 
 @Slf4j
-public class ComputeChildrenService implements Task {
+public class ComputeChildrenService {
     private final XValueContainer container;
 
     public ComputeChildrenService(XValueContainer container) {
         this.container = container;
     }
 
-    @Override
     public void execute() {
         computeChildren(container);
     }
 
     private void computeChildren(XValueContainer container) {
-        System.out.println("Inside Thread: " + Thread.currentThread().getName());
         Queue<XTestCompositeNode> queue = new LinkedList<>();
         Set<Integer> calculateChildrenIds = new HashSet<>();
         XTestCompositeNode rootComposite = new XTestCompositeNode(queue, container);
         queue.add(rootComposite);
-        int depth = 0;
 
         while (!queue.isEmpty()) {
             int size = queue.size();
@@ -48,7 +45,6 @@ public class ComputeChildrenService implements Task {
                 current.retrieveNodeIdAndRef();
                 calculateChildrenIds.add(current.ref);
                 List<XTestCompositeNode> childrenContainers = new ArrayList<>(queue);
-                System.out.println(Thread.currentThread().getName() + ": " + childrenContainers);
                 for (XTestCompositeNode childCompositeNode : childrenContainers) {
                     XValue child = (XValue) childCompositeNode.container;
                     CompletableFuture valueFuture = new CompletableFuture();
@@ -57,11 +53,8 @@ public class ComputeChildrenService implements Task {
                     valueFuture.join();
                 }
             }
-            System.out.println("Queue size outside loop: " + queue.size() + "," + depth++);
         }
 
-        System.out.println("Completed Everything");
-        System.out.println();
         print(rootComposite);
     }
 

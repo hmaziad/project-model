@@ -18,7 +18,6 @@ public class SnapDebugger extends AnAction {
         XStackFrame frame = manager.getCurrentSession().getCurrentStackFrame();
         ComputeChildrenService computeChildrenService = new ComputeChildrenService(frame);
         CompletableFuture.runAsync(computeChildrenService::execute);
-        System.out.println(Thread.currentThread().getName() + ": Done"); // AWT-EventQueue-0
     }
 
     @Override

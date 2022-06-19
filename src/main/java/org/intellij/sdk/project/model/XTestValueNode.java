@@ -16,7 +16,6 @@ import com.intellij.xdebugger.frame.presentation.XValuePresentation;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodePresentationConfigurator;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValuePresentationUtil;
 
-// here we are in UI thread
 public class XTestValueNode extends XValueNodePresentationConfigurator.ConfigurableXValueNodeImpl {
     private final CompletableFuture future1;
     private XTestCompositeNode compositeNode;
@@ -33,7 +32,6 @@ public class XTestValueNode extends XValueNodePresentationConfigurator.Configura
         this.compositeNode = compositeNode;
         this.future = future;
     }
-    //  private XValue childNode;
 
     @Override
     public void applyPresentation(@Nullable Icon icon, @NotNull XValuePresentation valuePresentation, boolean hasChildren) {
