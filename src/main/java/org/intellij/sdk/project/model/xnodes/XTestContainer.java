@@ -2,12 +2,13 @@
 package org.intellij.sdk.project.model.xnodes;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.xdebugger.frame.XDebuggerTreeNodeHyperlink;
 
-public class XTestContainer<T> {
+public class XTestContainer<T> extends DefaultMutableTreeNode {
     private String myErrorMessage;
 
     public void tooManyChildren(int remaining) {

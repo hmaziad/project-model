@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 
+import javax.swing.tree.MutableTreeNode;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.debugger.engine.JavaValue;
 import com.intellij.debugger.ui.impl.watch.ValueDescriptorImpl;
@@ -69,6 +70,7 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
 
     public void addChild(XTestCompositeNode child) {
         this.children.add(child);
+        add(child);
     }
 
     private List<XValue> getChildren(XValueChildrenList children) {
@@ -94,5 +96,15 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
                 this.ref = descriptor.getValue().hashCode();
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return "XTestCompositeNode{" + "value='" + value + '\'' + "} " + super.toString();
+    }
+
+    @Override
+    public void add(MutableTreeNode newChild) {
+        super.add(newChild);
     }
 }

@@ -53,7 +53,7 @@ public class ComputeChildrenService {
                 }
             }
         }
-
+        log.info("Finished Calculating Children");
         print(rootNode);
     }
 
@@ -69,6 +69,6 @@ public class ComputeChildrenService {
 
     private void print(XTestCompositeNode node, String tab) {
         System.out.println(tab + node.getContainer().toString() + " " + node.getNodeId() + " " + node.getValue());
-        node.getChildren().stream().forEach(child -> print(child, tab + "\t"));
+        node.getChildren().forEach(child -> print(child, tab + "\t"));
     }
 }

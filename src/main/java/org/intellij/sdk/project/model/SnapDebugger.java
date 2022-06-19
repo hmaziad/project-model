@@ -23,11 +23,13 @@ public class SnapDebugger extends AnAction {
     @Override
     public void actionPerformed(@NotNull final AnActionEvent event) {
         Project project = Objects.requireNonNull(event.getProject(), PROJECT_NOT_FOUND_ERROR_MESSAGE);
-        log.info("Project {}", project);
+        log.info("Project {}...", project);
         XDebuggerManager manager = XDebuggerManager.getInstance(project);
         XDebugSession currentSession = manager.getCurrentSession();
         XDebugSession session = Objects.requireNonNull(currentSession, START_DEBUGGER_ERROR_MESSAGE);
+        log.info("Debug Session Retrieved...");
         ComputeChildrenService computeChildrenService = new ComputeChildrenService(session.getCurrentStackFrame());
+        log.info("Start Computing Children...");
         CompletableFuture.runAsync(computeChildrenService::execute);
     }
 

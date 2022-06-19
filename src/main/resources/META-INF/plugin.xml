@@ -3,42 +3,46 @@
 
 <idea-plugin>
 
-  <!-- Unique id for this plugin. Must stay constant for the life of the plugin. -->
-  <id>org.intellij.sdk.project.model</id>
+    <!-- Unique id for this plugin. Must stay constant for the life of the plugin. -->
+    <id>org.intellij.sdk.project.model</id>
 
-  <!-- Text to display as name on Preferences/Settings | Plugin page -->
-  <name>SDK: Project Model Sample</name>
+    <!-- Text to display as name on Preferences/Settings | Plugin page -->
+    <name>SDK: Project Model Sample</name>
 
-  <!-- Product and plugin compatibility requirements -->
-  <depends>com.intellij.modules.platform</depends>
-  <depends>com.intellij.java</depends>
+    <!-- Product and plugin compatibility requirements -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.java</depends>
 
-  <!-- Text to display as description on Preferences/Settings | Plugin page -->
-  <description>
-    <![CDATA[
+    <!-- Text to display as description on Preferences/Settings | Plugin page -->
+    <description>
+        <![CDATA[
       Demonstrates various aspects of interacting with project model.<br>Adds menu items to
       <b>Tools</b> and <b>Editor Context</b> menus.
     ]]>
-  </description>
-  <change-notes>
-    <![CDATA[
+    </description>
+    <change-notes>
+        <![CDATA[
       <ul>
         <li><b>2.0.0</b> Convert to Gradle-based plugin, change plugin ID</li>
         <li><b>1.0.0</b> Release 2018.3 and earlier.</li>
       </ul>
     ]]>
-  </change-notes>
+    </change-notes>
 
-  <!-- Text to display as company information on Preferences/Settings | Plugin page -->
-  <vendor url="https://plugins.jetbrains.com">IntelliJ Platform SDK</vendor>
+    <!-- Text to display as company information on Preferences/Settings | Plugin page -->
+    <vendor url="https://plugins.jetbrains.com">IntelliJ Platform SDK</vendor>
 
-  <actions>
-    <action id="ProjectModel.SourceRoots" class="org.intellij.sdk.project.model.SnapDebugger"
-            text="Snap Debugger"
-            description="Shows debuggers"
-            icon="SdkIcons.Sdk_default_icon">
-      <add-to-group group-id="ToolsMenu" anchor="first"/>
-    </action>
-  </actions>
+    <actions>
+        <action id="ProjectModel.SourceRoots" class="org.intellij.sdk.project.model.SnapDebugger"
+                text="Snap Debugger"
+                description="Shows debuggers"
+                icon="SdkIcons.Sdk_default_icon">
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
+        </action>
+    </actions>
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="Sample Calendar" secondary="true" icon="AllIcons.General.Modified" anchor="bottom"
+                    factoryClass="org.intellij.sdk.project.model.MyToolWindowFactory"/>
+    </extensions>
 
 </idea-plugin>
