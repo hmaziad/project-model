@@ -42,7 +42,7 @@
     </actions>
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Sample Calendar" secondary="true" icon="AllIcons.General.Modified" anchor="bottom"
-                    factoryClass="org.intellij.sdk.project.model.MyToolWindowFactory"/>
+                    factoryClass="org.intellij.sdk.project.model.SnapDebugger"/>
     </extensions>
 
 </idea-plugin>

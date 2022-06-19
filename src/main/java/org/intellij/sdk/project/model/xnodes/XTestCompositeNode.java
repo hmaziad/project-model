@@ -100,7 +100,7 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
 
     @Override
     public String toString() {
-        return "XTestCompositeNode{" + "value='" + value + '\'' + "} " + super.toString();
+        return container.toString();
     }
 
     @Override

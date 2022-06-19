@@ -11,12 +11,9 @@ public class MyToolWindow {
     private JPanel myToolWindowContent;
     private JTree myTreeActual;
 
-    public MyToolWindow() {
-        DefaultMutableTreeNode rootActual = new DefaultMutableTreeNode("Helo");
-        rootActual.add(new DefaultMutableTreeNode("1"));
-        rootActual.add(new DefaultMutableTreeNode("2"));
+    public void setTreeView(DefaultMutableTreeNode node) {
         DefaultTreeModel modelActual = (DefaultTreeModel) this.myTreeActual.getModel();
-        modelActual.setRoot(rootActual);
+        modelActual.setRoot(node);
     }
 
     public JPanel getContent() {

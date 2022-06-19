@@ -17,9 +17,13 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ComputeChildrenService {
-    private final XValueContainer container;
+    private MyToolWindow myToolWindow;
+    private XValueContainer container;
 
-    public ComputeChildrenService(XValueContainer container) {
+    public void initToolWindow(MyToolWindow myToolWindow) {
+        this.myToolWindow = myToolWindow;
+    }
+    public void initStackFrame(XValueContainer container) {
         this.container = container;
     }
 
@@ -54,6 +58,7 @@ public class ComputeChildrenService {
             }
         }
         log.info("Finished Calculating Children");
+        this.myToolWindow.setTreeView(rootNode);
         print(rootNode);
     }
 
