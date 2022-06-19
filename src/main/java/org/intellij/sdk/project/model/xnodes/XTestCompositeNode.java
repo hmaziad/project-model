@@ -100,7 +100,8 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
 
     @Override
     public String toString() {
-        return container.toString();
+        String myNodeId = getNodeId().isEmpty() ? "" : String.format("{%s}", getNodeId());
+        return getContainer().toString() + " = " + myNodeId + " " + getValue();
     }
 
     @Override
