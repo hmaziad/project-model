@@ -39,7 +39,7 @@ public class SnapDebugger extends AnAction implements ToolWindowFactory {
     }
 
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        MyToolWindow myToolWindow = new MyToolWindow();
+        MyToolWindow myToolWindow = new MyToolWindow(project);
         this.computeChildrenService.initToolWindow(myToolWindow);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(myToolWindow.getContent(), "Debugger Tab 1", false);
