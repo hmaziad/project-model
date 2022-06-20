@@ -57,23 +57,14 @@ public class ComputeChildrenService {
                 }
             }
         }
-        log.info("Finished Calculating Children");
+        log.info("Finished Calculating Children...");
         this.myToolWindow.setTreeView(rootNode);
-        print(rootNode);
+        Helper.print(rootNode);
     }
 
     private void computeChildren(XTestCompositeNode currentNode) {
         currentNode.getContainer().computeChildren(currentNode);
         currentNode.getFuture().join();
         currentNode.retrieveNodeIdAndRef();
-    }
-
-    private void print(XTestCompositeNode node) {
-        print(node, "");
-    }
-
-    private void print(XTestCompositeNode node, String tab) {
-        System.out.println(tab + node.getContainer().toString() + " " + node.getNodeId() + " " + node.getValue());
-        node.getChildren().forEach(child -> print(child, tab + "\t"));
     }
 }

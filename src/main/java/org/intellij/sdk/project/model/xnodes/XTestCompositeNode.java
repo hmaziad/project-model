@@ -49,6 +49,19 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
         this.container = container;
     }
 
+    public static XTestCompositeNode createNode(String name, String nodeId, String value) {
+        XTestCompositeNode node = new XTestCompositeNode(null, null);
+        node.setContainer(new XValueContainer() {
+            @Override
+            public String toString() {
+                return name;
+            }
+        });
+        node.setNodeId(nodeId);
+        node.setValue(value);
+        return node;
+    }
+
     @Override
     public void addChildren(@NotNull XValueChildrenList children, boolean last) {
         addChildrenToQueue(queue, children);
