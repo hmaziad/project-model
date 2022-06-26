@@ -48,7 +48,7 @@ public class MyToolWindow {
 
     private void updateJComboBox() {
         try (Stream<Path> files = Files.list(Paths.get(this.fullPath))) {
-            files.forEach(path -> updateFileNames(path));
+            files.forEach(this::updateFileNames);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

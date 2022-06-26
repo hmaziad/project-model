@@ -69,7 +69,14 @@ public class Parser {
 
 
     private static void addLines(StringBuilder sb, XTestCompositeNode node, String spaces) {
-        sb.append(spaces + "," + node.getContainer().toString() + "," + node.getNodeId() + "," + node.getValue() + "\n");
+        sb.append(spaces)
+          .append(",")
+          .append(node.getContainer().toString())
+          .append(",")
+          .append(node.getNodeId())
+          .append(",")
+          .append(node.getValue())
+          .append("\n");
         node.getChildren().forEach(child -> addLines(sb, child, spaces + " "));
     }
 }
