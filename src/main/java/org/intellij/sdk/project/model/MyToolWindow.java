@@ -6,7 +6,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.swing.*;
@@ -26,6 +29,7 @@ public class MyToolWindow {
     private JButton saveButton;
     private JComboBox<String> targetFiles;
     private JComboBox<String> baseFiles;
+    private JButton diffSessionButton;
     private XTestCompositeNode node;
     private final Project project;
 
@@ -37,13 +41,35 @@ public class MyToolWindow {
         saveButton.addActionListener(e -> saveNodeInFile());
         targetFiles.addActionListener(e -> selectDebugFile());
         diffFilesButton.addActionListener( e -> diffFiles());
+        diffSessionButton.addActionListener( e -> diffSession());
+    }
+
+    private void diffSession() {
+        try {
+            String targetFileName = (String) targetFiles.getSelectedItem();
+            List<String> original = Files.readAllLines(Paths.get(fullPath + targetFileName));
+            // todo this needs to be refactored
+            List<String> revised = Arrays.stream(Parser.deParse(this.node).split("\n")).collect(Collectors.toList());
+            XTestCompositeNode diffNode = Helper.unifiedDiff(original, revised);
+            this.modelActual.setRoot(diffNode);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+
     }
 
     private void diffFiles() {
         String targetFileName = (String) targetFiles.getSelectedItem();
         String baseFileName = (String) baseFiles.getSelectedItem();
-        XTestCompositeNode diffNode = Helper.unifiedDiff(fullPath + baseFileName, fullPath + targetFileName);
-        this.modelActual.setRoot(diffNode);
+        try {
+            List<String> original = Files.readAllLines(Paths.get(fullPath + baseFileName));
+            List<String> revised = Files.readAllLines(Paths.get(fullPath + targetFileName));
+            XTestCompositeNode diffNode = Helper.unifiedDiff(original, revised);
+            this.modelActual.setRoot(diffNode);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+
     }
 
     private void updateJComboBox() {

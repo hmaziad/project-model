@@ -67,7 +67,6 @@ public class Parser {
         return sb.toString();
     }
 
-
     private static void addLines(StringBuilder sb, XTestCompositeNode node, String spaces) {
         sb.append(spaces)
           .append(",")

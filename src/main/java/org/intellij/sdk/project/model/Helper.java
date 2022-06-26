@@ -1,8 +1,5 @@
 package org.intellij.sdk.project.model;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,17 +17,8 @@ public class Helper {
         node.getChildren().forEach(child -> print(child, tab + "\t"));
     }
 
-    public static XTestCompositeNode unifiedDiff(String basePath, String targetPath) {
+    public static XTestCompositeNode unifiedDiff(List<String> original, List<String> revised) {
         DiffRowGenerator generator = DiffRowGenerator.create().showInlineDiffs(true).inlineDiffByWord(true).oldTag(f -> "").newTag(f -> "").build();
-
-        List<String> original = null;
-        List<String> revised = null;
-        try {
-            original = Files.readAllLines(Paths.get(basePath));
-            revised = Files.readAllLines(Paths.get(targetPath));
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
         List<DiffRow> rows = generator.generateDiffRows(original, revised);
         List<String> output = new ArrayList<>();
         for (DiffRow row : rows) {
