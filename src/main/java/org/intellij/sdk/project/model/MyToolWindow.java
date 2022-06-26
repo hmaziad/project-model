@@ -2,6 +2,7 @@
 
 package org.intellij.sdk.project.model;
 
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,6 +11,7 @@ import java.util.Date;
 import java.util.stream.Stream;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
 import org.jetbrains.annotations.NotNull;
@@ -24,24 +26,41 @@ public class MyToolWindow {
     private JTree myTreeActual;
     private JButton saveButton;
     private JComboBox<String> debugFiles;
+    private JComboBox diffAgainst;
+    private JButton diff;
     private XTestCompositeNode node;
     private Project project;
 
     public MyToolWindow(@NotNull Project project) {
         this.modelActual = (DefaultTreeModel) this.myTreeActual.getModel();
+//        this.myTreeActual.setCellRenderer(new DebugTreeRenderer());
+
         this.project = project;
         this.FULL_PATH = project.getBasePath() + DEBUG_FILES_PATH;
         updateJComboBox();
         saveButton.addActionListener(e -> saveNodeInFile());
         debugFiles.addActionListener(e -> selectDebugFile());
+        diff.addActionListener( e -> doDiff());
+    }
+
+    private void doDiff() {
+        String targetFileName = (String) debugFiles.getSelectedItem();
+        String baseFileName = (String) diffAgainst.getSelectedItem();
+        XTestCompositeNode diffNode = Helper.unifiedDiff(FULL_PATH + baseFileName, FULL_PATH + targetFileName);
+        this.modelActual.setRoot(diffNode);
     }
 
     private void updateJComboBox() {
         try (Stream<Path> files = Files.list(Paths.get(this.FULL_PATH))) {
-            files.forEach(path -> debugFiles.addItem(path.getFileName().toString()));
+            files.forEach(path -> updateFileNames(path));
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    private void updateFileNames(Path path) {
+        debugFiles.addItem(path.getFileName().toString());
+        diffAgainst.addItem(path.getFileName().toString());
     }
 
     private void selectDebugFile() {
@@ -69,5 +88,24 @@ public class MyToolWindow {
 
     public JPanel getContent() {
         return myToolWindowContent;
+    }
+
+    private class DebugTreeRenderer extends DefaultTreeCellRenderer {
+        private static final String SPAN_FORMAT = "<span style='color:%s;'>%s</span>";
+
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
+            System.out.println(getText());
+            if (value instanceof XTestCompositeNode) {
+                XTestCompositeNode value1 = (XTestCompositeNode) value;
+                System.out.println(value1);
+
+                //                XTestCompositeNode node = (XTestCompositeNode) value;
+//                String text = String.format(SPAN_FORMAT, "blue", value1.getUserObject());
+//                this.setText("<html>" + text + "</html>");
+            }
+            return this;
+        }
     }
 }

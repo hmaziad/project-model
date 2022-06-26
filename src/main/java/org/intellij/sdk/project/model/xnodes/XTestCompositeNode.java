@@ -36,6 +36,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class XTestCompositeNode extends XTestContainer<XValue> implements XCompositeNode {
+    private static final String SPAN_FORMAT = "<html><span style='color:%s;'>%s</span></html>";
+
     private CompletableFuture<List<XValue>> future = new CompletableFuture<>();
     private Queue<XTestCompositeNode> queue;
     private XValueContainer container;
@@ -43,13 +45,14 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
     private List<XTestCompositeNode> children = new ArrayList<>();
     private String nodeId = "";
     private int ref;
+    private char diffChar;
 
     public XTestCompositeNode(Queue<XTestCompositeNode> queue, XValueContainer container) {
         this.queue = queue;
         this.container = container;
     }
 
-    public static XTestCompositeNode createNode(String name, String nodeId, String value) {
+    public static XTestCompositeNode createNode(String name, String nodeId, String value, char ch) {
         XTestCompositeNode node = new XTestCompositeNode(null, null);
         node.setContainer(new XValueContainer() {
             @Override
@@ -59,6 +62,7 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
         });
         node.setNodeId(nodeId);
         node.setValue(value);
+        node.setDiffChar(ch);
         return node;
     }
 
@@ -114,7 +118,13 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
     @Override
     public String toString() {
         String myNodeId = getNodeId().isEmpty() ? "" : String.format("{%s}", getNodeId());
-        return getContainer().toString() + " = " + myNodeId + " " + getValue();
+        String output = getContainer().toString() + " = " + myNodeId + " " + getValue();
+        if (diffChar == '+') {
+            output = String.format(SPAN_FORMAT, "green", output);
+        }else if(diffChar == '-'){
+            output = String.format(SPAN_FORMAT, "red", output);
+        }
+        return output;
     }
 
     @Override
