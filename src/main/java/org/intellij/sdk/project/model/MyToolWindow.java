@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,6 +18,7 @@ import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 
 public class MyToolWindow {
 
@@ -30,11 +32,14 @@ public class MyToolWindow {
     private JComboBox<String> targetFiles;
     private JComboBox<String> baseFiles;
     private JButton diffSessionButton;
+    private JLabel noFileSelectedLabel;
     private XTestCompositeNode node;
     private final Project project;
 
     public MyToolWindow(@NotNull Project project) {
         this.modelActual = (DefaultTreeModel) this.myTreeActual.getModel();
+        this.modelActual.setRoot(null);
+
         this.fullPath = project.getBasePath() + DEBUG_FILES_PATH;
         this.project = project;
         updateJComboBox();
@@ -46,6 +51,10 @@ public class MyToolWindow {
 
     private void diffSession() {
         try {
+            if (Objects.isNull(this.node)) {
+                showDialogMessage();
+                return;
+            }
             String targetFileName = (String) targetFiles.getSelectedItem();
             List<String> original = Files.readAllLines(Paths.get(fullPath + targetFileName));
             // todo this needs to be refactored
@@ -56,6 +65,10 @@ public class MyToolWindow {
             throw new IllegalStateException(e);
         }
 
+    }
+
+    private void showDialogMessage() {
+        Messages.showDialog(this.project, "Please Start a Debug Session", "No session created", new String[] {"ok"}, 0, null);
     }
 
     private void diffFiles() {
@@ -74,6 +87,8 @@ public class MyToolWindow {
 
     private void updateJComboBox() {
         try (Stream<Path> files = Files.list(Paths.get(this.fullPath))) {
+            targetFiles.removeAllItems();
+            baseFiles.removeAllItems();
             files.forEach(this::updateFileNames);
         } catch (IOException e) {
             throw new IllegalStateException(e);
@@ -81,9 +96,7 @@ public class MyToolWindow {
     }
 
     private void updateFileNames(Path path) {
-        targetFiles.removeAllItems();
         targetFiles.addItem(path.getFileName().toString());
-        baseFiles.removeAllItems();
         baseFiles.addItem(path.getFileName().toString());
     }
 
@@ -92,9 +105,14 @@ public class MyToolWindow {
         Path selectedPath = Paths.get(fullPath + selectedFileName);
         XTestCompositeNode parsedNode = Parser.parse(selectedPath);
         this.modelActual.setRoot(parsedNode);
+        this.noFileSelectedLabel.setVisible(false);
     }
 
     private void saveNodeInFile() {
+        if (Objects.isNull(this.node)) {
+            showDialogMessage();
+            return;
+        }
         String newFolder = project.getBasePath() + DEBUG_FILES_PATH;
         try {
             Files.createDirectories(Paths.get(newFolder));
