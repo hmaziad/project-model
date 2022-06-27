@@ -81,7 +81,9 @@ public class MyToolWindow {
     }
 
     private void updateFileNames(Path path) {
+        targetFiles.removeAllItems();
         targetFiles.addItem(path.getFileName().toString());
+        baseFiles.removeAllItems();
         baseFiles.addItem(path.getFileName().toString());
     }
 
