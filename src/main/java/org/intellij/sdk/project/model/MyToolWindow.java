@@ -29,8 +29,8 @@ public class MyToolWindow {
     private JTree myTreeActual;
     private JButton diffFilesButton;
     private JButton saveButton;
-    private JComboBox<String> targetFiles;
-    private JComboBox<String> baseFiles;
+    private JComboBox<String> targetFilesBox;
+    private JComboBox<String> baseFilesBox;
     private JButton diffSessionButton;
     private JLabel noFileSelectedLabel;
     private XTestCompositeNode node;
@@ -44,9 +44,13 @@ public class MyToolWindow {
         this.project = project;
         updateJComboBox();
         saveButton.addActionListener(e -> saveNodeInFile());
-        targetFiles.addActionListener(e -> selectDebugFile());
-        diffFilesButton.addActionListener( e -> diffFiles());
-        diffSessionButton.addActionListener( e -> diffSession());
+        baseFilesBox.addActionListener(e -> updateJComboBox());
+        targetFilesBox.addActionListener(e -> {
+            selectDebugFile();
+            updateJComboBox();
+        });
+        diffFilesButton.addActionListener(e -> diffFiles());
+        diffSessionButton.addActionListener(e -> diffSession());
     }
 
     private void diffSession() {
@@ -55,7 +59,7 @@ public class MyToolWindow {
                 showDialogMessage();
                 return;
             }
-            String targetFileName = (String) targetFiles.getSelectedItem();
+            String targetFileName = (String) targetFilesBox.getSelectedItem();
             List<String> original = Files.readAllLines(Paths.get(fullPath + targetFileName));
             // todo this needs to be refactored
             List<String> revised = Arrays.stream(Parser.deParse(this.node).split("\n")).collect(Collectors.toList());
@@ -72,8 +76,8 @@ public class MyToolWindow {
     }
 
     private void diffFiles() {
-        String targetFileName = (String) targetFiles.getSelectedItem();
-        String baseFileName = (String) baseFiles.getSelectedItem();
+        String targetFileName = (String) targetFilesBox.getSelectedItem();
+        String baseFileName = (String) baseFilesBox.getSelectedItem();
         try {
             List<String> original = Files.readAllLines(Paths.get(fullPath + baseFileName));
             List<String> revised = Files.readAllLines(Paths.get(fullPath + targetFileName));
@@ -87,8 +91,6 @@ public class MyToolWindow {
 
     private void updateJComboBox() {
         try (Stream<Path> files = Files.list(Paths.get(this.fullPath))) {
-            targetFiles.removeAllItems();
-            baseFiles.removeAllItems();
             files.forEach(this::updateFileNames);
         } catch (IOException e) {
             throw new IllegalStateException(e);
@@ -96,12 +98,12 @@ public class MyToolWindow {
     }
 
     private void updateFileNames(Path path) {
-        targetFiles.addItem(path.getFileName().toString());
-        baseFiles.addItem(path.getFileName().toString());
+        targetFilesBox.addItem(path.getFileName().toString());
+        baseFilesBox.addItem(path.getFileName().toString());
     }
 
     private void selectDebugFile() {
-        String selectedFileName = (String) targetFiles.getSelectedItem();
+        String selectedFileName = (String) targetFilesBox.getSelectedItem();
         Path selectedPath = Paths.get(fullPath + selectedFileName);
         XTestCompositeNode parsedNode = Parser.parse(selectedPath);
         this.modelActual.setRoot(parsedNode);
@@ -117,7 +119,6 @@ public class MyToolWindow {
         try {
             Files.createDirectories(Paths.get(newFolder));
             Files.writeString(Paths.get(newFolder + new Date().getTime() + ".txt"), Parser.deParse(this.node));
-            updateJComboBox();
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

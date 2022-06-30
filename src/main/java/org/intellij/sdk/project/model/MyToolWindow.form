@@ -24,7 +24,7 @@
           <html.disable class="java.lang.Boolean" value="false"/>
         </clientProperties>
       </component>
-      <component id="c75ee" class="javax.swing.JComboBox" binding="targetFiles">
+      <component id="c75ee" class="javax.swing.JComboBox" binding="targetFilesBox">
         <constraints>
           <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="78" height="40"/>
@@ -44,7 +44,7 @@
           <text value="Diff Files"/>
         </properties>
       </component>
-      <component id="8a7cc" class="javax.swing.JComboBox" binding="baseFiles">
+      <component id="8a7cc" class="javax.swing.JComboBox" binding="baseFilesBox">
         <constraints>
           <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
           <gridbag weightx="0.0" weighty="0.0"/>
