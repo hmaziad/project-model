@@ -78,4 +78,9 @@ public class Parser {
           .append("\n");
         node.getChildren().forEach(child -> addLines(sb, child, spaces + " "));
     }
+
+    public static String deParse(List<String> diffLines) {
+        return String.join("\n", diffLines);
+    }
+
 }

@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,7 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class MyToolWindow {
-    private static final String PROJECT_NOT_FOUND_ERROR_MESSAGE = "Please open a project to use this feature";
     private static final String START_DEBUGGER_ERROR_MESSAGE = "Please start debugger to use this feature";
     private static final ComputeChildrenService computeChildrenService = new ComputeChildrenService();
 
@@ -46,10 +44,9 @@ public class MyToolWindow {
     private JComboBox<String> targetFilesBox;
     private JComboBox<String> baseFilesBox;
     private JButton diffSessionButton;
-    private JLabel noFileSelectedLabel;
     private JButton saveDiffButton;
-    private XTestCompositeNode node;
     private final Project project;
+    private List<String> diffLines;
 
     public MyToolWindow(@NotNull Project project) {
         this.xDebuggerManager = XDebuggerManager.getInstance(project);
@@ -65,6 +62,7 @@ public class MyToolWindow {
     private void initializeListeners() {
         this.diffSessionButton.addActionListener(e -> diffSession());
         this.targetFilesBox.addPopupMenuListener(new DropDownListener());
+        this.targetFilesBox.addActionListener(e -> selectTargetFile());
         this.saveSessionButton.addActionListener(e -> saveSessionInFile());
         this.saveDiffButton.addActionListener(e -> saveDiffInFile());
         this.baseFilesBox.addActionListener(e -> updateJComboBox());
@@ -72,33 +70,28 @@ public class MyToolWindow {
     }
 
     private void saveDiffInFile() {
-        // do nothing
-    }
-
-    private void loadDebuggerSession() {
-        XDebugSession currentSession = this.xDebuggerManager.getCurrentSession();
-        XDebugSession session = Objects.requireNonNull(currentSession, START_DEBUGGER_ERROR_MESSAGE);
-        log.info("Debug Session Retrieved...");
-        computeChildrenService.initStackFrame(session.getCurrentStackFrame());
-        log.info("Start Computing Children...");
+        String newFolder = project.getBasePath() + DEBUG_FILES_PATH;
+        try {
+            Files.createDirectories(Paths.get(newFolder));
+            Files.writeString(Paths.get(newFolder + "Diff-" + new Date().getTime() + ".txt"), Parser.deParse(this.diffLines));
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     private void diffSession() {
         loadDebuggerSession();
-        //        CompletableFuture.runAsync(computeChildrenService::execute);
+        CompletableFuture.runAsync(() -> computeChildrenService.execute(this::doDiffSession));
     }
 
-    private void doDiffSession() {
+    private void doDiffSession(XTestCompositeNode node) {
         try {
-            if (Objects.isNull(this.node)) {
-                showDialogMessage();
-                return;
-            }
             String targetFileName = (String) targetFilesBox.getSelectedItem();
             List<String> original = Files.readAllLines(Paths.get(fullPath + targetFileName));
             // todo this needs to be refactored
-            List<String> revised = Arrays.stream(Parser.deParse(this.node).split("\n")).collect(Collectors.toList());
-            XTestCompositeNode diffNode = Helper.unifiedDiff(original, revised);
+            List<String> revised = Arrays.stream(Parser.deParse(node).split("\n")).collect(Collectors.toList());
+            this.diffLines = Helper.unifiedDiff(original, revised);
+            XTestCompositeNode diffNode = Parser.parse(this.diffLines);
             this.modelActual.setRoot(diffNode);
         } catch (IOException e) {
             throw new IllegalStateException(e);
@@ -115,7 +108,9 @@ public class MyToolWindow {
         try {
             List<String> original = Files.readAllLines(Paths.get(fullPath + baseFileName));
             List<String> revised = Files.readAllLines(Paths.get(fullPath + targetFileName));
-            XTestCompositeNode diffNode = Helper.unifiedDiff(original, revised);
+            this.diffLines = Helper.unifiedDiff(original, revised);
+            ;
+            XTestCompositeNode diffNode = Parser.parse(this.diffLines);
             this.modelActual.setRoot(diffNode);
         } catch (IOException e) {
             throw new IllegalStateException(e);
@@ -143,33 +138,26 @@ public class MyToolWindow {
         }
     }
 
-    private void selectDebugFile() {
+    private void selectTargetFile() {
         String selectedFileName = (String) targetFilesBox.getSelectedItem();
         Path selectedPath = Paths.get(fullPath + selectedFileName);
         XTestCompositeNode parsedNode = Parser.parse(selectedPath);
         this.modelActual.setRoot(parsedNode);
-        //        this.noFileSelectedLabel.setVisible(false);
     }
 
     private void saveSessionInFile() {
         loadDebuggerSession();
-        Consumer<XTestCompositeNode> saveSessionConsumer = this::saveSession;
-        CompletableFuture.runAsync(() -> computeChildrenService.execute(saveSessionConsumer));
+        CompletableFuture.runAsync(() -> computeChildrenService.execute(this::saveSession));
     }
 
     private void saveSession(XTestCompositeNode computedNode) {
         String newFolder = project.getBasePath() + DEBUG_FILES_PATH;
         try {
             Files.createDirectories(Paths.get(newFolder));
-            Files.writeString(Paths.get(newFolder + new Date().getTime() + ".txt"), Parser.deParse(computedNode));
+            Files.writeString(Paths.get(newFolder + "Snap-" + new Date().getTime() + ".txt"), Parser.deParse(computedNode));
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    public void setTreeView(XTestCompositeNode node) {
-        this.node = node;
-        this.modelActual.setRoot(node);
     }
 
     public JPanel getContent() {
@@ -192,5 +180,13 @@ public class MyToolWindow {
         public void popupMenuCanceled(PopupMenuEvent e) {
             // nothing
         }
+    }
+
+    private void loadDebuggerSession() {
+        XDebugSession currentSession = this.xDebuggerManager.getCurrentSession();
+        XDebugSession session = Objects.requireNonNull(currentSession, START_DEBUGGER_ERROR_MESSAGE);
+        log.info("Debug Session Retrieved...");
+        computeChildrenService.initStackFrame(session.getCurrentStackFrame());
+        log.info("Start Computing Children...");
     }
 }

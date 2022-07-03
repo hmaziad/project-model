@@ -17,7 +17,7 @@ public class Helper {
         node.getChildren().forEach(child -> print(child, tab + "\t"));
     }
 
-    public static XTestCompositeNode unifiedDiff(List<String> original, List<String> revised) {
+    public static List<String> unifiedDiff(List<String> original, List<String> revised) {
         DiffRowGenerator generator = DiffRowGenerator.create().showInlineDiffs(true).inlineDiffByWord(true).oldTag(f -> "").newTag(f -> "").build();
         List<DiffRow> rows = generator.generateDiffRows(original, revised);
         List<String> output = new ArrayList<>();
@@ -35,7 +35,7 @@ public class Helper {
                 output.add(newLine);
             }
         }
-        return Parser.parse(output);
+        return output;
     }
 
 }
