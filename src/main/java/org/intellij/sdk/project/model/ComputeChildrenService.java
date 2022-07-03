@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
 import org.intellij.sdk.project.model.xnodes.XTestValueNode;
@@ -27,11 +28,11 @@ public class ComputeChildrenService {
         this.container = container;
     }
 
-    public void execute() {
-        computeChildren(container);
+    public void execute(Consumer<XTestCompositeNode> saveSessionConsumer) {
+        computeChildren(container, saveSessionConsumer);
     }
 
-    private void computeChildren(XValueContainer container) {
+    private void computeChildren(XValueContainer container, Consumer<XTestCompositeNode> saveSessionConsumer) {
         Queue<XTestCompositeNode> nodesQueue = new ArrayDeque<>();
         Set<Integer> childrenRefs = new HashSet<>();
         XTestCompositeNode rootNode = new XTestCompositeNode(nodesQueue, container);
@@ -58,7 +59,7 @@ public class ComputeChildrenService {
             }
         }
         log.info("Finished Calculating Children...");
-        this.myToolWindow.setTreeView(rootNode);
+        saveSessionConsumer.accept(rootNode);
         Helper.print(rootNode);
     }
 
