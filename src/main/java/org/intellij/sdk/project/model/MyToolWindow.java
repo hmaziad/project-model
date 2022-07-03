@@ -45,6 +45,8 @@ public class MyToolWindow {
     private JComboBox<String> baseFilesBox;
     private JButton diffSessionButton;
     private JButton saveDiffButton;
+    private JButton UpButton;
+    private JButton downButton;
     private final Project project;
     private List<String> diffLines;
 
@@ -61,12 +63,22 @@ public class MyToolWindow {
 
     private void initializeListeners() {
         this.diffSessionButton.addActionListener(e -> diffSession());
+        this.UpButton.addActionListener(e -> goUp());
+        this.downButton.addActionListener(e -> goDown());
         this.targetFilesBox.addPopupMenuListener(new DropDownListener());
         this.targetFilesBox.addActionListener(e -> selectTargetFile());
         this.saveSessionButton.addActionListener(e -> saveSessionInFile());
         this.saveDiffButton.addActionListener(e -> saveDiffInFile());
         this.baseFilesBox.addActionListener(e -> updateJComboBox());
         this.diffFilesButton.addActionListener(e -> diffFiles());
+    }
+
+    private void goDown() {
+
+    }
+
+    private void goUp() {
+
     }
 
     private void saveDiffInFile() {
