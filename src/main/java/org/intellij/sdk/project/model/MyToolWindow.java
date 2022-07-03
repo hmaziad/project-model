@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -19,12 +20,21 @@ import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.xdebugger.XDebugSession;
+import com.intellij.xdebugger.XDebuggerManager;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class MyToolWindow {
+    private static final String PROJECT_NOT_FOUND_ERROR_MESSAGE = "Please open a project to use this feature";
+    private static final String START_DEBUGGER_ERROR_MESSAGE = "Please start debugger to use this feature";
+    private static final ComputeChildrenService computeChildrenService = new ComputeChildrenService();
 
     private static final String DEBUG_FILES_PATH = "/src/main/resources/debugFiles/";
     private final DefaultTreeModel modelActual;
     private final String fullPath;
+    private final XDebuggerManager manager;
     private JPanel myToolWindowContent;
     private JTree myTreeActual;
     private JButton diffFilesButton;
@@ -37,9 +47,9 @@ public class MyToolWindow {
     private final Project project;
 
     public MyToolWindow(@NotNull Project project) {
+        this.manager = XDebuggerManager.getInstance(project);
         this.modelActual = (DefaultTreeModel) this.myTreeActual.getModel();
         this.modelActual.setRoot(null);
-
         this.fullPath = project.getBasePath() + DEBUG_FILES_PATH;
         this.project = project;
         updateJComboBox();
@@ -53,7 +63,21 @@ public class MyToolWindow {
         diffSessionButton.addActionListener(e -> diffSession());
     }
 
+    private void loadDebuggerSession(XDebuggerManager manager) {
+        XDebugSession currentSession = manager.getCurrentSession();
+        XDebugSession session = Objects.requireNonNull(currentSession, START_DEBUGGER_ERROR_MESSAGE);
+        log.info("Debug Session Retrieved...");
+        computeChildrenService.initStackFrame(session.getCurrentStackFrame());
+        computeChildrenService.initToolWindow(this);
+        log.info("Start Computing Children...");
+    }
+
     private void diffSession() {
+        loadDebuggerSession(manager);
+        CompletableFuture.runAsync(computeChildrenService::execute);
+    }
+
+    private void doDiffSession() {
         try {
             if (Objects.isNull(this.node)) {
                 showDialogMessage();
@@ -68,7 +92,6 @@ public class MyToolWindow {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
-
     }
 
     private void showDialogMessage() {
@@ -107,7 +130,7 @@ public class MyToolWindow {
         Path selectedPath = Paths.get(fullPath + selectedFileName);
         XTestCompositeNode parsedNode = Parser.parse(selectedPath);
         this.modelActual.setRoot(parsedNode);
-        this.noFileSelectedLabel.setVisible(false);
+//        this.noFileSelectedLabel.setVisible(false);
     }
 
     private void saveNodeInFile() {

@@ -31,15 +31,6 @@
 
     <!-- Text to display as company information on Preferences/Settings | Plugin page -->
     <vendor url="https://plugins.jetbrains.com">IntelliJ Platform SDK</vendor>
-
-    <actions>
-        <action id="ProjectModel.SourceRoots" class="org.intellij.sdk.project.model.SnapDebugger"
-                text="Snap Debugger"
-                description="Shows debuggers"
-                icon="SdkIcons.Sdk_default_icon">
-            <add-to-group group-id="ToolsMenu" anchor="first"/>
-        </action>
-    </actions>
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Armadillo" secondary="true" icon="AllIcons.General.Modified" anchor="bottom"
                     factoryClass="org.intellij.sdk.project.model.SnapDebugger"/>
