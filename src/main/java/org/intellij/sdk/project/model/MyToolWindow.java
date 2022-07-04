@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +20,7 @@ import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.project.Project;
@@ -49,6 +51,8 @@ public class MyToolWindow {
     private JButton downButton;
     private final Project project;
     private List<String> diffLines;
+    private List<XTestCompositeNode> diffNodes = new ArrayList<>();
+    private int index = -1;
 
     public MyToolWindow(@NotNull Project project) {
         this.xDebuggerManager = XDebuggerManager.getInstance(project);
@@ -74,11 +78,23 @@ public class MyToolWindow {
     }
 
     private void goDown() {
-
+        if (diffNodes.isEmpty()) {
+            return;
+        }
+        this.index = this.index == diffNodes.size() - 1 ? this.index : this.index + 1;
+        TreePath nodePath = new TreePath(diffNodes.get(this.index).getPath());
+        this.myTreeActual.expandPath(nodePath);
+        this.myTreeActual.setSelectionPath(nodePath);
     }
 
     private void goUp() {
-
+        if (diffNodes.isEmpty()) {
+            return;
+        }
+        this.index = this.index == 0 ? this.index : this.index -1;
+        TreePath nodePath = new TreePath(diffNodes.get(this.index).getPath());
+        this.myTreeActual.expandPath(nodePath);
+        this.myTreeActual.setSelectionPath(nodePath);
     }
 
     private void saveDiffInFile() {
@@ -103,7 +119,7 @@ public class MyToolWindow {
             // todo this needs to be refactored
             List<String> revised = Arrays.stream(Parser.deParse(node).split("\n")).collect(Collectors.toList());
             this.diffLines = Helper.unifiedDiff(original, revised);
-            XTestCompositeNode diffNode = Parser.parse(this.diffLines);
+            XTestCompositeNode diffNode = Parser.parse(this.diffLines, this.diffNodes);
             this.modelActual.setRoot(diffNode);
         } catch (IOException e) {
             throw new IllegalStateException(e);
@@ -121,8 +137,8 @@ public class MyToolWindow {
             List<String> original = Files.readAllLines(Paths.get(fullPath + baseFileName));
             List<String> revised = Files.readAllLines(Paths.get(fullPath + targetFileName));
             this.diffLines = Helper.unifiedDiff(original, revised);
-            ;
-            XTestCompositeNode diffNode = Parser.parse(this.diffLines);
+            this.diffNodes.clear();
+            XTestCompositeNode diffNode = Parser.parse(this.diffLines, this.diffNodes);
             this.modelActual.setRoot(diffNode);
         } catch (IOException e) {
             throw new IllegalStateException(e);

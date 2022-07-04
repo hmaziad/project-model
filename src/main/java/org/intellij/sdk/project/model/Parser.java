@@ -16,18 +16,16 @@ public class Parser {
     private static final int TYPE = 2;
     private static final int VALUE = 3;
     private static final int PARTS = 4;
-    private static final char plus = '+';
-    private static final char minus = '-';
 
     public static XTestCompositeNode parse(Path path) {
         try {
-            return parse(Files.readAllLines(path));
+            return parse(Files.readAllLines(path), new ArrayList<>());
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    public static XTestCompositeNode parse(List<String> lines) {
+    public static XTestCompositeNode parse(List<String> lines, List<XTestCompositeNode> diffNodes) {
         List<String[]> lineArrays = new ArrayList<>();
         for (String line : lines) {
             String[] lineArray = line.split(",", PARTS);
@@ -44,6 +42,9 @@ public class Parser {
                 index--;
             }
             XTestCompositeNode newNode = createNode(lineArray, ch);
+            if (newNode.getDiffChar() == '+' || newNode.getDiffChar() == '-') {
+                diffNodes.add(newNode);
+            }
             nodePerIndex.put(index, newNode);
             if (index == 0) {
                 continue;
