@@ -2,6 +2,7 @@
 
 package org.intellij.sdk.project.model;
 
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -53,7 +54,7 @@ public class MyToolWindow {
     private List<String> diffLines;
     private List<XTestCompositeNode> diffNodes = new ArrayList<>();
     private int index = -1;
-
+// scrolling: https://stackoverflow.com/questions/5257655/scrolling-a-tree-node-to-top-of-a-scroll-pane
     public MyToolWindow(@NotNull Project project) {
         this.xDebuggerManager = XDebuggerManager.getInstance(project);
         computeChildrenService.initToolWindow(this);
@@ -85,6 +86,9 @@ public class MyToolWindow {
         TreePath nodePath = new TreePath(diffNodes.get(this.index).getPath());
         this.myTreeActual.expandPath(nodePath);
         this.myTreeActual.setSelectionPath(nodePath);
+        Rectangle bounds = myTreeActual.getPathBounds(nodePath);
+        bounds.height = myTreeActual.getVisibleRect().height;
+        myTreeActual.scrollRectToVisible(bounds);
     }
 
     private void goUp() {
@@ -95,6 +99,9 @@ public class MyToolWindow {
         TreePath nodePath = new TreePath(diffNodes.get(this.index).getPath());
         this.myTreeActual.expandPath(nodePath);
         this.myTreeActual.setSelectionPath(nodePath);
+        Rectangle bounds = myTreeActual.getPathBounds(nodePath);
+        bounds.height = myTreeActual.getVisibleRect().height;
+        myTreeActual.scrollRectToVisible(bounds);
     }
 
     private void saveDiffInFile() {

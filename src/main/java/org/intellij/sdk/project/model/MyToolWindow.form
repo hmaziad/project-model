@@ -2,28 +2,11 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="org.intellij.sdk.project.model.MyToolWindow">
   <grid id="27dc6" binding="myToolWindowContent" layout-manager="GridBagLayout">
     <constraints>
-      <xy x="20" y="20" width="500" height="478"/>
+      <xy x="20" y="20" width="515" height="478"/>
     </constraints>
     <properties/>
     <border type="none"/>
     <children>
-      <component id="e33c6" class="javax.swing.JTree" binding="myTreeActual">
-        <constraints>
-          <grid row="0" column="0" row-span="10" col-span="1" vsize-policy="2" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
-            <preferred-size width="150" height="50"/>
-          </grid>
-          <gridbag weightx="20.0" weighty="0.0"/>
-        </constraints>
-        <properties>
-          <enabled value="true"/>
-          <largeModel value="false"/>
-          <name value="hey"/>
-          <rootVisible value="false"/>
-        </properties>
-        <clientProperties>
-          <html.disable class="java.lang.Boolean" value="false"/>
-        </clientProperties>
-      </component>
       <component id="c75ee" class="javax.swing.JComboBox" binding="targetFilesBox">
         <constraints>
           <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
@@ -127,6 +110,20 @@
           </component>
         </children>
       </grid>
+      <scrollpane id="92491">
+        <constraints>
+          <grid row="0" column="0" row-span="10" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="20.0" weighty="0.0"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="20e25" class="javax.swing.JTree" binding="myTreeActual">
+            <constraints/>
+            <properties/>
+          </component>
+        </children>
+      </scrollpane>
     </children>
   </grid>
 </form>
