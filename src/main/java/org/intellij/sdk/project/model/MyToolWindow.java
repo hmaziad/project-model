@@ -60,12 +60,21 @@ public class MyToolWindow {
         computeChildrenService.initToolWindow(this);
         this.modelActual = (DefaultTreeModel) this.myTreeActual.getModel();
         this.modelActual.setRoot(null);
+        this.myTreeActual.setRootVisible(false);
         this.fullPath = project.getBasePath() + DEBUG_FILES_PATH;
         this.project = project;
         updateJComboBox();
         initializeListeners();
     }
+/*
+DefaultMutableTreeNode r1 = (DefaultMutableTreeNode) myTreeActual.getModel().getRoot();
+TreePath treePath = new TreePath(r1.getPath());
+DefaultMutableTreeNode r2 = diffNodes.get(0);
+TreePath diffNodePath = new TreePath(r2);
 
+for later
+//myTreeActual.getPathBounds(treePath);
+ */
     private void initializeListeners() {
         this.diffSessionButton.addActionListener(e -> diffSession());
         this.UpButton.addActionListener(e -> goUp());
@@ -79,10 +88,10 @@ public class MyToolWindow {
     }
 
     private void goDown() {
-        if (diffNodes.isEmpty()) {
+        if (diffNodes.isEmpty() || this.index == diffNodes.size() - 1) {
             return;
         }
-        this.index = this.index == diffNodes.size() - 1 ? this.index : this.index + 1;
+        this.index++;
         TreePath nodePath = new TreePath(diffNodes.get(this.index).getPath());
         this.myTreeActual.expandPath(nodePath);
         this.myTreeActual.setSelectionPath(nodePath);
@@ -92,10 +101,10 @@ public class MyToolWindow {
     }
 
     private void goUp() {
-        if (diffNodes.isEmpty()) {
+        if (diffNodes.isEmpty() || this.index == 0) {
             return;
         }
-        this.index = this.index == 0 ? this.index : this.index -1;
+        this.index--;
         TreePath nodePath = new TreePath(diffNodes.get(this.index).getPath());
         this.myTreeActual.expandPath(nodePath);
         this.myTreeActual.setSelectionPath(nodePath);

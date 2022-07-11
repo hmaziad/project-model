@@ -33,6 +33,7 @@ public class Parser {
         }
 
         Map<Integer, XTestCompositeNode> nodePerIndex = new HashMap<>();
+        nodePerIndex.put(-1, createNode(new String[] {"", "name", "nodeId", "value"}, ' '));
         for (String[] lineArray : lineArrays) {
             String first = lineArray[INDEX];
             char ch = ' ';
@@ -46,16 +47,9 @@ public class Parser {
                 diffNodes.add(newNode);
             }
             nodePerIndex.put(index, newNode);
-            if (index == 0) {
-                continue;
-            }
-            if (nodePerIndex.get(index - 1) == null) {
-                System.out.println("Stop");
-            }
-
             nodePerIndex.get(index - 1).addChild(newNode);
         }
-        return nodePerIndex.get(INDEX);
+        return nodePerIndex.get(-1);
     }
 
     private static XTestCompositeNode createNode(String[] next, char ch) {
