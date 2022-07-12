@@ -18,8 +18,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.swing.*;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
@@ -50,6 +48,7 @@ public class MyToolWindow {
     private JButton saveDiffButton;
     private JButton UpButton;
     private JButton downButton;
+    private JButton refreshButton;
     private final Project project;
     private List<String> diffLines;
     private List<XTestCompositeNode> diffNodes = new ArrayList<>();
@@ -63,7 +62,7 @@ public class MyToolWindow {
         this.myTreeActual.setRootVisible(false);
         this.fullPath = project.getBasePath() + DEBUG_FILES_PATH;
         this.project = project;
-        updateJComboBox();
+//        updateJComboBox();
         initializeListeners();
     }
 
@@ -71,12 +70,24 @@ public class MyToolWindow {
         this.diffSessionButton.addActionListener(e -> diffSession());
         this.UpButton.addActionListener(e -> navigateUp());
         this.downButton.addActionListener(e -> navigateDown());
-        this.targetFilesBox.addPopupMenuListener(new DropDownListener());
-        this.targetFilesBox.addActionListener(e -> selectTargetFile());
+//        this.targetFilesBox.addActionListener(e -> selectTargetFile());
         this.saveSessionButton.addActionListener(e -> saveSessionInFile());
-        this.saveDiffButton.addActionListener(e -> saveDiffInFile());
-        this.baseFilesBox.addActionListener(e -> updateJComboBox());
-        this.diffFilesButton.addActionListener(e -> diffFiles());
+//        this.saveDiffButton.addActionListener(e -> saveDiffInFile());
+//        this.baseFilesBox.addActionListener(e -> updateJComboBox());
+//        this.diffFilesButton.addActionListener(e -> diffFiles());
+//        this.refreshButton.addActionListener(e -> updateJComboBox());
+        this.refreshButton.addActionListener(e -> updateJComboBoxFromState());
+    }
+
+    private void updateJComboBoxFromState() {
+        log.info("Updating target combo box");
+        this.targetFilesBox.removeAllItems();
+        PersistencyService //
+            .getInstance() //
+            .getState() //
+            .nodes //
+            .keySet() //
+            .forEach(this.targetFilesBox::addItem);
     }
 
     private void navigateDown() {
@@ -187,8 +198,17 @@ public class MyToolWindow {
 
     private void saveSessionInFile() {
         loadDebuggerSession();
-        CompletableFuture.runAsync(() -> computeChildrenService.execute(this::saveSession));
+        CompletableFuture.runAsync(() -> computeChildrenService.execute(this::persistNode));
     }
+
+    private void persistNode(XTestCompositeNode computedNode) {
+        PersistencyService persistencyService = PersistencyService.getInstance();
+        PersistencyService.State state = persistencyService.getState();
+        String snapName = "Snap-" + new Date().getTime();
+        state.nodes.put(snapName, computedNode);
+        persistencyService.loadState(state);
+    }
+
 
     private void saveSession(XTestCompositeNode computedNode) {
         String newFolder = project.getBasePath() + DEBUG_FILES_PATH;
@@ -204,24 +224,6 @@ public class MyToolWindow {
 
     public JPanel getContent() {
         return myToolWindowContent;
-    }
-
-    private class DropDownListener implements PopupMenuListener {
-
-        @Override
-        public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-            updateJComboBox();
-        }
-
-        @Override
-        public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-            // nothing
-        }
-
-        @Override
-        public void popupMenuCanceled(PopupMenuEvent e) {
-            // nothing
-        }
     }
 
     private void loadDebuggerSession() {

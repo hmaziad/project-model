@@ -12,6 +12,10 @@ import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
 import com.github.difflib.text.DiffRow;
 import com.github.difflib.text.DiffRowGenerator;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Parser {
     private static final int INDEX = 0;
     private static final int NAME = 1;
