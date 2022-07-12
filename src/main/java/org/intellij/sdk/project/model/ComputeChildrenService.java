@@ -60,7 +60,7 @@ public class ComputeChildrenService {
         }
         log.info("Finished Calculating Children...");
         saveSessionConsumer.accept(rootNode);
-        Helper.print(rootNode);
+        Parser.print(rootNode);
     }
 
     private void computeChildren(XTestCompositeNode currentNode) {

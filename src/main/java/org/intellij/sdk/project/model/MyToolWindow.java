@@ -54,7 +54,7 @@ public class MyToolWindow {
     private List<String> diffLines;
     private List<XTestCompositeNode> diffNodes = new ArrayList<>();
     private int index = -1;
-// scrolling: https://stackoverflow.com/questions/5257655/scrolling-a-tree-node-to-top-of-a-scroll-pane
+
     public MyToolWindow(@NotNull Project project) {
         this.xDebuggerManager = XDebuggerManager.getInstance(project);
         computeChildrenService.initToolWindow(this);
@@ -66,19 +66,11 @@ public class MyToolWindow {
         updateJComboBox();
         initializeListeners();
     }
-/*
-DefaultMutableTreeNode r1 = (DefaultMutableTreeNode) myTreeActual.getModel().getRoot();
-TreePath treePath = new TreePath(r1.getPath());
-DefaultMutableTreeNode r2 = diffNodes.get(0);
-TreePath diffNodePath = new TreePath(r2);
 
-for later
-//myTreeActual.getPathBounds(treePath);
- */
     private void initializeListeners() {
         this.diffSessionButton.addActionListener(e -> diffSession());
-        this.UpButton.addActionListener(e -> goUp());
-        this.downButton.addActionListener(e -> goDown());
+        this.UpButton.addActionListener(e -> navigateUp());
+        this.downButton.addActionListener(e -> navigateDown());
         this.targetFilesBox.addPopupMenuListener(new DropDownListener());
         this.targetFilesBox.addActionListener(e -> selectTargetFile());
         this.saveSessionButton.addActionListener(e -> saveSessionInFile());
@@ -87,24 +79,23 @@ for later
         this.diffFilesButton.addActionListener(e -> diffFiles());
     }
 
-    private void goDown() {
+    private void navigateDown() {
         if (diffNodes.isEmpty() || this.index == diffNodes.size() - 1) {
             return;
         }
         this.index++;
-        TreePath nodePath = new TreePath(diffNodes.get(this.index).getPath());
-        this.myTreeActual.expandPath(nodePath);
-        this.myTreeActual.setSelectionPath(nodePath);
-        Rectangle bounds = myTreeActual.getPathBounds(nodePath);
-        bounds.height = myTreeActual.getVisibleRect().height;
-        myTreeActual.scrollRectToVisible(bounds);
+        updateTreeSelectionAndScroll();
     }
 
-    private void goUp() {
+    private void navigateUp() {
         if (diffNodes.isEmpty() || this.index == 0) {
             return;
         }
         this.index--;
+        updateTreeSelectionAndScroll();
+    }
+
+    private void updateTreeSelectionAndScroll() {
         TreePath nodePath = new TreePath(diffNodes.get(this.index).getPath());
         this.myTreeActual.expandPath(nodePath);
         this.myTreeActual.setSelectionPath(nodePath);
@@ -114,10 +105,12 @@ for later
     }
 
     private void saveDiffInFile() {
-        String newFolder = project.getBasePath() + DEBUG_FILES_PATH;
         try {
+            String newFolder = project.getBasePath() + DEBUG_FILES_PATH;
             Files.createDirectories(Paths.get(newFolder));
-            Files.writeString(Paths.get(newFolder + "Diff-" + new Date().getTime() + ".txt"), Parser.deParse(this.diffLines));
+            Path filePath = Paths.get(newFolder + "Diff-" + new Date().getTime() + ".txt");
+            String diffAsString = Parser.writeNodeAsString(this.diffLines);
+            Files.writeString(filePath, diffAsString);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
@@ -125,17 +118,20 @@ for later
 
     private void diffSession() {
         loadDebuggerSession();
-        CompletableFuture.runAsync(() -> computeChildrenService.execute(this::doDiffSession));
+        CompletableFuture.runAsync(() -> computeChildrenService.execute(this::diffDebuggerSession));
     }
 
-    private void doDiffSession(XTestCompositeNode node) {
+    private void diffDebuggerSession(XTestCompositeNode node) {
         try {
             String targetFileName = (String) targetFilesBox.getSelectedItem();
             List<String> original = Files.readAllLines(Paths.get(fullPath + targetFileName));
             // todo this needs to be refactored
-            List<String> revised = Arrays.stream(Parser.deParse(node).split("\n")).collect(Collectors.toList());
-            this.diffLines = Helper.unifiedDiff(original, revised);
-            XTestCompositeNode diffNode = Parser.parse(this.diffLines, this.diffNodes);
+            List<String> revised = Arrays //
+                .stream(Parser.writeNodeAsString(node).split("\n")) //
+                .collect(Collectors.toList());
+
+            this.diffLines = Parser.unifiedDiffOfStrings(original, revised);
+            XTestCompositeNode diffNode = Parser.parseStringsToNode(this.diffLines, this.diffNodes);
             this.modelActual.setRoot(diffNode);
         } catch (IOException e) {
             throw new IllegalStateException(e);
@@ -152,14 +148,13 @@ for later
         try {
             List<String> original = Files.readAllLines(Paths.get(fullPath + baseFileName));
             List<String> revised = Files.readAllLines(Paths.get(fullPath + targetFileName));
-            this.diffLines = Helper.unifiedDiff(original, revised);
+            this.diffLines = Parser.unifiedDiffOfStrings(original, revised);
             this.diffNodes.clear();
-            XTestCompositeNode diffNode = Parser.parse(this.diffLines, this.diffNodes);
+            XTestCompositeNode diffNode = Parser.parseStringsToNode(this.diffLines, this.diffNodes);
             this.modelActual.setRoot(diffNode);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
-
     }
 
     private void updateJComboBox() {
@@ -185,7 +180,7 @@ for later
     private void selectTargetFile() {
         String selectedFileName = (String) targetFilesBox.getSelectedItem();
         Path selectedPath = Paths.get(fullPath + selectedFileName);
-        XTestCompositeNode parsedNode = Parser.parse(selectedPath);
+        XTestCompositeNode parsedNode = Parser.parseStringsToNode(selectedPath);
         this.modelActual.setRoot(parsedNode);
     }
 
@@ -198,7 +193,7 @@ for later
         String newFolder = project.getBasePath() + DEBUG_FILES_PATH;
         try {
             Files.createDirectories(Paths.get(newFolder));
-            Files.writeString(Paths.get(newFolder + "Snap-" + new Date().getTime() + ".txt"), Parser.deParse(computedNode));
+            Files.writeString(Paths.get(newFolder + "Snap-" + new Date().getTime() + ".txt"), Parser.writeNodeAsString(computedNode));
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

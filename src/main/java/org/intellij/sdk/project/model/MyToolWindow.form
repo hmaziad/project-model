@@ -42,7 +42,7 @@
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
-          <text value="Diff Session"/>
+          <text value="Diff Session Against File"/>
         </properties>
       </component>
       <component id="f893b" class="javax.swing.JButton" binding="saveSessionButton">

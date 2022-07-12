@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
+import com.github.difflib.text.DiffRow;
+import com.github.difflib.text.DiffRowGenerator;
 
 public class Parser {
     private static final int INDEX = 0;
@@ -17,15 +19,15 @@ public class Parser {
     private static final int VALUE = 3;
     private static final int PARTS = 4;
 
-    public static XTestCompositeNode parse(Path path) {
+    public static XTestCompositeNode parseStringsToNode(Path path) {
         try {
-            return parse(Files.readAllLines(path), new ArrayList<>());
+            return parseStringsToNode(Files.readAllLines(path), new ArrayList<>());
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    public static XTestCompositeNode parse(List<String> lines, List<XTestCompositeNode> diffNodes) {
+    public static XTestCompositeNode parseStringsToNode(List<String> lines, List<XTestCompositeNode> diffNodes) {
         List<String[]> lineArrays = new ArrayList<>();
         for (String line : lines) {
             String[] lineArray = line.split(",", PARTS);
@@ -56,7 +58,7 @@ public class Parser {
         return XTestCompositeNode.createNode(next[NAME], next[TYPE], next[VALUE], ch);
     }
 
-    public static String deParse(XTestCompositeNode node) {
+    public static String writeNodeAsString(XTestCompositeNode node) {
         StringBuilder sb = new StringBuilder();
         addLines(sb, node, "");
         return sb.toString();
@@ -74,8 +76,37 @@ public class Parser {
         node.getChildren().forEach(child -> addLines(sb, child, spaces + " "));
     }
 
-    public static String deParse(List<String> diffLines) {
+    public static String writeNodeAsString(List<String> diffLines) {
         return String.join("\n", diffLines);
     }
 
+    public static void print(XTestCompositeNode node) {
+        print(node, "");
+    }
+
+    private static void print(XTestCompositeNode node, String tab) {
+        System.out.println(tab + node.getContainer().toString() + " " + node.getNodeId() + " " + node.getValue());
+        node.getChildren().forEach(child -> print(child, tab + "\t"));
+    }
+
+    public static List<String> unifiedDiffOfStrings(List<String> original, List<String> revised) {
+        DiffRowGenerator generator = DiffRowGenerator.create().showInlineDiffs(true).inlineDiffByWord(true).oldTag(f -> "").newTag(f -> "").build();
+        List<DiffRow> rows = generator.generateDiffRows(original, revised);
+        List<String> output = new ArrayList<>();
+        for (DiffRow row : rows) {
+            String oldLine = row.getOldLine();
+            String newLine = row.getNewLine();
+            if (!oldLine.equals(newLine)) {
+                if (!oldLine.isEmpty()) {
+                    output.add("-" + oldLine);
+                }
+                if (!newLine.isEmpty()) {
+                    output.add("+" + newLine);
+                }
+            } else {
+                output.add(newLine);
+            }
+        }
+        return output;
+    }
 }
