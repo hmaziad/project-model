@@ -60,20 +60,17 @@ public class Parser {
 
     public static String writeNodeAsString(XTestCompositeNode node) {
         StringBuilder sb = new StringBuilder();
-        addLines(sb, node, "");
+        addLines(sb, node.getChildren(), "");
         return sb.toString();
     }
 
-    private static void addLines(StringBuilder sb, XTestCompositeNode node, String spaces) {
-        sb.append(spaces)
-          .append(",")
-          .append(node.getContainer().toString())
-          .append(",")
-          .append(node.getNodeId())
-          .append(",")
-          .append(node.getValue())
-          .append("\n");
-        node.getChildren().forEach(child -> addLines(sb, child, spaces + " "));
+    private static void addLines(StringBuilder sb, List<XTestCompositeNode> nodes, String spaces) {
+        nodes.forEach(child -> appendData(sb, child, spaces));
+        nodes.forEach(child -> addLines(sb, child.getChildren(), spaces + " "));
+    }
+
+    private static void appendData(StringBuilder sb, XTestCompositeNode node, String spaces) {
+        sb.append(spaces).append(",").append(node.getContainer().toString()).append(",").append(node.getNodeId()).append(",").append(node.getValue()).append("\n");
     }
 
     public static String writeNodeAsString(List<String> diffLines) {

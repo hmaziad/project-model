@@ -182,6 +182,7 @@ public class MyToolWindow {
         Path selectedPath = Paths.get(fullPath + selectedFileName);
         XTestCompositeNode parsedNode = Parser.parseStringsToNode(selectedPath);
         this.modelActual.setRoot(parsedNode);
+        this.myTreeActual.setRootVisible(false);
     }
 
     private void saveSessionInFile() {
@@ -193,7 +194,9 @@ public class MyToolWindow {
         String newFolder = project.getBasePath() + DEBUG_FILES_PATH;
         try {
             Files.createDirectories(Paths.get(newFolder));
-            Files.writeString(Paths.get(newFolder + "Snap-" + new Date().getTime() + ".txt"), Parser.writeNodeAsString(computedNode));
+            Path filePath = Paths.get(newFolder + "Snap-" + new Date().getTime() + ".txt");
+            String nodeAsString = Parser.writeNodeAsString(computedNode);
+            Files.writeString(filePath, nodeAsString);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
