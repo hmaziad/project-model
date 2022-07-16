@@ -27,9 +27,9 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
-@Slf4j
+@Log4j2
 public class MyToolWindow {
     private static final String START_DEBUGGER_ERROR_MESSAGE = "Please start debugger to use this feature";
     private static final ComputeChildrenService computeChildrenService = new ComputeChildrenService();
@@ -80,11 +80,10 @@ public class MyToolWindow {
     }
 
     private void updateJComboBoxFromState() {
-        log.info("Updating target combo box");
+        LOG.info("Updating target combo box");
         this.targetFilesBox.removeAllItems();
         PersistencyService //
             .getInstance() //
-            .getState() //
             .nodes //
             .keySet() //
             .forEach(this.targetFilesBox::addItem);
@@ -203,7 +202,7 @@ public class MyToolWindow {
 
     private void persistNode(XTestCompositeNode computedNode) {
         PersistencyService persistencyService = PersistencyService.getInstance();
-        PersistencyService.State state = persistencyService.getState();
+        PersistencyService state = persistencyService.getState();
         String snapName = "Snap-" + new Date().getTime();
         state.nodes.put(snapName, computedNode);
         persistencyService.loadState(state);
@@ -229,8 +228,8 @@ public class MyToolWindow {
     private void loadDebuggerSession() {
         XDebugSession currentSession = this.xDebuggerManager.getCurrentSession();
         XDebugSession session = Objects.requireNonNull(currentSession, START_DEBUGGER_ERROR_MESSAGE);
-        log.info("Debug Session Retrieved...");
+        LOG.info("Debug Session Retrieved...");
         computeChildrenService.initStackFrame(session.getCurrentStackFrame());
-        log.info("Start Computing Children...");
+        LOG.info("Start Computing Children...");
     }
 }

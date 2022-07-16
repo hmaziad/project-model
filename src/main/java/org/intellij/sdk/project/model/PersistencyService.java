@@ -1,15 +1,20 @@
 package org.intellij.sdk.project.model;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.Storage;
+import com.intellij.util.xmlb.XmlSerializerUtil;
 
-public class PersistencyService implements PersistentStateComponent<PersistencyService.State> {
-    private State state = new State();
+import lombok.Data;
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
+@Storage("yourName.xml")
+@Data
+public class PersistencyService implements PersistentStateComponent<PersistencyService> {
+    public Map<String, XTestCompositeNode> nodes;
 
     private PersistencyService(){}
 
@@ -21,17 +26,14 @@ public class PersistencyService implements PersistentStateComponent<PersistencyS
     }
 
     @Override
-    public @Nullable PersistencyService.State getState() {
-        return this.state;
+    public PersistencyService getState() {
+        LOG.debug("Persistency State returned {}", this);
+        return this;
     }
 
     @Override
-    public void loadState(@NotNull State state) {
-        this.state = state;
-    }
-
-    static class State {
-        public Map<String, XTestCompositeNode> nodes = new HashMap<>();;
+    public void loadState(PersistencyService state) {
+        XmlSerializerUtil.copyBean(state, this);
     }
 
 }

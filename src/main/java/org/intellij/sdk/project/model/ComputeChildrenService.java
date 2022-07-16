@@ -58,7 +58,7 @@ public class ComputeChildrenService {
                 }
             }
         }
-        log.info("Finished Calculating Children...");
+        LOG.debug("Computed Debug Node {}", rootNode);
         saveSessionConsumer.accept(rootNode);
         Parser.print(rootNode);
     }
