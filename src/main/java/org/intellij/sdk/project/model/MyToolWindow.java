@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -28,6 +29,7 @@ import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
 
 import lombok.extern.log4j.Log4j2;
+
 
 @Log4j2
 public class MyToolWindow {
@@ -76,18 +78,18 @@ public class MyToolWindow {
 //        this.baseFilesBox.addActionListener(e -> updateJComboBox());
 //        this.diffFilesButton.addActionListener(e -> diffFiles());
 //        this.refreshButton.addActionListener(e -> updateJComboBox());
-        this.refreshButton.addActionListener(e -> updateJComboBoxFromState());
+//        this.refreshButton.addActionListener(e -> updateJComboBoxFromState());
     }
 
-    private void updateJComboBoxFromState() {
-        LOG.info("Updating target combo box");
-        this.targetFilesBox.removeAllItems();
-        PersistencyService //
-            .getInstance() //
-            .nodes //
-            .keySet() //
-            .forEach(this.targetFilesBox::addItem);
-    }
+//    private void updateJComboBoxFromState() {
+//        LOG.info("Updating target combo box");
+//        this.targetFilesBox.removeAllItems();
+//        PersistencyService //
+//            .getInstance() //
+//            .nodes //
+//            .keySet() //
+//            .forEach(this.targetFilesBox::addItem);
+//    }
 
     private void navigateDown() {
         if (diffNodes.isEmpty() || this.index == diffNodes.size() - 1) {
@@ -201,11 +203,13 @@ public class MyToolWindow {
     }
 
     private void persistNode(XTestCompositeNode computedNode) {
-        PersistencyService persistencyService = PersistencyService.getInstance();
-        PersistencyService state = persistencyService.getState();
         String snapName = "Snap-" + new Date().getTime();
-        state.nodes.put(snapName, computedNode);
-        persistencyService.loadState(state);
+        Map<String, XTestCompositeNode> newMap = Map.of(snapName, computedNode);
+        PersistencyService.State state1 = new PersistencyService.State();
+        state1.stateNodes = newMap;
+        PersistencyService persistencyService = PersistencyService.getInstance();
+        persistencyService.loadState(state1);
+        persistencyService.getState();
     }
 
 
