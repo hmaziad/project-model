@@ -73,7 +73,6 @@ public class MyToolWindow {
         this.project = project;
 //        updateJComboBox();
         initializeListeners();
-        this.theCount.setText((Objects.requireNonNull(persistencyService.getState(), "persistency service is null").getCeva()));
     }
 
     private void initializeListeners() {
@@ -87,10 +86,6 @@ public class MyToolWindow {
 //        this.diffFilesButton.addActionListener(e -> diffFiles());
 //        this.refreshButton.addActionListener(e -> updateJComboBox());
 //        this.refreshButton.addActionListener(e -> updateJComboBoxFromState());
-        this.button1.addActionListener(e -> {
-            persistencyService.setCeva(textField1.getText());
-            theCount.setText(persistencyService.getCeva());
-        });
     }
 
 //    private void updateJComboBoxFromState() {
@@ -210,13 +205,8 @@ public class MyToolWindow {
     }
 
     private void saveSessionInFile() {
-        persistencyService.setCeva("cevaaaaa");
-        theCount.setText(persistencyService.getCeva());
-
-//        loadDebuggerSession();
-//        CompletableFuture.runAsync(() -> computeChildrenService.execute(this::persistNode));
-
-
+        loadDebuggerSession();
+        CompletableFuture.runAsync(() -> computeChildrenService.execute(this::persistNode));
     }
 
     private void persistNode(XTestCompositeNode computedNode) {
