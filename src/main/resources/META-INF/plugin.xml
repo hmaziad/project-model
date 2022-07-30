@@ -35,5 +35,10 @@
         <toolWindow id="Armadillo" secondary="true" icon="AllIcons.General.Modified" anchor="bottom"
                     factoryClass="org.intellij.sdk.project.model.SnapDebugger"/>
     </extensions>
-
+    <application-components>
+        <component>
+            <implementation-class>org.intellij.sdk.project.model.PersistencyService</implementation-class>
+            <interface-class>org.intellij.sdk.project.model.PersistencyService</interface-class>
+        </component>
+    </application-components>
 </idea-plugin>

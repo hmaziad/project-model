@@ -23,6 +23,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
 import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.xdebugger.XDebugSession;
@@ -35,8 +36,10 @@ import lombok.extern.log4j.Log4j2;
 public class MyToolWindow {
     private static final String START_DEBUGGER_ERROR_MESSAGE = "Please start debugger to use this feature";
     private static final ComputeChildrenService computeChildrenService = new ComputeChildrenService();
+    private static final PersistencyService persistencyService = ServiceManager.getService(PersistencyService.class);
 
     private static final String DEBUG_FILES_PATH = "/src/main/resources/debugFiles/";
+
     private final DefaultTreeModel modelActual;
     private final String fullPath;
     private final XDebuggerManager xDebuggerManager;
@@ -51,10 +54,14 @@ public class MyToolWindow {
     private JButton UpButton;
     private JButton downButton;
     private JButton refreshButton;
+    private JLabel theCount;
+    private JTextField textField1;
+    private JButton button1;
     private final Project project;
     private List<String> diffLines;
     private List<XTestCompositeNode> diffNodes = new ArrayList<>();
     private int index = -1;
+
 
     public MyToolWindow(@NotNull Project project) {
         this.xDebuggerManager = XDebuggerManager.getInstance(project);
@@ -66,6 +73,7 @@ public class MyToolWindow {
         this.project = project;
 //        updateJComboBox();
         initializeListeners();
+        this.theCount.setText((Objects.requireNonNull(persistencyService.getState(), "persistency service is null").getCeva()));
     }
 
     private void initializeListeners() {
@@ -79,6 +87,10 @@ public class MyToolWindow {
 //        this.diffFilesButton.addActionListener(e -> diffFiles());
 //        this.refreshButton.addActionListener(e -> updateJComboBox());
 //        this.refreshButton.addActionListener(e -> updateJComboBoxFromState());
+        this.button1.addActionListener(e -> {
+            persistencyService.setCeva(textField1.getText());
+            theCount.setText(persistencyService.getCeva());
+        });
     }
 
 //    private void updateJComboBoxFromState() {
@@ -198,18 +210,24 @@ public class MyToolWindow {
     }
 
     private void saveSessionInFile() {
-        loadDebuggerSession();
-        CompletableFuture.runAsync(() -> computeChildrenService.execute(this::persistNode));
+        persistencyService.setCeva("cevaaaaa");
+        theCount.setText(persistencyService.getCeva());
+
+//        loadDebuggerSession();
+//        CompletableFuture.runAsync(() -> computeChildrenService.execute(this::persistNode));
+
+
     }
 
     private void persistNode(XTestCompositeNode computedNode) {
         String snapName = "Snap-" + new Date().getTime();
         Map<String, XTestCompositeNode> newMap = Map.of(snapName, computedNode);
-        PersistencyService.State state1 = new PersistencyService.State();
-        state1.stateNodes = newMap;
-        PersistencyService persistencyService = PersistencyService.getInstance();
-        persistencyService.loadState(state1);
-        persistencyService.getState();
+        PersistencyService state1 = new PersistencyService();
+//        state1.newMap = newMap;
+//        LOG.debug("Persisting node");
+//        PersistencyService persistencyService = PersistencyService.getInstance();
+//        persistencyService.loadState(state1);
+//        persistencyService.getState();
     }
 
 
