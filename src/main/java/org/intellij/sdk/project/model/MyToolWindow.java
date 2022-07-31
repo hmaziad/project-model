@@ -34,7 +34,7 @@ public class MyToolWindow {
     private JPanel myToolWindowContent;
     private JTree myTreeActual;
     private JButton diffFilesButton;
-    private JButton saveSessionButton;
+    private JButton saveSnapShotButton;
     private JComboBox<String> targetFilesBox;
     private JComboBox<String> baseFilesBox;
     private JButton diffSessionButton;
@@ -63,7 +63,7 @@ public class MyToolWindow {
         this.UpButton.addActionListener(e -> navigateUp());
         this.downButton.addActionListener(e -> navigateDown());
         this.targetFilesBox.addActionListener(e -> selectTargetFile());
-        this.saveSessionButton.addActionListener(e -> saveSessionInFile());
+        this.saveSnapShotButton.addActionListener(e -> saveSnapShot());
         this.deleteButton.addActionListener(e -> deleteSnap());
 //        this.saveDiffButton.addActionListener(e -> saveDiffInFile());
 //        this.baseFilesBox.addActionListener(e -> updateJComboBox());
@@ -144,7 +144,7 @@ public class MyToolWindow {
         this.myTreeActual.setRootVisible(false);
     }
 
-    private void saveSessionInFile() {
+    private void saveSnapShot() {
         String snapName = "Snap-" + new Date().getTime();
         this.targetFilesBox.addItem(snapName); // this also freezes Persistency service if written after computing the node
         loadDebuggerSession();

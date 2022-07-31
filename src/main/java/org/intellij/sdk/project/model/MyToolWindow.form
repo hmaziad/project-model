@@ -45,7 +45,7 @@
           <text value="Diff Session Against File"/>
         </properties>
       </component>
-      <component id="f893b" class="javax.swing.JButton" binding="saveSessionButton">
+      <component id="f893b" class="javax.swing.JButton" binding="saveSnapShotButton">
         <constraints>
           <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="2" fill="1" indent="0" use-parent-layout="false"/>
           <gridbag weightx="0.0" weighty="1.0"/>
