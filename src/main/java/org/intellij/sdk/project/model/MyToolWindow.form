@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="org.intellij.sdk.project.model.MyToolWindow">
   <grid id="27dc6" binding="myToolWindowContent" layout-manager="GridBagLayout">
     <constraints>
-      <xy x="20" y="20" width="515" height="478"/>
+      <xy x="20" y="20" width="515" height="509"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -20,7 +20,7 @@
       </component>
       <component id="174c1" class="javax.swing.JButton" binding="diffFilesButton">
         <constraints>
-          <grid row="12" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="10" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
@@ -29,7 +29,7 @@
       </component>
       <component id="8a7cc" class="javax.swing.JComboBox" binding="baseFilesBox">
         <constraints>
-          <grid row="11" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="9" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
@@ -42,21 +42,12 @@
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
-          <text value="Diff Session Against File"/>
-        </properties>
-      </component>
-      <component id="f893b" class="javax.swing.JButton" binding="saveSnapShotButton">
-        <constraints>
-          <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="2" fill="1" indent="0" use-parent-layout="false"/>
-          <gridbag weightx="0.0" weighty="1.0"/>
-        </constraints>
-        <properties>
-          <text value=" Save Session"/>
+          <text value="Diff against snapshot"/>
         </properties>
       </component>
       <component id="d172e" class="javax.swing.JLabel">
         <constraints>
-          <grid row="10" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="8" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag top="0" left="5" bottom="0" right="0" weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
@@ -70,16 +61,7 @@
         </constraints>
         <properties>
           <alignmentX value="0.0"/>
-          <text value="Select Target File:"/>
-        </properties>
-      </component>
-      <component id="77217" class="javax.swing.JButton" binding="saveDiffShotButton">
-        <constraints>
-          <grid row="8" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false"/>
-          <gridbag weightx="0.0" weighty="1.0"/>
-        </constraints>
-        <properties>
-          <text value=" Save Diff"/>
+          <text value="Select snap:"/>
         </properties>
       </component>
       <grid id="28b40" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -112,7 +94,7 @@
       </grid>
       <scrollpane id="92491">
         <constraints>
-          <grid row="0" column="0" row-span="14" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="0" column="0" row-span="12" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
           <gridbag weightx="20.0" weighty="0.0"/>
         </constraints>
         <properties/>
@@ -142,6 +124,34 @@
           <text value="Delete Snap"/>
         </properties>
       </component>
+      <grid id="1434d" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints>
+          <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="1.0" weighty="0.5"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="d1915" class="javax.swing.JButton" binding="saveDiffShotButton">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Save Diff"/>
+            </properties>
+          </component>
+          <component id="4168d" class="javax.swing.JButton" binding="saveSnapShotButton">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <enabled value="true"/>
+              <text value="Save Snap"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
     </children>
   </grid>
 </form>
