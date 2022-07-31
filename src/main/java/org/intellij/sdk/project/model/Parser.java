@@ -1,9 +1,11 @@
 package org.intellij.sdk.project.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
 import com.github.difflib.text.DiffRow;
@@ -73,10 +75,10 @@ public class Parser {
         return output;
     }
 
-    public static String writeNodeAsString(XTestCompositeNode node) {
+    public static List<String> writeNodeAsString(XTestCompositeNode node) {
         StringBuilder sb = new StringBuilder();
         addLines(sb, node.getChildren(), "");
-        return sb.toString();
+        return Arrays.stream(sb.toString().split("\n")).collect(Collectors.toList());
     }
 
     private static void addLines(StringBuilder sb, List<XTestCompositeNode> nodes, String spaces) {

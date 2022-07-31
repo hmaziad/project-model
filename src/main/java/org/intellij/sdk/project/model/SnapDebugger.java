@@ -18,7 +18,7 @@ public class SnapDebugger implements ToolWindowFactory {
         LOG.info("Starting Tool Window");
         MyToolWindow myToolWindow = new MyToolWindow(project);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        Content content = contentFactory.createContent(myToolWindow.getContent(), "Debugger Tab 1", false);
+        Content content = contentFactory.createContent(myToolWindow.getContent(), "Debugger Tab", false);
         toolWindow.getContentManager().addContent(content);
     }
 
