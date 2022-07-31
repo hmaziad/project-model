@@ -2,7 +2,6 @@
 
 package org.intellij.sdk.project.model;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -13,7 +12,6 @@ import java.util.stream.Collectors;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
 import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.components.ServiceManager;
@@ -29,46 +27,50 @@ public class MyToolWindow {
     private static final ComputeChildrenService computeChildrenService = new ComputeChildrenService();
     private static final PersistencyService persistencyService = ServiceManager.getService(PersistencyService.class);
 
+    private final NodeNavigator nodeNavigator;
     private final DefaultTreeModel modelActual;
     private final XDebuggerManager xDebuggerManager;
+
     private JPanel myToolWindowContent;
-    private JTree myTreeActual;
+    private JTree nodeTree;
     private JButton diffFilesButton;
     private JButton saveSnapShotButton;
     private JComboBox<String> sourceShotsBox;
     private JComboBox<String> baseFilesBox;
-    private JButton diffSessionButton;
+    private JButton diffShotButton;
     private JButton saveDiffShotButton;
     private JButton UpButton;
     private JButton downButton;
     private JButton refreshButton;
     private JButton deleteButton;
-    private final Project project;
     private List<String> diffLines;
     private List<XTestCompositeNode> diffNodes = new ArrayList<>();
-    private int index = -1;
     private XTestCompositeNode diffNode;
 
     public MyToolWindow(@NotNull Project project) {
         this.xDebuggerManager = XDebuggerManager.getInstance(project);
         computeChildrenService.initToolWindow(this);
-        this.modelActual = (DefaultTreeModel) this.myTreeActual.getModel();
+        this.modelActual = (DefaultTreeModel) this.nodeTree.getModel();
         this.modelActual.setRoot(null);
-        this.myTreeActual.setRootVisible(false);
-        this.project = project;
+        this.nodeTree.setRootVisible(false);
+        this.nodeNavigator = new NodeNavigator(this.diffNodes, this.nodeTree);
         initializeListeners();
     }
 
     private void initializeListeners() {
-        this.diffSessionButton.addActionListener(e -> diffSession());
-        this.UpButton.addActionListener(e -> navigateUp());
-        this.downButton.addActionListener(e -> navigateDown());
-        this.sourceShotsBox.addActionListener(e -> selectTargetShot());
+        this.diffShotButton.addActionListener(e -> {
+            this.nodeNavigator.reset();
+            diffShot();
+        });
+        this.UpButton.addActionListener(e -> this.nodeNavigator.navigateUp());
+        this.downButton.addActionListener(e -> this.nodeNavigator.navigateDown());
+        this.sourceShotsBox.addActionListener(e -> {
+            selectTargetShot();
+            this.nodeNavigator.reset();
+        });
         this.saveSnapShotButton.addActionListener(e -> saveSnapShot());
         this.deleteButton.addActionListener(e -> deleteSnap());
         this.saveDiffShotButton.addActionListener(e -> saveDiffShot());
-//        this.baseFilesBox.addActionListener(e -> updateJComboBox());
-//        this.diffFilesButton.addActionListener(e -> diffFiles());
         this.refreshButton.addActionListener(e -> {
             this.sourceShotsBox.removeAllItems();
             persistencyService.getNodes().keySet().forEach(this.sourceShotsBox::addItem);
@@ -87,40 +89,15 @@ public class MyToolWindow {
         this.sourceShotsBox.removeItem(currentItem);
     }
 
-    private void navigateDown() {
-        if (diffNodes.isEmpty() || this.index == diffNodes.size() - 1) {
-            return;
-        }
-        this.index++;
-        updateTreeSelectionAndScroll();
-    }
-
-    private void navigateUp() {
-        if (diffNodes.isEmpty() || this.index == 0) {
-            return;
-        }
-        this.index--;
-        updateTreeSelectionAndScroll();
-    }
-
-    private void updateTreeSelectionAndScroll() {
-        TreePath nodePath = new TreePath(diffNodes.get(this.index).getPath());
-        this.myTreeActual.expandPath(nodePath);
-        this.myTreeActual.setSelectionPath(nodePath);
-        Rectangle bounds = myTreeActual.getPathBounds(nodePath);
-        bounds.height = myTreeActual.getVisibleRect().height;
-        myTreeActual.scrollRectToVisible(bounds);
-    }
-
-    private void diffSession() {
+    private void diffShot() {
         loadDebuggerSession();
-        CompletableFuture.runAsync(() -> computeChildrenService.execute(this::diffDebuggerSession));
+        CompletableFuture.runAsync(() -> computeChildrenService.execute(this::diffDebuggerShot));
     }
 
-    private void diffDebuggerSession(XTestCompositeNode node) {
-        String sourceSnapShotName = (String) sourceShotsBox.getSelectedItem();
+    private void diffDebuggerShot(XTestCompositeNode node) {
+        String targetSnapShotName = (String) sourceShotsBox.getSelectedItem();
         List<String> targetNodeAsStrings = Arrays //
-            .stream(Parser.writeNodeAsString(persistencyService.getNodes().get(sourceSnapShotName)).split("\n")) //
+            .stream(Parser.writeNodeAsString(persistencyService.getNodes().get(targetSnapShotName)).split("\n")) //
             .collect(Collectors.toList());
         LOG.debug("Target: {}", targetNodeAsStrings);
 
@@ -141,7 +118,7 @@ public class MyToolWindow {
     private void selectTargetShot() {
         String selectedFileName = (String) sourceShotsBox.getSelectedItem();
         this.modelActual.setRoot(persistencyService.getNodes().get(selectedFileName));
-        this.myTreeActual.setRootVisible(false);
+        this.nodeTree.setRootVisible(false);
     }
 
     private void saveSnapShot() {

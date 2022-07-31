@@ -52,6 +52,27 @@ public class Parser {
         return XTestCompositeNode.createNode(next[NAME], next[TYPE], next[VALUE], ch);
     }
 
+    public static List<String> unifiedDiffOfStrings(List<String> original, List<String> revised) {
+        DiffRowGenerator generator = DiffRowGenerator.create().showInlineDiffs(true).inlineDiffByWord(true).oldTag(f -> "").newTag(f -> "").build();
+        List<DiffRow> rows = generator.generateDiffRows(original, revised);
+        List<String> output = new ArrayList<>();
+        for (DiffRow row : rows) {
+            String oldLine = row.getOldLine();
+            String newLine = row.getNewLine();
+            if (!oldLine.equals(newLine)) {
+                if (!oldLine.isEmpty()) {
+                    output.add("-" + oldLine);
+                }
+                if (!newLine.isEmpty()) {
+                    output.add("+" + newLine);
+                }
+            } else {
+                output.add(newLine);
+            }
+        }
+        return output;
+    }
+
     public static String writeNodeAsString(XTestCompositeNode node) {
         StringBuilder sb = new StringBuilder();
         addLines(sb, node.getChildren(), "");
@@ -76,10 +97,6 @@ public class Parser {
             .append("\n");
     }
 
-    public static String writeNodeAsString(List<String> diffLines) {
-        return String.join("\n", diffLines);
-    }
-
     public static void print(XTestCompositeNode node) {
         print(node, "");
     }
@@ -87,26 +104,5 @@ public class Parser {
     private static void print(XTestCompositeNode node, String tab) {
         System.out.println(tab + node.getContainer().toString() + " " + node.getNodeId() + " " + node.getValue());
         node.getChildren().forEach(child -> print(child, tab + "\t"));
-    }
-
-    public static List<String> unifiedDiffOfStrings(List<String> original, List<String> revised) {
-        DiffRowGenerator generator = DiffRowGenerator.create().showInlineDiffs(true).inlineDiffByWord(true).oldTag(f -> "").newTag(f -> "").build();
-        List<DiffRow> rows = generator.generateDiffRows(original, revised);
-        List<String> output = new ArrayList<>();
-        for (DiffRow row : rows) {
-            String oldLine = row.getOldLine();
-            String newLine = row.getNewLine();
-            if (!oldLine.equals(newLine)) {
-                if (!oldLine.isEmpty()) {
-                    output.add("-" + oldLine);
-                }
-                if (!newLine.isEmpty()) {
-                    output.add("+" + newLine);
-                }
-            } else {
-                output.add(newLine);
-            }
-        }
-        return output;
     }
 }
