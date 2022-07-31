@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -73,6 +72,7 @@ public class MyToolWindow {
         this.project = project;
 //        updateJComboBox();
         initializeListeners();
+        persistencyService.addObserver(targetFilesBox);
     }
 
     private void initializeListeners() {
@@ -211,8 +211,8 @@ public class MyToolWindow {
 
     private void persistNode(XTestCompositeNode computedNode) {
         String snapName = "Snap-" + new Date().getTime();
-        Map<String, XTestCompositeNode> newMap = Map.of(snapName, computedNode);
-        PersistencyService state1 = new PersistencyService();
+//        targetFilesBox.addItem(snapName); // this also freezes Persistency service
+        persistencyService.addNode(snapName, computedNode);
 //        state1.newMap = newMap;
 //        LOG.debug("Persisting node");
 //        PersistencyService persistencyService = PersistencyService.getInstance();

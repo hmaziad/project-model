@@ -30,11 +30,13 @@ import com.intellij.xdebugger.frame.XValueChildrenList;
 import com.intellij.xdebugger.frame.XValueContainer;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 // Collecting data\u2026
 @Getter
 @Setter
+@NoArgsConstructor
 public class XTestCompositeNode extends XTestContainer<XValue> implements XCompositeNode {
     private static final String SPAN_FORMAT = "<html><span style='color:%s;'>%s</span></html>";
 
