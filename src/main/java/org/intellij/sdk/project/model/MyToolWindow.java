@@ -65,16 +65,34 @@ public class MyToolWindow {
         this.UpButton.addActionListener(e -> this.nodeNavigator.navigateUp());
         this.downButton.addActionListener(e -> this.nodeNavigator.navigateDown());
         this.sourceShotsBox.addActionListener(e -> {
-            selectTargetShot();
+            selectShot();
             this.nodeNavigator.reset();
         });
         this.saveSnapShotButton.addActionListener(e -> saveSnapShot());
-        this.deleteButton.addActionListener(e -> deleteSnap());
+        this.deleteButton.addActionListener(e -> deleteShot());
         this.saveDiffShotButton.addActionListener(e -> saveDiffShot());
         this.refreshButton.addActionListener(e -> {
             this.sourceShotsBox.removeAllItems();
             persistencyService.getNodes().keySet().forEach(this.sourceShotsBox::addItem);
         });
+    }
+
+    private void diffShot() {
+        loadDebuggerSession();
+        CompletableFuture.runAsync(() -> computeChildrenService.execute(this::diffDebuggerShot));
+    }
+
+    private void selectShot() {
+        String selectedFileName = (String) sourceShotsBox.getSelectedItem();
+        this.modelActual.setRoot(persistencyService.getNodes().get(selectedFileName));
+        this.nodeTree.setRootVisible(false);
+    }
+
+    private void saveSnapShot() {
+        String snapName = "Snap-" + new Date().getTime();
+        this.sourceShotsBox.addItem(snapName); // this also freezes Persistency service if written after computing the node
+        loadDebuggerSession();
+        CompletableFuture.runAsync(() -> computeChildrenService.execute(computedNode ->  persistencyService.addNode(snapName, computedNode)));
     }
 
     private void saveDiffShot() {
@@ -83,15 +101,10 @@ public class MyToolWindow {
         persistencyService.addNode(diffName, this.diffNode);
     }
 
-    private void deleteSnap() {
-        Object currentItem = this.sourceShotsBox.getSelectedItem();
-        persistencyService.getNodes().remove((String) currentItem);
-        this.sourceShotsBox.removeItem(currentItem);
-    }
-
-    private void diffShot() {
-        loadDebuggerSession();
-        CompletableFuture.runAsync(() -> computeChildrenService.execute(this::diffDebuggerShot));
+    private void deleteShot() {
+        Object currentShotName = this.sourceShotsBox.getSelectedItem();
+        persistencyService.getNodes().remove((String) currentShotName);
+        this.sourceShotsBox.removeItem(currentShotName);
     }
 
     private void diffDebuggerShot(XTestCompositeNode node) {
@@ -113,19 +126,6 @@ public class MyToolWindow {
         LOG.debug("Diff Node: {}", this.diffNode);
 
         this.modelActual.setRoot(this.diffNode);
-    }
-
-    private void selectTargetShot() {
-        String selectedFileName = (String) sourceShotsBox.getSelectedItem();
-        this.modelActual.setRoot(persistencyService.getNodes().get(selectedFileName));
-        this.nodeTree.setRootVisible(false);
-    }
-
-    private void saveSnapShot() {
-        String snapName = "Snap-" + new Date().getTime();
-        this.sourceShotsBox.addItem(snapName); // this also freezes Persistency service if written after computing the node
-        loadDebuggerSession();
-        CompletableFuture.runAsync(() -> computeChildrenService.execute(computedNode ->  persistencyService.addNode(snapName, computedNode)));
     }
 
     public JPanel getContent() {
