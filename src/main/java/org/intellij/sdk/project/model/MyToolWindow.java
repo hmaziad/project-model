@@ -35,10 +35,10 @@ public class MyToolWindow {
     private JTree myTreeActual;
     private JButton diffFilesButton;
     private JButton saveSnapShotButton;
-    private JComboBox<String> targetFilesBox;
+    private JComboBox<String> sourceShotsBox;
     private JComboBox<String> baseFilesBox;
     private JButton diffSessionButton;
-    private JButton saveDiffButton;
+    private JButton saveDiffShotButton;
     private JButton UpButton;
     private JButton downButton;
     private JButton refreshButton;
@@ -47,6 +47,7 @@ public class MyToolWindow {
     private List<String> diffLines;
     private List<XTestCompositeNode> diffNodes = new ArrayList<>();
     private int index = -1;
+    private XTestCompositeNode diffNode;
 
     public MyToolWindow(@NotNull Project project) {
         this.xDebuggerManager = XDebuggerManager.getInstance(project);
@@ -62,22 +63,28 @@ public class MyToolWindow {
         this.diffSessionButton.addActionListener(e -> diffSession());
         this.UpButton.addActionListener(e -> navigateUp());
         this.downButton.addActionListener(e -> navigateDown());
-        this.targetFilesBox.addActionListener(e -> selectTargetFile());
+        this.sourceShotsBox.addActionListener(e -> selectTargetShot());
         this.saveSnapShotButton.addActionListener(e -> saveSnapShot());
         this.deleteButton.addActionListener(e -> deleteSnap());
-//        this.saveDiffButton.addActionListener(e -> saveDiffInFile());
+        this.saveDiffShotButton.addActionListener(e -> saveDiffShot());
 //        this.baseFilesBox.addActionListener(e -> updateJComboBox());
 //        this.diffFilesButton.addActionListener(e -> diffFiles());
         this.refreshButton.addActionListener(e -> {
-            this.targetFilesBox.removeAllItems();
-            persistencyService.getNodes().keySet().forEach(this.targetFilesBox::addItem);
+            this.sourceShotsBox.removeAllItems();
+            persistencyService.getNodes().keySet().forEach(this.sourceShotsBox::addItem);
         });
     }
 
+    private void saveDiffShot() {
+        String diffName = "Diff-" + new Date().getTime();
+        this.sourceShotsBox.addItem(diffName);
+        persistencyService.addNode(diffName, this.diffNode);
+    }
+
     private void deleteSnap() {
-        Object currentItem = this.targetFilesBox.getSelectedItem();
+        Object currentItem = this.sourceShotsBox.getSelectedItem();
         persistencyService.getNodes().remove((String) currentItem);
-        this.targetFilesBox.removeItem(currentItem);
+        this.sourceShotsBox.removeItem(currentItem);
     }
 
     private void navigateDown() {
@@ -111,42 +118,35 @@ public class MyToolWindow {
     }
 
     private void diffDebuggerSession(XTestCompositeNode node) {
+        String sourceSnapShotName = (String) sourceShotsBox.getSelectedItem();
+        List<String> targetNodeAsStrings = Arrays //
+            .stream(Parser.writeNodeAsString(persistencyService.getNodes().get(sourceSnapShotName)).split("\n")) //
+            .collect(Collectors.toList());
+        LOG.debug("Target: {}", targetNodeAsStrings);
 
-        String targetFileName = (String) targetFilesBox.getSelectedItem();
-        //            List<String> original = Files.readAllLines(Paths.get(fullPath + targetFileName));
-        List<String> original = new ArrayList<>();
-        // todo this needs to be refactored
-        List<String> revised = Arrays //
+        List<String> sourceNodeAsStrings = Arrays //
             .stream(Parser.writeNodeAsString(node).split("\n")) //
             .collect(Collectors.toList());
+        LOG.debug("Source: {}", sourceNodeAsStrings);
 
-        this.diffLines = Parser.unifiedDiffOfStrings(original, revised);
-        XTestCompositeNode diffNode = Parser.parseStringsToNode(this.diffLines, this.diffNodes);
-        this.modelActual.setRoot(diffNode);
+        this.diffLines = Parser.unifiedDiffOfStrings(targetNodeAsStrings, sourceNodeAsStrings);
+        LOG.debug("Diff Lines: {}",  this.diffLines);
+
+        this.diffNode = Parser.parseStringsToNode(this.diffLines, this.diffNodes);
+        LOG.debug("Diff Node: {}", this.diffNode);
+
+        this.modelActual.setRoot(this.diffNode);
     }
 
-    private void diffFiles() {
-        String targetFileName = (String) targetFilesBox.getSelectedItem();
-        String baseFileName = (String) baseFilesBox.getSelectedItem();
-        List<String> original = new ArrayList<>();
-        List<String> revised = new ArrayList<>();
-        this.diffLines = Parser.unifiedDiffOfStrings(original, revised);
-        this.diffNodes.clear();
-        XTestCompositeNode diffNode = Parser.parseStringsToNode(this.diffLines, this.diffNodes);
-        this.modelActual.setRoot(diffNode);
-    }
-
-    private void selectTargetFile() {
-        String selectedFileName = (String) targetFilesBox.getSelectedItem();
-//        Path selectedPath = Paths.get(fullPath + selectedFileName);
-//        XTestCompositeNode parsedNode = Parser.parseStringsToNode(selectedPath);
+    private void selectTargetShot() {
+        String selectedFileName = (String) sourceShotsBox.getSelectedItem();
         this.modelActual.setRoot(persistencyService.getNodes().get(selectedFileName));
         this.myTreeActual.setRootVisible(false);
     }
 
     private void saveSnapShot() {
         String snapName = "Snap-" + new Date().getTime();
-        this.targetFilesBox.addItem(snapName); // this also freezes Persistency service if written after computing the node
+        this.sourceShotsBox.addItem(snapName); // this also freezes Persistency service if written after computing the node
         loadDebuggerSession();
         CompletableFuture.runAsync(() -> computeChildrenService.execute(computedNode ->  persistencyService.addNode(snapName, computedNode)));
     }

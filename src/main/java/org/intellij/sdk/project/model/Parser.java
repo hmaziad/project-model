@@ -1,8 +1,5 @@
 package org.intellij.sdk.project.model;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,16 +20,9 @@ public class Parser {
     private static final int VALUE = 3;
     private static final int PARTS = 4;
 
-    public static XTestCompositeNode parseStringsToNode(Path path) {
-        try {
-            return parseStringsToNode(Files.readAllLines(path), new ArrayList<>());
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
     public static XTestCompositeNode parseStringsToNode(List<String> lines, List<XTestCompositeNode> diffNodes) {
         List<String[]> lineArrays = new ArrayList<>();
+        diffNodes.clear();
         for (String line : lines) {
             String[] lineArray = line.split(",", PARTS);
             lineArrays.add(lineArray);
@@ -69,12 +59,21 @@ public class Parser {
     }
 
     private static void addLines(StringBuilder sb, List<XTestCompositeNode> nodes, String spaces) {
-        nodes.forEach(child -> appendData(sb, child, spaces));
-        nodes.forEach(child -> addLines(sb, child.getChildren(), spaces + " "));
+        nodes.forEach(child -> {
+            appendData(sb, child, spaces);
+            addLines(sb, child.getChildren(), spaces + " ");
+        });
     }
 
     private static void appendData(StringBuilder sb, XTestCompositeNode node, String spaces) {
-        sb.append(spaces).append(",").append(node.getContainer().toString()).append(",").append(node.getNodeId()).append(",").append(node.getValue()).append("\n");
+        sb.append(spaces) //
+            .append(",") //
+            .append(node.getContainer().toString()) //
+            .append(",") //
+            .append(node.getNodeId()) //
+            .append(",") //
+            .append(node.getValue()) //
+            .append("\n");
     }
 
     public static String writeNodeAsString(List<String> diffLines) {
