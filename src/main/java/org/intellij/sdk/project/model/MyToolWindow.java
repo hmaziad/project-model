@@ -14,6 +14,7 @@ import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
 
@@ -30,6 +31,8 @@ public class MyToolWindow {
     private final NodeNavigatorService nodeNavigatorService;
     private final DefaultTreeModel modelActual;
     private final XDebuggerManager xDebuggerManager;
+    private Project project;
+
 
     private JPanel myToolWindowContent;
     private JTree nodeTree;
@@ -43,12 +46,15 @@ public class MyToolWindow {
     private JButton downButton;
     private JButton refreshButton;
     private JButton deleteButton;
+    private JButton takeSnapshot;
     private List<String> diffLines;
     private List<XTestCompositeNode> diffNodes = new ArrayList<>();
     private XTestCompositeNode diffNode;
+    private XTestCompositeNode computedNode;
 
     public MyToolWindow(@NotNull Project project) {
         this.xDebuggerManager = XDebuggerManager.getInstance(project);
+        this.project = project;
         this.modelActual = (DefaultTreeModel) this.nodeTree.getModel();
         this.modelActual.setRoot(null);
         this.nodeTree.setRootVisible(false);
@@ -75,6 +81,7 @@ public class MyToolWindow {
         this.saveSnapShotButton.addActionListener(e -> saveSnapShot());
         this.deleteButton.addActionListener(e -> deleteShot());
         this.saveDiffShotButton.addActionListener(e -> saveDiffShot());
+        this.takeSnapshot.addActionListener(e -> takeSnapshot());
         this.refreshButton.addActionListener(e -> {
             this.sourceShotsBox.removeAllItems();
             this.otherShotsBox.removeAllItems();
@@ -85,6 +92,14 @@ public class MyToolWindow {
                 }
             });
         });
+    }
+
+    private void takeSnapshot() {
+        loadDebuggerSession();
+        CompletableFuture.runAsync(() -> computeChildrenService.execute(resultComputedNode -> {
+            this.computedNode = resultComputedNode;
+            this.modelActual.setRoot(this.computedNode);
+        }));
     }
 
     private void diffSnaps() {
@@ -116,8 +131,7 @@ public class MyToolWindow {
         String snapName = SNAP + new Date().getTime();
         this.sourceShotsBox.addItem(snapName); // this also freezes Persistency service if written after computing the node
         this.otherShotsBox.addItem(snapName); // this also freezes Persistency service if written after computing the node
-        loadDebuggerSession();
-        CompletableFuture.runAsync(() -> computeChildrenService.execute(computedNode -> persistencyService.addNode(snapName, computedNode)));
+        persistencyService.addNode(snapName, this.computedNode);
     }
 
     private void saveDiffShot() {
@@ -155,9 +169,12 @@ public class MyToolWindow {
 
     private void loadDebuggerSession() {
         XDebugSession currentSession = this.xDebuggerManager.getCurrentSession();
-        XDebugSession session = Objects.requireNonNull(currentSession, START_DEBUGGER_ERROR_MESSAGE);
+        if (Objects.isNull(currentSession)) {
+            Messages.showMessageDialog(this.project, START_DEBUGGER_ERROR_MESSAGE, "Error", Messages.getInformationIcon());
+            return;
+        }
         LOG.info("Debug Session Retrieved...");
-        computeChildrenService.initStackFrame(session.getCurrentStackFrame());
+        computeChildrenService.initStackFrame(currentSession.getCurrentStackFrame());
         LOG.info("Start Computing Children...");
     }
 }
