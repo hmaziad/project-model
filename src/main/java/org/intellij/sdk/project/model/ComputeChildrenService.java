@@ -18,12 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ComputeChildrenService {
-    private MyToolWindow myToolWindow;
     private XValueContainer container;
 
-    public void initToolWindow(MyToolWindow myToolWindow) {
-        this.myToolWindow = myToolWindow;
-    }
     public void initStackFrame(XValueContainer container) {
         this.container = container;
     }
@@ -60,7 +56,7 @@ public class ComputeChildrenService {
         }
         LOG.debug("Computed Debug Node {}", rootNode);
         saveSessionConsumer.accept(rootNode);
-        Parser.print(rootNode);
+        ParserService.print(rootNode);
     }
 
     private void computeChildren(XTestCompositeNode currentNode) {

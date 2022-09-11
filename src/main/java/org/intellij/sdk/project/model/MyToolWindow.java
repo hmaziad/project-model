@@ -27,7 +27,7 @@ public class MyToolWindow {
     private static final String SNAP = "Snap-";
     private static final String DIFF = "Diff-";
 
-    private final NodeNavigator nodeNavigator;
+    private final NodeNavigatorService nodeNavigatorService;
     private final DefaultTreeModel modelActual;
     private final XDebuggerManager xDebuggerManager;
 
@@ -39,7 +39,7 @@ public class MyToolWindow {
     private JComboBox<String> otherShotsBox;
     private JButton diffShotButton;
     private JButton saveDiffShotButton;
-    private JButton UpButton;
+    private JButton upButton;
     private JButton downButton;
     private JButton refreshButton;
     private JButton deleteButton;
@@ -49,32 +49,29 @@ public class MyToolWindow {
 
     public MyToolWindow(@NotNull Project project) {
         this.xDebuggerManager = XDebuggerManager.getInstance(project);
-        computeChildrenService.initToolWindow(this);
         this.modelActual = (DefaultTreeModel) this.nodeTree.getModel();
         this.modelActual.setRoot(null);
         this.nodeTree.setRootVisible(false);
-        this.nodeNavigator = new NodeNavigator(this.diffNodes, this.nodeTree);
+        this.nodeNavigatorService = new NodeNavigatorService(this.diffNodes, this.nodeTree);
         initializeListeners();
     }
 
     private void initializeListeners() {
         this.diffShotButton.addActionListener(e -> {
-            this.nodeNavigator.reset();
+            this.nodeNavigatorService.reset();
             diffCurrentSessionWithSnapShot();
         });
         this.diffSnapsButton.addActionListener(e -> {
-            this.nodeNavigator.reset();
+            this.nodeNavigatorService.reset();
             diffSnaps();
         });
-        this.UpButton.addActionListener(e -> this.nodeNavigator.navigateUp());
-        this.downButton.addActionListener(e -> this.nodeNavigator.navigateDown());
+        this.upButton.addActionListener(e -> this.nodeNavigatorService.navigateUp());
+        this.downButton.addActionListener(e -> this.nodeNavigatorService.navigateDown());
         this.sourceShotsBox.addActionListener(e -> {
             selectShot();
-            this.nodeNavigator.reset();
+            this.nodeNavigatorService.reset();
         });
-        this.otherShotsBox.addActionListener(e -> {
-            this.nodeNavigator.reset();
-        });
+        this.otherShotsBox.addActionListener(e -> this.nodeNavigatorService.reset());
         this.saveSnapShotButton.addActionListener(e -> saveSnapShot());
         this.deleteButton.addActionListener(e -> deleteShot());
         this.saveDiffShotButton.addActionListener(e -> saveDiffShot());
@@ -95,10 +92,10 @@ public class MyToolWindow {
         String selectedTargetName = (String) this.otherShotsBox.getSelectedItem();
         XTestCompositeNode selectedSourceNode = persistencyService.getNodes().get(selectedSourceName);
         XTestCompositeNode selectedTargetNode = persistencyService.getNodes().get(selectedTargetName);
-        List<String> selectedSourceAsString = Parser.writeNodeAsString(selectedSourceNode);
-        List<String> selectedTargetAsString = Parser.writeNodeAsString(selectedTargetNode);
-        this.diffLines = Parser.unifiedDiffOfStrings(selectedSourceAsString, selectedTargetAsString);
-        this.diffNode = Parser.parseStringsToNode(this.diffLines, this.diffNodes);
+        List<String> selectedSourceAsString = ParserService.writeNodeAsString(selectedSourceNode);
+        List<String> selectedTargetAsString = ParserService.writeNodeAsString(selectedTargetNode);
+        this.diffLines = ParserService.unifiedDiffOfStrings(selectedSourceAsString, selectedTargetAsString);
+        this.diffNode = ParserService.parseStringsToNode(this.diffLines, this.diffNodes);
         LOG.debug("Diff Node: {}", this.diffNode);
         this.modelActual.setRoot(this.diffNode);
     }
@@ -141,13 +138,13 @@ public class MyToolWindow {
 
     private void diffDebuggerShot(XTestCompositeNode computedNode) {
         String targetSnapShotName = (String) sourceShotsBox.getSelectedItem();
-        List<String> targetNodeAsStrings = Parser.writeNodeAsString(persistencyService.getNodes().get(targetSnapShotName));
+        List<String> targetNodeAsStrings = ParserService.writeNodeAsString(persistencyService.getNodes().get(targetSnapShotName));
         LOG.debug("Target: {}", targetNodeAsStrings);
-        List<String> sourceNodeAsStrings = Parser.writeNodeAsString(computedNode);
+        List<String> sourceNodeAsStrings = ParserService.writeNodeAsString(computedNode);
         LOG.debug("Source: {}", sourceNodeAsStrings);
-        this.diffLines = Parser.unifiedDiffOfStrings(targetNodeAsStrings, sourceNodeAsStrings);
+        this.diffLines = ParserService.unifiedDiffOfStrings(targetNodeAsStrings, sourceNodeAsStrings);
         LOG.debug("Diff Lines: {}", this.diffLines);
-        this.diffNode = Parser.parseStringsToNode(this.diffLines, this.diffNodes);
+        this.diffNode = ParserService.parseStringsToNode(this.diffLines, this.diffNodes);
         LOG.debug("Diff Node: {}", this.diffNode);
         this.modelActual.setRoot(this.diffNode);
     }

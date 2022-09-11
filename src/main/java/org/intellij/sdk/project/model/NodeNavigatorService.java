@@ -8,12 +8,12 @@ import javax.swing.*;
 import javax.swing.tree.TreePath;
 import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
 
-public class NodeNavigator {
+public class NodeNavigatorService {
     private final List<XTestCompositeNode> diffNodes;
     private final JTree nodeTree;
     private int index = -1;
 
-    public NodeNavigator(List<XTestCompositeNode> diffNodes, JTree nodeTree) {
+    public NodeNavigatorService(List<XTestCompositeNode> diffNodes, JTree nodeTree) {
         this.diffNodes = diffNodes;
         this.nodeTree = nodeTree;
     }

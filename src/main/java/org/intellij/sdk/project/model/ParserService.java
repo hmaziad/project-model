@@ -13,9 +13,11 @@ import com.github.difflib.text.DiffRowGenerator;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class Parser {
+@Log4j2
+public class ParserService {
     private static final int INDEX = 0;
     private static final int NAME = 1;
     private static final int TYPE = 2;
@@ -104,7 +106,7 @@ public class Parser {
     }
 
     private static void print(XTestCompositeNode node, String tab) {
-        System.out.println(tab + node.getContainer().toString() + " " + node.getNodeId() + " " + node.getValue());
+        LOG.info(tab + node.getContainer().toString() + " " + node.getNodeId() + " " + node.getValue());
         node.getChildren().forEach(child -> print(child, tab + "\t"));
     }
 }

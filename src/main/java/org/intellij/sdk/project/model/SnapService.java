@@ -12,7 +12,7 @@ import com.intellij.ui.content.ContentFactory;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-public class SnapDebugger implements ToolWindowFactory {
+public class SnapService implements ToolWindowFactory {
 
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         LOG.info("Starting Tool Window");
