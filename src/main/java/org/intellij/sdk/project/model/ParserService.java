@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
+import org.jetbrains.annotations.NotNull;
 import com.github.difflib.text.DiffRow;
 import com.github.difflib.text.DiffRowGenerator;
 
@@ -18,12 +19,13 @@ import lombok.extern.log4j.Log4j2;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Log4j2
 public class ParserService {
-    private static final int INDEX = 0;
-    private static final int NAME = 1;
-    private static final int TYPE = 2;
-    private static final int VALUE = 3;
+    private static final int INDENTS_SIGN_PART = 0;
+    private static final int NAME_PART = 1;
+    private static final int TYPE_PART = 2;
+    private static final int VALUE_PART = 3;
     private static final int PARTS = 4;
-
+    private static final char SPACE = ' ';
+// use this tool instead https://github.com/google/diff-match-patch
     public static XTestCompositeNode parseStringsToNode(List<String> lines, List<XTestCompositeNode> diffNodes) {
         List<String[]> lineArrays = new ArrayList<>();
         diffNodes.clear();
@@ -33,27 +35,33 @@ public class ParserService {
         }
 
         Map<Integer, XTestCompositeNode> nodePerIndex = new HashMap<>();
-        nodePerIndex.put(-1, createNode(new String[] {"", "name", "nodeId", "value"}, ' '));
-        for (String[] lineArray : lineArrays) {
-            String first = lineArray[INDEX];
-            char ch = ' ';
-            int index = first.length();
-            if (!first.isEmpty() && (first.charAt(0) == '+' || first.charAt(0) == '-')) {
-                ch = first.charAt(0);
-                index--;
+        nodePerIndex.put(-1, createDummyNode());
+        for (int lineNumber = 0; lineNumber < lineArrays.size(); lineNumber++) {
+            String[] lineArray = lineArrays.get(lineNumber);
+            String indentsAndSign = lineArray[INDENTS_SIGN_PART];
+            char signOrSpace = SPACE;
+            int indents = indentsAndSign.length();
+            if (!indentsAndSign.isEmpty() && (indentsAndSign.charAt(0) == '+' || indentsAndSign.charAt(0) == '-')) {
+                signOrSpace = indentsAndSign.charAt(0);
+                indents--;
             }
-            XTestCompositeNode newNode = createNode(lineArray, ch);
+            XTestCompositeNode newNode = createNode(lineArray, signOrSpace, lineNumber);
             if (newNode.getDiffChar() == '+' || newNode.getDiffChar() == '-') {
                 diffNodes.add(newNode);
             }
-            nodePerIndex.put(index, newNode);
-            nodePerIndex.get(index - 1).addChild(newNode);
+            nodePerIndex.put(indents, newNode);
+            nodePerIndex.get(indents - 1).addChild(newNode);
         }
         return nodePerIndex.get(-1);
     }
 
-    private static XTestCompositeNode createNode(String[] next, char ch) {
-        return XTestCompositeNode.createNode(next[NAME], next[TYPE], next[VALUE], ch);
+    @NotNull
+    private static XTestCompositeNode createDummyNode() {
+        return createNode(new String[] {"", "name", "nodeId", "value"}, SPACE, -1);
+    }
+
+    private static XTestCompositeNode createNode(String[] next, char signOrSpace, int lineNumber) {
+        return XTestCompositeNode.createNode(next[NAME_PART], next[TYPE_PART], next[VALUE_PART], signOrSpace, lineNumber);
     }
 
     public static List<String> unifiedDiffOfStrings(List<String> original, List<String> revised) {

@@ -32,6 +32,7 @@ public class XTestValueNode extends XValueNodePresentationConfigurator.Configura
         myValue = XValuePresentationUtil.computeValueText(valuePresentation);
         if (!myValue.startsWith("Collecting data")) {
             compositeNode.setValue(myValue);
+            compositeNode.setIcon(icon);
             childNodeFuture.complete(null);
         }
         if (!hasChildren) {

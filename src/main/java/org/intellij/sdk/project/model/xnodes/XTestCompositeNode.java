@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 
+import javax.swing.*;
 import javax.swing.tree.MutableTreeNode;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.debugger.engine.JavaValue;
@@ -48,13 +49,15 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
     private String nodeId = "";
     private int ref;
     private char diffChar;
+    private int lineNumber;
+    private Icon icon;
 
     public XTestCompositeNode(Queue<XTestCompositeNode> queue, XValueContainer container) {
         this.queue = queue;
         this.container = container;
     }
 
-    public static XTestCompositeNode createNode(String name, String nodeId, String value, char ch) {
+    public static XTestCompositeNode createNode(String name, String nodeId, String value, char signOrSpace, int lineNumber) {
         XTestCompositeNode node = new XTestCompositeNode(null, null);
         node.setContainer(new XValueContainer() {
             @Override
@@ -64,7 +67,8 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
         });
         node.setNodeId(nodeId);
         node.setValue(value);
-        node.setDiffChar(ch);
+        node.setDiffChar(signOrSpace);
+        node.setLineNumber(lineNumber);
         return node;
     }
 
@@ -132,5 +136,9 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
     @Override
     public void add(MutableTreeNode newChild) {
         super.add(newChild);
+    }
+
+    public void setIcon(Icon icon) {
+        this.icon = icon;
     }
 }

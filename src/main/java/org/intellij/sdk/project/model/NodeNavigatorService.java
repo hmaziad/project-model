@@ -12,14 +12,16 @@ public class NodeNavigatorService {
     private final List<XTestCompositeNode> diffNodes;
     private final JTree nodeTree;
     private int index = -1;
+    private List<XTestCompositeNode> groupedDiffNodes;
 
     public NodeNavigatorService(List<XTestCompositeNode> diffNodes, JTree nodeTree) {
         this.diffNodes = diffNodes;
         this.nodeTree = nodeTree;
+        reset();
     }
 
     public void navigateDown() {
-        if (diffNodes.isEmpty() || this.index == diffNodes.size() - 1) {
+        if (this.groupedDiffNodes.isEmpty() || this.index == this.groupedDiffNodes.size() - 1) {
             return;
         }
         this.index++;
@@ -27,7 +29,7 @@ public class NodeNavigatorService {
     }
 
     public void navigateUp() {
-        if (diffNodes.isEmpty() || this.index == 0) {
+        if (this.groupedDiffNodes.isEmpty() || this.index == 0) {
             return;
         }
         this.index--;
@@ -35,7 +37,7 @@ public class NodeNavigatorService {
     }
 
     private void updateTreeSelectionAndScroll() {
-        TreePath nodePath = new TreePath(diffNodes.get(this.index).getPath());
+        TreePath nodePath = new TreePath(this.diffNodes.get(this.groupedDiffNodes.get(this.index).getLineNumber()).getPath());
         this.nodeTree.expandPath(nodePath);
         this.nodeTree.setSelectionPath(nodePath);
         Rectangle bounds = nodeTree.getPathBounds(nodePath);

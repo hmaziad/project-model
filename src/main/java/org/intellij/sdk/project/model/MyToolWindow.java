@@ -2,13 +2,16 @@
 
 package org.intellij.sdk.project.model;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
 import org.jetbrains.annotations.NotNull;
@@ -51,6 +54,7 @@ public class MyToolWindow {
     private List<XTestCompositeNode> diffNodes = new ArrayList<>();
     private XTestCompositeNode diffNode;
     private XTestCompositeNode computedNode;
+    private AtomicBoolean isDiffShot = new AtomicBoolean();
 
     public MyToolWindow(@NotNull Project project) {
         this.xDebuggerManager = XDebuggerManager.getInstance(project);
@@ -60,28 +64,31 @@ public class MyToolWindow {
         this.nodeTree.setRootVisible(false);
         this.nodeNavigatorService = new NodeNavigatorService(this.diffNodes, this.nodeTree);
         initializeListeners();
+        this.nodeTree.setCellRenderer(new DebuggerTreeRenderer());
     }
 
     private void initializeListeners() {
-        this.diffShotButton.addActionListener(e -> {
-            this.nodeNavigatorService.reset();
-            diffCurrentSessionWithSnapShot();
-        });
-        this.diffSnapsButton.addActionListener(e -> {
-            this.nodeNavigatorService.reset();
-            diffSnaps();
-        });
-        this.upButton.addActionListener(e -> this.nodeNavigatorService.navigateUp());
-        this.downButton.addActionListener(e -> this.nodeNavigatorService.navigateDown());
-        this.sourceShotsBox.addActionListener(e -> {
-            selectShot();
-            this.nodeNavigatorService.reset();
-        });
-        this.otherShotsBox.addActionListener(e -> this.nodeNavigatorService.reset());
-        this.saveSnapShotButton.addActionListener(e -> saveSnapShot());
-        this.deleteButton.addActionListener(e -> deleteShot());
-        this.saveDiffShotButton.addActionListener(e -> saveDiffShot());
         this.takeSnapshot.addActionListener(e -> takeSnapshot());
+        this.saveSnapShotButton.addActionListener(e -> saveSnapShot());
+        this.diffShotButton.addActionListener(e -> diffCurrentSessionWithSnapShot());
+        this.saveDiffShotButton.addActionListener(e -> saveDiffShot());
+        this.upButton.addActionListener(e -> {
+            if (!this.isDiffShot.get()) {
+                Messages.showMessageDialog(this.project, "Please diff a node first", "Error", Messages.getInformationIcon());
+                return;
+            }
+            this.nodeNavigatorService.navigateUp();
+        });
+        this.downButton.addActionListener(e -> {
+            if (!this.isDiffShot.get()) {
+                Messages.showMessageDialog(this.project, "Please diff a node first", "Error", Messages.getInformationIcon());
+                return;
+            }
+            this.nodeNavigatorService.navigateDown();
+        });
+        this.sourceShotsBox.addActionListener(e -> selectShot());
+        this.otherShotsBox.addActionListener(e -> this.nodeNavigatorService.reset());
+        this.deleteButton.addActionListener(e -> deleteShot());
         this.refreshButton.addActionListener(e -> {
             this.sourceShotsBox.removeAllItems();
             this.otherShotsBox.removeAllItems();
@@ -92,6 +99,8 @@ public class MyToolWindow {
                 }
             });
         });
+        this.diffSnapsButton.addActionListener(e -> diffSnaps());
+
     }
 
     private void takeSnapshot() {
@@ -99,10 +108,12 @@ public class MyToolWindow {
         CompletableFuture.runAsync(() -> computeChildrenService.execute(resultComputedNode -> {
             this.computedNode = resultComputedNode;
             this.modelActual.setRoot(this.computedNode);
+            isDiffShot.set(false);
         }));
     }
 
     private void diffSnaps() {
+        this.nodeNavigatorService.reset();
         String selectedSourceName = (String) this.sourceShotsBox.getSelectedItem();
         String selectedTargetName = (String) this.otherShotsBox.getSelectedItem();
         XTestCompositeNode selectedSourceNode = persistencyService.getNodes().get(selectedSourceName);
@@ -113,14 +124,42 @@ public class MyToolWindow {
         this.diffNode = ParserService.parseStringsToNode(this.diffLines, this.diffNodes);
         LOG.debug("Diff Node: {}", this.diffNode);
         this.modelActual.setRoot(this.diffNode);
+        isDiffShot.set(true);
     }
 
     private void diffCurrentSessionWithSnapShot() {
-        loadDebuggerSession();
-        CompletableFuture.runAsync(() -> computeChildrenService.execute(this::diffDebuggerShot));
+        this.nodeNavigatorService.reset();
+        StringBuilder messageBuilder = new StringBuilder();
+        if (Objects.isNull(this.computedNode)) {
+            messageBuilder.append("Please take a snap shot first");
+        }
+        Object selectedItem = sourceShotsBox.getSelectedItem();
+        if (Objects.isNull(selectedItem)) {
+            messageBuilder.append("\nPlease take select a ref snap shot from dropdown button");
+        }
+        if (messageBuilder.length() != 0) {
+            Messages.showMessageDialog(this.project, messageBuilder.toString(), "Error", Messages.getInformationIcon());
+            return;
+        }
+        String targetSnapShotName = (String) selectedItem;
+        List<String> targetNodeAsStrings = ParserService.writeNodeAsString(persistencyService.getNodes().get(targetSnapShotName));
+        LOG.debug("Target: {}", targetNodeAsStrings);
+        List<String> sourceNodeAsStrings = ParserService.writeNodeAsString(this.computedNode);
+        LOG.debug("Source: {}", sourceNodeAsStrings);
+        this.diffLines = ParserService.unifiedDiffOfStrings(targetNodeAsStrings, sourceNodeAsStrings);
+        LOG.debug("Diff Lines: {}", this.diffLines);
+        this.diffNode = ParserService.parseStringsToNode(this.diffLines, this.diffNodes);
+        if (this.diffNodes.isEmpty()) {
+            Messages.showMessageDialog(this.project, "Nodes are identical", "Info", Messages.getInformationIcon());
+            return;
+        }
+        LOG.debug("Diff Node: {}", this.diffNode);
+        this.modelActual.setRoot(this.diffNode);
+        this.isDiffShot.set(true);
     }
 
     private void selectShot() {
+        this.nodeNavigatorService.reset();
         String selectedSourceName = (String) this.sourceShotsBox.getSelectedItem();
         XTestCompositeNode root = persistencyService.getNodes().get(selectedSourceName);
         this.modelActual.setRoot(root);
@@ -128,6 +167,10 @@ public class MyToolWindow {
     }
 
     private void saveSnapShot() {
+        if (Objects.isNull(this.computedNode)) {
+            Messages.showMessageDialog(this.project, "please take a snapshot first", "Error", Messages.getInformationIcon());
+            return;
+        }
         String snapName = SNAP + new Date().getTime();
         this.sourceShotsBox.addItem(snapName); // this also freezes Persistency service if written after computing the node
         this.otherShotsBox.addItem(snapName); // this also freezes Persistency service if written after computing the node
@@ -135,6 +178,10 @@ public class MyToolWindow {
     }
 
     private void saveDiffShot() {
+        if (Objects.isNull(this.diffNode)) {
+            Messages.showMessageDialog(this.project, "please diff a node first", "Error", Messages.getInformationIcon());
+            return;
+        }
         String diffName = DIFF + new Date().getTime();
         this.sourceShotsBox.addItem(diffName);
         persistencyService.addNode(diffName, this.diffNode);
@@ -150,19 +197,6 @@ public class MyToolWindow {
         }
     }
 
-    private void diffDebuggerShot(XTestCompositeNode computedNode) {
-        String targetSnapShotName = (String) sourceShotsBox.getSelectedItem();
-        List<String> targetNodeAsStrings = ParserService.writeNodeAsString(persistencyService.getNodes().get(targetSnapShotName));
-        LOG.debug("Target: {}", targetNodeAsStrings);
-        List<String> sourceNodeAsStrings = ParserService.writeNodeAsString(computedNode);
-        LOG.debug("Source: {}", sourceNodeAsStrings);
-        this.diffLines = ParserService.unifiedDiffOfStrings(targetNodeAsStrings, sourceNodeAsStrings);
-        LOG.debug("Diff Lines: {}", this.diffLines);
-        this.diffNode = ParserService.parseStringsToNode(this.diffLines, this.diffNodes);
-        LOG.debug("Diff Node: {}", this.diffNode);
-        this.modelActual.setRoot(this.diffNode);
-    }
-
     public JPanel getContent() {
         return myToolWindowContent;
     }
@@ -176,5 +210,19 @@ public class MyToolWindow {
         LOG.info("Debug Session Retrieved...");
         computeChildrenService.initStackFrame(currentSession.getCurrentStackFrame());
         LOG.info("Start Computing Children...");
+    }
+
+
+}
+
+class DebuggerTreeRenderer extends DefaultTreeCellRenderer {
+
+    @Override
+    public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean exp, boolean leaf, int row, boolean hasFocus) {
+        super.getTreeCellRendererComponent(tree, value, sel, exp, leaf, row, hasFocus);
+
+        XTestCompositeNode node = (XTestCompositeNode) value;
+        setIcon(node.getIcon());
+        return this;
     }
 }
