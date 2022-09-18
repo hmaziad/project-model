@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.ui.JBColor;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
 
@@ -216,6 +217,18 @@ public class MyToolWindow {
 }
 
 class DebuggerTreeRenderer extends DefaultTreeCellRenderer {
+    // Both methods are needed
+    private JBColor theColor;
+
+    @Override
+    public Color getBackground() {
+        return theColor;
+    }
+
+    @Override
+    public Color getBackgroundNonSelectionColor() {
+        return theColor;
+    }
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean exp, boolean leaf, int row, boolean hasFocus) {
@@ -223,6 +236,13 @@ class DebuggerTreeRenderer extends DefaultTreeCellRenderer {
 
         XTestCompositeNode node = (XTestCompositeNode) value;
         setIcon(node.getIcon());
+        if (node.getDiffChar() == '+') {
+            this.theColor = JBColor.GREEN;
+        } else if (node.getDiffChar() == '-') {
+            this.theColor = JBColor.RED;
+        } else {
+            this.theColor = null;
+        }
         return this;
     }
 }

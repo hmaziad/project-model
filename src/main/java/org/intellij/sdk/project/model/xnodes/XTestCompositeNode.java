@@ -39,8 +39,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class XTestCompositeNode extends XTestContainer<XValue> implements XCompositeNode {
-    private static final String SPAN_FORMAT = "<html><span style='color:%s;'>%s</span></html>";
-
     private CompletableFuture<List<XValue>> future = new CompletableFuture<>();
     private Queue<XTestCompositeNode> queue;
     private XValueContainer container;
@@ -124,13 +122,7 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
     @Override
     public String toString() {
         String myNodeId = getNodeId().isEmpty() ? "" : String.format("{%s}", getNodeId());
-        String output = getContainer().toString() + " = " + myNodeId + " " + getValue();
-        if (diffChar == '+') {
-            output = String.format(SPAN_FORMAT, "green", output);
-        }else if(diffChar == '-'){
-            output = String.format(SPAN_FORMAT, "red", output);
-        }
-        return output;
+        return getContainer().toString() + " = " + myNodeId + " " + getValue();
     }
 
     @Override
