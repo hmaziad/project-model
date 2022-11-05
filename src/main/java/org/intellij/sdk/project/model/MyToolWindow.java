@@ -120,7 +120,7 @@ public class MyToolWindow {
         XTestCompositeNode selectedTargetNode = persistencyService.getNodes().get(selectedTargetName);
         List<String> selectedSourceAsString = ParserService.writeNodeAsString(selectedSourceNode);
         List<String> selectedTargetAsString = ParserService.writeNodeAsString(selectedTargetNode);
-        this.diffLines = ParserService.unifiedDiffOfStrings(selectedSourceAsString, selectedTargetAsString);
+        this.diffLines = ParserService.diffStrings(selectedSourceAsString, selectedTargetAsString);
         this.diffNode = ParserService.parseStringsToNode(this.diffLines, this.diffNodes);
         LOG.debug("Diff Node: {}", this.diffNode);
         this.modelActual.setRoot(this.diffNode);
@@ -146,7 +146,7 @@ public class MyToolWindow {
         LOG.debug("Target: {}", targetNodeAsStrings);
         List<String> sourceNodeAsStrings = ParserService.writeNodeAsString(this.computedNode);
         LOG.debug("Source: {}", sourceNodeAsStrings);
-        this.diffLines = ParserService.unifiedDiffOfStrings(targetNodeAsStrings, sourceNodeAsStrings);
+        this.diffLines = ParserService.diffStrings(targetNodeAsStrings, sourceNodeAsStrings);
         LOG.debug("Diff Lines: {}", this.diffLines);
         this.diffNode = ParserService.parseStringsToNode(this.diffLines, this.diffNodes);
         if (this.diffNodes.isEmpty()) {

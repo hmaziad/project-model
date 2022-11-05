@@ -3,6 +3,7 @@ package org.intellij.sdk.project.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -15,6 +16,8 @@ import com.github.difflib.text.DiffRowGenerator;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import name.fraser.neil.plaintext.StandardBreakScorer;
+import name.fraser.neil.plaintext.diff_match_patch;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Log4j2
@@ -64,7 +67,24 @@ public class ParserService {
         return XTestCompositeNode.createNode(next[NAME_PART], next[TYPE_PART], next[VALUE_PART], signOrSpace, lineNumber);
     }
 
-    public static List<String> unifiedDiffOfStrings(List<String> original, List<String> revised) {
+    public static String diffStrings2() {
+        diff_match_patch dmp = new diff_match_patch(new StandardBreakScorer());
+        String source = ",args,String[0]@791,[]\n" + ",names,ArrayList@792, size = 4\n" + " ,0,,Hussein\n" + " ,1,,Ali1\n" + " ,2,,Maziad\n" + " ,3,,testing\n"
+            + ",someLists,ArrayList@794, size = 2\n" + " ,0,ImmutableCollections$ListN@801, size = 4\n" + "  ,0,Integer@808,1\n" + "  ,1,Integer@809,3\n" + "  ,2,Integer@809,3\n"
+            + "  ,3,Integer@810,7\n" + " ,1,ImmutableCollections$SetN@802, size = 3\n" + "  ,0,Integer@810,7\n" + "  ,1,Integer@812,4\n" + "  ,2,Integer@813,5\n";
+        String destination = ",args,String[0]@791,[]\n" + ",names,ArrayList@792, size = 5\n" + " ,0,,Hussein\n" + " ,1,,Ali1\n" + " ,2,,Maziad\n" + " ,3,,testing\n"
+            + " ,4,,Jello\n" + ",someLists,ArrayList@794, size = 3\n" + " ,0,ImmutableCollections$ListN@801, size = 4\n" + "  ,0,Integer@808,1\n" + "  ,1,Integer@809,3\n"
+            + "  ,2,Integer@809,3\n" + "  ,3,Integer@810,7\n" + " ,1,ImmutableCollections$SetN@802, size = 3\n" + "  ,0,Integer@810,7\n" + "  ,1,Integer@812,4\n"
+            + "  ,2,Integer@813,5\n" + " ,2,ImmutableCollections$List12@817, size = 1\n" + "  ,0,Integer@822,12332\n";
+
+        LinkedList<diff_match_patch.Diff> diff = dmp.diff_main(source, destination);
+        // Result: [(-1, "Hell"), (1, "G"), (0, "o"), (1, "odbye"), (0, " World.")]
+        // Result: [(-1, "Hello"), (1, "Goodbye"), (0, " World.")]
+        return dmp.diff_toDelta(diff);
+    }
+
+
+    public static List<String> diffStrings(List<String> original, List<String> revised) {
         DiffRowGenerator generator = DiffRowGenerator.create().showInlineDiffs(true).inlineDiffByWord(true).oldTag(f -> "").newTag(f -> "").build();
         List<DiffRow> rows = generator.generateDiffRows(original, revised);
         List<String> output = new ArrayList<>();
@@ -118,3 +138,15 @@ public class ParserService {
         node.getChildren().forEach(child -> print(child, tab + "\t"));
     }
 }
+
+/*
+dmp.diff_map(source, destination).stream().map(difff -> {
+    if (difff.operation == diff_match_patch.Operation.DELETE) {
+        return "-" + difff.text;
+    } else if (difff.operation == diff_match_patch.Operation.INSERT) {
+        return "+" + difff.text;
+    } else {
+        return difff.text;
+    }
+}).reduce("", (acc, cur) -> acc + cur);
+ */
