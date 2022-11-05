@@ -15,9 +15,9 @@ import org.junit.Test;
 public class ParserServiceTest {
 
     @Test
-    public void test_parse_strings_to_node_dfs() throws IOException {
-        assertParsingForFile("src/test/resources/nodeAsString/source.txt");
-        assertParsingForFile("src/test/resources/nodeAsString/destination.txt");
+    public void test_parse_normal_strings_to_node_dfs() throws IOException {
+        assertParsingForFile("src/test/resources/nodeAsString/source-numbers.txt");
+        assertParsingForFile("src/test/resources/nodeAsString/destination-numbers.txt");
     }
 
     private void assertParsingForFile(String path) throws IOException {
