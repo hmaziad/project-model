@@ -1,5 +1,6 @@
 package org.intellij.sdk.project.model;
 
+import static org.intellij.sdk.project.model.ParserService.convertDiffStringsToNode;
 import static org.intellij.sdk.project.model.ParserService.convertNodeToStrings;
 import static org.junit.Assert.assertEquals;
 
@@ -23,6 +24,12 @@ public class ParserServiceTest {
         assertParsingForFile("src/test/resources/nodeAsString/destination-numbers.txt");
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void test_parse_corrupted_string_handled() throws IOException {
+        assertParsingForFile("src/test/resources/nodeAsString/corrupted-strings.txt");
+    }
+
+
     private void assertParsingForFile(String path) throws IOException {
         List<String> lines = Files.readAllLines(Path.of(path));
         XTestCompositeNode rootNode = ParserService.convertStringsToNode(lines);
@@ -40,11 +47,6 @@ public class ParserServiceTest {
                 assertNodeValues(currentNode.getChildren(), lines, index);
             }
         }
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void test_parse_corrupted_string_handled() throws IOException {
-        assertParsingForFile("src/test/resources/nodeAsString/corrupted-strings.txt");
     }
 
     @Test
@@ -81,5 +83,10 @@ public class ParserServiceTest {
         };
     }
 
-
+    @Test
+    public void test_parse_diff_strings_to_node_dfs() throws IOException {
+        // todo complete this test
+        List<String> lines = Files.readAllLines(Path.of("src/test/resources/nodeAsString/diff-result-numbers.txt"));
+        convertDiffStringsToNode(lines);
+    }
 }
