@@ -1,12 +1,10 @@
 package org.intellij.sdk.project.model;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -24,11 +22,8 @@ public class ParserServiceTest {
 
     private void assertParsingForFile(String path) throws IOException {
         List<String> lines = Files.readAllLines(Path.of(path));
-        ArrayList<XTestCompositeNode> diffNodes = new ArrayList<>();
-        XTestCompositeNode rootNode = ParserService.parseStringsToNode(lines, diffNodes);
+        XTestCompositeNode rootNode = ParserService.parseStringsToNode(lines);
         assertNodeValues(rootNode.getChildren(), lines, new AtomicInteger(0));
-        assertTrue("Diff nodes is not empty", CollectionUtils.isEmpty(diffNodes));
-        System.out.println();
     }
 
     private void assertNodeValues(List<XTestCompositeNode> children, List<String> lines, AtomicInteger index) {

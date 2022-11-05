@@ -121,7 +121,7 @@ public class MyToolWindow {
         List<String> selectedSourceAsString = ParserService.writeNodeAsString(selectedSourceNode);
         List<String> selectedTargetAsString = ParserService.writeNodeAsString(selectedTargetNode);
         this.diffLines = ParserService.diffStrings(selectedSourceAsString, selectedTargetAsString);
-        this.diffNode = ParserService.parseStringsToNode(this.diffLines, this.diffNodes);
+        this.diffNode = ParserService.parseStringsToNode(this.diffLines);
         LOG.debug("Diff Node: {}", this.diffNode);
         this.modelActual.setRoot(this.diffNode);
         isDiffShot.set(true);
@@ -148,7 +148,7 @@ public class MyToolWindow {
         LOG.debug("Source: {}", sourceNodeAsStrings);
         this.diffLines = ParserService.diffStrings(targetNodeAsStrings, sourceNodeAsStrings);
         LOG.debug("Diff Lines: {}", this.diffLines);
-        this.diffNode = ParserService.parseStringsToNode(this.diffLines, this.diffNodes);
+        this.diffNode = ParserService.parseStringsToNode(this.diffLines);
         if (this.diffNodes.isEmpty()) {
             Messages.showMessageDialog(this.project, "Nodes are identical", "Info", Messages.getInformationIcon());
             return;

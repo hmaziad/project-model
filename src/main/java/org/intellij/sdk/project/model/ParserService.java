@@ -29,14 +29,12 @@ public class ParserService {
     private static final int PARTS = 4;
     private static final char SPACE = ' ';
 // use this tool instead https://github.com/google/diff-match-patch
-    public static XTestCompositeNode parseStringsToNode(List<String> lines, List<XTestCompositeNode> diffNodes) {
+    public static XTestCompositeNode parseStringsToNode(List<String> lines) {
         List<String[]> lineArrays = new ArrayList<>();
-        diffNodes.clear();
         for (String line : lines) {
             String[] lineArray = line.split(",", PARTS);
             lineArrays.add(lineArray);
         }
-
         Map<Integer, XTestCompositeNode> nodePerIndex = new HashMap<>();
         nodePerIndex.put(-1, createDummyNode());
         for (int lineNumber = 0; lineNumber < lineArrays.size(); lineNumber++) {
@@ -49,9 +47,6 @@ public class ParserService {
                 indents--;
             }
             XTestCompositeNode newNode = createNode(lineArray, signOrSpace, lineNumber);
-            if (newNode.getDiffChar() == '+' || newNode.getDiffChar() == '-') {
-                diffNodes.add(newNode);
-            }
             nodePerIndex.put(indents, newNode);
             nodePerIndex.get(indents - 1).addChild(newNode);
         }
