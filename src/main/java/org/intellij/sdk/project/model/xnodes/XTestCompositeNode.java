@@ -23,6 +23,7 @@ import java.util.concurrent.CompletableFuture;
 import javax.swing.*;
 import javax.swing.tree.MutableTreeNode;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.VisibleForTesting;
 import com.intellij.debugger.engine.JavaValue;
 import com.intellij.debugger.ui.impl.watch.ValueDescriptorImpl;
 import com.intellij.xdebugger.frame.XCompositeNode;
@@ -53,6 +54,13 @@ public class XTestCompositeNode extends XTestContainer<XValue> implements XCompo
     public XTestCompositeNode(Queue<XTestCompositeNode> queue, XValueContainer container) {
         this.queue = queue;
         this.container = container;
+    }
+
+    @VisibleForTesting
+    public XTestCompositeNode(XValueContainer container, String value, String nodeId) {
+        this.container = container;
+        this.value = value;
+        this.nodeId = nodeId;
     }
 
     public static XTestCompositeNode createNode(String name, String nodeId, String value, char signOrSpace, int lineNumber) {

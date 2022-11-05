@@ -33,6 +33,6 @@ public class DiffService {
     }
 
     private static void appendWithSign(StringBuilder sb, diff_match_patch.Diff item, String sign) {
-        sb.append("<<").append(sign).append(",").append(item.text).append(">>");
+        sb.append("<<").append(sign).append(item.text).append(">>");
     }
 }

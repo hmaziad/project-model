@@ -15,20 +15,11 @@ public class DiffServiceTest {
     public void test_diff_two_strings() throws IOException {
         List<String> original = Files.readAllLines(Path.of("src/test/resources/nodeAsString/source-numbers.txt"));
         List<String> revised = Files.readAllLines(Path.of("src/test/resources/nodeAsString/destination-numbers.txt"));
-        List<String> expectedDiff = Files.readAllLines(Path.of("src/test/resources/nodeAsString/diff-result-numbers.txt"));
 
-        List<String> actualDiff = DiffService.diffStrings(original, revised);
-        IntStream //
-            .range(0, expectedDiff.size()) //
-            .forEach(index -> assertEquals(expectedDiff.get(index), actualDiff.get(index)));
-    }
-
-    @Test
-    public void test_diff_two_strings_deiff2() throws IOException {
-        List<String> original = Files.readAllLines(Path.of("src/test/resources/nodeAsString/source-numbers.txt"));
-        List<String> revised = Files.readAllLines(Path.of("src/test/resources/nodeAsString/destination-numbers.txt"));
         List<String> expectedDiff = Files.readAllLines(Path.of("src/test/resources/nodeAsString/diff-result-numbers.txt"));
         List<String> actualDiff = DiffService.diffStrings(original, revised);
+
+        assertEquals(expectedDiff.size(), actualDiff.size());
         IntStream //
             .range(0, expectedDiff.size()) //
             .forEach(index -> assertEquals(expectedDiff.get(index), actualDiff.get(index)));

@@ -14,6 +14,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+// use this tool instead https://github.com/google/diff-match-patch
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Log4j2
 public class ParserService {
@@ -23,8 +25,30 @@ public class ParserService {
     private static final int VALUE_PART = 3;
     private static final int PARTS = 4;
     private static final char SPACE = ' ';
-// use this tool instead https://github.com/google/diff-match-patch
+
     public static XTestCompositeNode convertStringsToNode(List<String> lines) {
+        try {
+            List<String[]> lineArrays = new ArrayList<>();
+            for (String line : lines) {
+                String[] lineArray = line.split(",", PARTS);
+                lineArrays.add(lineArray);
+            }
+            Map<Integer, XTestCompositeNode> nodePerIndex = new HashMap<>();
+            nodePerIndex.put(-1, createDummyNode());
+            for (int lineNumber = 0; lineNumber < lineArrays.size(); lineNumber++) {
+                String[] lineArray = lineArrays.get(lineNumber);
+                int numberOfIndents = Integer.parseInt(lineArray[INDENTS_PART]);
+                XTestCompositeNode newNode = createNode(lineArray, SPACE, lineNumber);
+                nodePerIndex.put(numberOfIndents, newNode);
+                nodePerIndex.get(numberOfIndents - 1).addChild(newNode);
+            }
+            return nodePerIndex.get(-1);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(String.format("Could not parse %s to a node", lines), e);
+        }
+    }
+
+    public static XTestCompositeNode convertDiffStringsToNode(List<String> lines) {
         try {
             List<String[]> lineArrays = new ArrayList<>();
             for (String line : lines) {
@@ -55,28 +79,21 @@ public class ParserService {
         return XTestCompositeNode.createNode(next[NAME_PART], next[TYPE_PART], next[VALUE_PART], signOrSpace, lineNumber);
     }
 
-    // TODO below methods have to be removed
-
     public static List<String> convertNodeToStrings(XTestCompositeNode node) {
         StringBuilder sb = new StringBuilder();
-        addLines(sb, node.getChildren(), "");
+        addLines(sb, node.getChildren(), 0);
         return Arrays.stream(sb.toString().split("\n")).collect(Collectors.toList());
     }
 
-    private static void addLines(StringBuilder sb, List<XTestCompositeNode> nodes, String spaces) {
+    private static void addLines(StringBuilder sb, List<XTestCompositeNode> nodes, int indents) {
         nodes.forEach(child -> {
-            appendData(sb, child, spaces);
-            addLines(sb, child.getChildren(), spaces + " ");
+            appendData(sb, child, indents);
+            addLines(sb, child.getChildren(), indents + 1);
         });
     }
 
-
-    public static void print(XTestCompositeNode node) {
-        print(node, "");
-    }
-
-    private static void appendData(StringBuilder sb, XTestCompositeNode node, String spaces) {
-        sb.append(spaces) //
+    private static void appendData(StringBuilder sb, XTestCompositeNode node, int indents) {
+        sb.append(indents) //
             .append(",") //
             .append(node.getContainer().toString()) //
             .append(",") //
@@ -86,6 +103,13 @@ public class ParserService {
             .append("\n");
     }
 
+    /**
+     *  not needed here, to be moved
+     */
+
+    public static void print(XTestCompositeNode node) {
+        print(node, "");
+    }
 
     private static void print(XTestCompositeNode node, String tab) {
         LOG.info(tab + node.getContainer().toString() + " " + node.getNodeId() + " " + node.getValue());
