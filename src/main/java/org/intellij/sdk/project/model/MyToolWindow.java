@@ -118,10 +118,10 @@ public class MyToolWindow {
         String selectedTargetName = (String) this.otherShotsBox.getSelectedItem();
         XTestCompositeNode selectedSourceNode = persistencyService.getNodes().get(selectedSourceName);
         XTestCompositeNode selectedTargetNode = persistencyService.getNodes().get(selectedTargetName);
-        List<String> selectedSourceAsString = ParserService.writeNodeAsString(selectedSourceNode);
-        List<String> selectedTargetAsString = ParserService.writeNodeAsString(selectedTargetNode);
+        List<String> selectedSourceAsString = ParserService.convertNodeToStrings(selectedSourceNode);
+        List<String> selectedTargetAsString = ParserService.convertNodeToStrings(selectedTargetNode);
         this.diffLines = DiffService.diffStrings(selectedSourceAsString, selectedTargetAsString);
-        this.diffNode = ParserService.parseStringsToNode(this.diffLines);
+        this.diffNode = ParserService.convertStringsToNode(this.diffLines);
         LOG.debug("Diff Node: {}", this.diffNode);
         this.modelActual.setRoot(this.diffNode);
         isDiffShot.set(true);
@@ -142,13 +142,13 @@ public class MyToolWindow {
             return;
         }
         String targetSnapShotName = (String) selectedItem;
-        List<String> targetNodeAsStrings = ParserService.writeNodeAsString(persistencyService.getNodes().get(targetSnapShotName));
+        List<String> targetNodeAsStrings = ParserService.convertNodeToStrings(persistencyService.getNodes().get(targetSnapShotName));
         LOG.debug("Target: {}", targetNodeAsStrings);
-        List<String> sourceNodeAsStrings = ParserService.writeNodeAsString(this.computedNode);
+        List<String> sourceNodeAsStrings = ParserService.convertNodeToStrings(this.computedNode);
         LOG.debug("Source: {}", sourceNodeAsStrings);
         this.diffLines = DiffService.diffStrings(targetNodeAsStrings, sourceNodeAsStrings);
         LOG.debug("Diff Lines: {}", this.diffLines);
-        this.diffNode = ParserService.parseStringsToNode(this.diffLines);
+        this.diffNode = ParserService.convertStringsToNode(this.diffLines);
         if (this.diffNodes.isEmpty()) {
             Messages.showMessageDialog(this.project, "Nodes are identical", "Info", Messages.getInformationIcon());
             return;

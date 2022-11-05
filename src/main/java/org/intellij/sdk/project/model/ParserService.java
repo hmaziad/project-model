@@ -24,22 +24,26 @@ public class ParserService {
     private static final int PARTS = 4;
     private static final char SPACE = ' ';
 // use this tool instead https://github.com/google/diff-match-patch
-    public static XTestCompositeNode parseStringsToNode(List<String> lines) {
-        List<String[]> lineArrays = new ArrayList<>();
-        for (String line : lines) {
-            String[] lineArray = line.split(",", PARTS);
-            lineArrays.add(lineArray);
+    public static XTestCompositeNode convertStringsToNode(List<String> lines) {
+        try {
+            List<String[]> lineArrays = new ArrayList<>();
+            for (String line : lines) {
+                String[] lineArray = line.split(",", PARTS);
+                lineArrays.add(lineArray);
+            }
+            Map<Integer, XTestCompositeNode> nodePerIndex = new HashMap<>();
+            nodePerIndex.put(-1, createDummyNode());
+            for (int lineNumber = 0; lineNumber < lineArrays.size(); lineNumber++) {
+                String[] lineArray = lineArrays.get(lineNumber);
+                int numberOfIndents = Integer.parseInt(lineArray[INDENTS_PART]);
+                XTestCompositeNode newNode = createNode(lineArray, SPACE, lineNumber);
+                nodePerIndex.put(numberOfIndents, newNode);
+                nodePerIndex.get(numberOfIndents - 1).addChild(newNode);
+            }
+            return nodePerIndex.get(-1);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(String.format("Could not parse %s to a node", lines), e);
         }
-        Map<Integer, XTestCompositeNode> nodePerIndex = new HashMap<>();
-        nodePerIndex.put(-1, createDummyNode());
-        for (int lineNumber = 0; lineNumber < lineArrays.size(); lineNumber++) {
-            String[] lineArray = lineArrays.get(lineNumber);
-            int numberOfIndents = Integer.parseInt(lineArray[INDENTS_PART]);
-            XTestCompositeNode newNode = createNode(lineArray, SPACE, lineNumber);
-            nodePerIndex.put(numberOfIndents, newNode);
-            nodePerIndex.get(numberOfIndents - 1).addChild(newNode);
-        }
-        return nodePerIndex.get(-1);
     }
 
     @NotNull
@@ -53,7 +57,7 @@ public class ParserService {
 
     // TODO below methods have to be removed
 
-    public static List<String> writeNodeAsString(XTestCompositeNode node) {
+    public static List<String> convertNodeToStrings(XTestCompositeNode node) {
         StringBuilder sb = new StringBuilder();
         addLines(sb, node.getChildren(), "");
         return Arrays.stream(sb.toString().split("\n")).collect(Collectors.toList());

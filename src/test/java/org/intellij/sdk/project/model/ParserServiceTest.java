@@ -22,7 +22,7 @@ public class ParserServiceTest {
 
     private void assertParsingForFile(String path) throws IOException {
         List<String> lines = Files.readAllLines(Path.of(path));
-        XTestCompositeNode rootNode = ParserService.parseStringsToNode(lines);
+        XTestCompositeNode rootNode = ParserService.convertStringsToNode(lines);
         assertNodeValues(rootNode.getChildren(), lines, new AtomicInteger(0));
     }
 
@@ -37,5 +37,10 @@ public class ParserServiceTest {
                 assertNodeValues(currentNode.getChildren(), lines, index);
             }
         }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_parse_corrupted_string_handled() throws IOException {
+        assertParsingForFile("src/test/resources/nodeAsString/corrupted-strings.txt");
     }
 }
