@@ -2,7 +2,7 @@
 
 package org.intellij.sdk.project.model.services;
 
-import org.intellij.sdk.project.model.MyToolWindow;
+import org.intellij.sdk.project.model.DebuggerWindow;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
@@ -17,9 +17,9 @@ public class SnapService implements ToolWindowFactory {
 
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         LOG.info("Starting Tool Window");
-        MyToolWindow myToolWindow = new MyToolWindow(project);
+        DebuggerWindow myToolWindow = new DebuggerWindow();
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        Content content = contentFactory.createContent(myToolWindow.getContent(), "Debugger Tab", false);
+        Content content = contentFactory.createContent(myToolWindow.getDebuggerWindowContent(), "Debugger Tab", false);
         toolWindow.getContentManager().addContent(content);
     }
 
