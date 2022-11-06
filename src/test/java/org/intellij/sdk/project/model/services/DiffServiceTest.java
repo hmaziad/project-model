@@ -1,4 +1,4 @@
-package org.intellij.sdk.project.model;
+package org.intellij.sdk.project.model.services;
 
 import static org.junit.Assert.assertEquals;
 
@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import org.intellij.sdk.project.model.services.DiffService;
 import org.junit.Test;
 
 public class DiffServiceTest {

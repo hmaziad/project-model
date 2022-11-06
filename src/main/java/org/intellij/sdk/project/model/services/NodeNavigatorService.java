@@ -1,4 +1,4 @@
-package org.intellij.sdk.project.model;
+package org.intellij.sdk.project.model.services;
 
 import java.awt.*;
 import java.util.List;

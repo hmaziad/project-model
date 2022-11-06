@@ -1,7 +1,7 @@
-package org.intellij.sdk.project.model;
+package org.intellij.sdk.project.model.services;
 
-import static org.intellij.sdk.project.model.ParserService.convertDiffStringsToNode;
-import static org.intellij.sdk.project.model.ParserService.convertNodeToStrings;
+import static org.intellij.sdk.project.model.services.ParserService.convertDiffStringsToNode;
+import static org.intellij.sdk.project.model.services.ParserService.convertNodeToStrings;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;

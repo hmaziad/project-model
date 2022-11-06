@@ -1,4 +1,4 @@
-package org.intellij.sdk.project.model;
+package org.intellij.sdk.project.model.services;
 
 import java.util.Arrays;
 import java.util.LinkedList;
