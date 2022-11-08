@@ -19,7 +19,7 @@ import lombok.extern.log4j.Log4j2;
 public class DebuggerWindow {
 
     @Getter
-    private JPanel DebuggerWindowContent;
+    private JPanel debuggerWindowContent;
     private JPanel rightSideBar;
     private JButton snapButton;
     private JButton saveButton;
@@ -50,6 +50,7 @@ public class DebuggerWindow {
         handleButton(this.expandButton, ButtonType.EXPAND);
         handleButton(this.collapseButton, ButtonType.COLLAPSE);
         handleToolbarSeperator(this.toolbarSeparatorCore);
+        handleToolbarSeperator(this.toolbarSeparatorOther);
         handleToolbar(this.toolbar);
 
         this.debugTree.setRootVisible(false);
