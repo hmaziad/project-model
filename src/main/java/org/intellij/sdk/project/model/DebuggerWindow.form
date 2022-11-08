@@ -6,83 +6,11 @@
     </constraints>
     <properties>
       <enabled value="true"/>
+      <foreground color="-12828863"/>
+      <inheritsPopupMenu value="false"/>
     </properties>
     <border type="none"/>
     <children>
-      <grid id="844b7" binding="topSideBar" layout-manager="FlowLayout" hgap="5" vgap="2" flow-align="0">
-        <constraints border-constraint="North"/>
-        <properties>
-          <preferredSize width="107" height="35"/>
-        </properties>
-        <border type="none">
-          <color color="-13816016"/>
-        </border>
-        <children>
-          <component id="d095e" class="javax.swing.JButton" binding="snapButton">
-            <constraints/>
-            <properties>
-              <background color="-12828863"/>
-              <borderPainted value="false"/>
-              <contentAreaFilled value="false"/>
-              <focusPainted value="true"/>
-              <foreground color="-4473925"/>
-              <hideActionText value="true"/>
-              <icon value="icons/snap/snapshotGutter_dark.png"/>
-              <label value=""/>
-              <margin top="0" left="0" bottom="0" right="0"/>
-              <maximumSize width="25" height="25"/>
-              <minimumSize width="25" height="25"/>
-              <preferredSize width="30" height="30"/>
-              <selected value="true"/>
-              <text value=""/>
-            </properties>
-          </component>
-          <component id="97a6a" class="javax.swing.JButton" binding="saveButton">
-            <constraints/>
-            <properties>
-              <background color="-12828863"/>
-              <borderPainted value="false"/>
-              <contentAreaFilled value="false"/>
-              <focusPainted value="true"/>
-              <foreground color="-4473925"/>
-              <hideActionText value="true"/>
-              <icon value="icons/save/download_dark.png"/>
-              <label value=""/>
-              <margin top="0" left="0" bottom="0" right="0"/>
-              <maximumSize width="25" height="25"/>
-              <minimumSize width="25" height="25"/>
-              <preferredSize width="30" height="30"/>
-              <selected value="true"/>
-              <text value=""/>
-            </properties>
-          </component>
-          <component id="7886" class="javax.swing.JButton" binding="diffButton">
-            <constraints/>
-            <properties>
-              <background color="-12828863"/>
-              <borderPainted value="false"/>
-              <contentAreaFilled value="false"/>
-              <focusPainted value="true"/>
-              <foreground color="-4473925"/>
-              <hideActionText value="true"/>
-              <icon value="icons/diff/diff.png"/>
-              <label value=""/>
-              <margin top="0" left="0" bottom="0" right="0"/>
-              <maximumSize width="25" height="25"/>
-              <minimumSize width="25" height="25"/>
-              <preferredSize width="30" height="30"/>
-              <selected value="true"/>
-              <text value=""/>
-            </properties>
-          </component>
-          <toolbar id="3340">
-            <constraints/>
-            <properties/>
-            <border type="none"/>
-            <children/>
-          </toolbar>
-        </children>
-      </grid>
       <grid id="6910" binding="rightSideBar" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints border-constraint="East"/>
@@ -92,15 +20,132 @@
       </grid>
       <scrollpane id="b82d5" binding="treePane">
         <constraints border-constraint="Center"/>
-        <properties/>
+        <properties>
+          <foreground color="-12828863"/>
+        </properties>
         <border type="none"/>
         <children>
           <component id="c3a56" class="javax.swing.JTree" binding="debugTree">
             <constraints/>
-            <properties/>
+            <properties>
+              <autoscrolls value="false"/>
+              <foreground color="-12828863"/>
+              <rootVisible value="false"/>
+              <toolTipText value="Debugger Tree"/>
+            </properties>
           </component>
         </children>
       </scrollpane>
+      <toolbar id="b5ecd" binding="toolbar">
+        <constraints border-constraint="North"/>
+        <properties>
+          <floatable value="false"/>
+          <foreground color="-12828863"/>
+          <preferredSize width="100" height="30"/>
+          <requestFocusEnabled value="false"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <component id="47f95" class="javax.swing.JButton" binding="snapButton">
+            <constraints/>
+            <properties>
+              <borderPainted value="false"/>
+              <contentAreaFilled value="false"/>
+              <foreground color="-12828863"/>
+              <icon value="icons/snap/snapshotGutter_dark.png"/>
+              <maximumSize width="30" height="30"/>
+              <minimumSize width="30" height="30"/>
+              <preferredSize width="30" height="30"/>
+              <text value=""/>
+              <toolTipText value="Snap Debugger Session"/>
+            </properties>
+          </component>
+          <component id="1b59f" class="javax.swing.JButton" binding="saveButton">
+            <constraints/>
+            <properties>
+              <borderPainted value="false"/>
+              <contentAreaFilled value="false"/>
+              <icon value="icons/save/download_dark.png"/>
+              <maximumSize width="30" height="30"/>
+              <preferredSize width="30" height="30"/>
+              <text value=""/>
+              <toolTipText value="Save Debugger Session"/>
+            </properties>
+          </component>
+          <component id="27459" class="javax.swing.JButton" binding="diffButton">
+            <constraints/>
+            <properties>
+              <borderPainted value="false"/>
+              <contentAreaFilled value="false"/>
+              <foreground color="-12828863"/>
+              <icon value="icons/diff/diff_dark.png"/>
+              <maximumSize width="30" height="30"/>
+              <preferredSize width="30" height="30"/>
+              <text value=""/>
+              <toolTipText value="Diff Debugger Current Session with Taken Snap Below "/>
+            </properties>
+          </component>
+          <component id="ed64f" class="javax.swing.JToolBar$Separator" binding="toolbarSeparatorCore">
+            <constraints/>
+            <properties>
+              <background color="-12828863"/>
+              <foreground color="-46364"/>
+              <maximumSize width="10" height="10"/>
+              <opaque value="true"/>
+              <orientation value="1"/>
+              <preferredSize width="10" height="10"/>
+            </properties>
+          </component>
+          <component id="8563a" class="javax.swing.JButton" binding="clearButton">
+            <constraints/>
+            <properties>
+              <borderPainted value="false"/>
+              <contentAreaFilled value="false"/>
+              <foreground color="-12828863"/>
+              <icon value="icons/clear/delete.png"/>
+              <maximumSize width="30" height="30"/>
+              <minimumSize width="30" height="30"/>
+              <preferredSize width="30" height="30"/>
+              <text value=""/>
+              <toolTipText value="Clear Debugger Session"/>
+            </properties>
+          </component>
+          <component id="ace36" class="javax.swing.JButton" binding="expandButton">
+            <constraints/>
+            <properties>
+              <borderPainted value="false"/>
+              <contentAreaFilled value="false"/>
+              <foreground color="-12828863"/>
+              <icon value="icons/expand/expandall_dark.png"/>
+              <maximumSize width="30" height="30"/>
+              <minimumSize width="30" height="30"/>
+              <preferredSize width="30" height="30"/>
+              <text value=""/>
+              <toolTipText value="Expand Nodes"/>
+            </properties>
+          </component>
+          <component id="a37e3" class="javax.swing.JButton" binding="collapseButton">
+            <constraints/>
+            <properties>
+              <borderPainted value="false"/>
+              <contentAreaFilled value="false"/>
+              <foreground color="-12828863"/>
+              <icon value="icons/collapse/collapseall_dark.png"/>
+              <maximumSize width="30" height="30"/>
+              <minimumSize width="30" height="30"/>
+              <preferredSize width="30" height="30"/>
+              <text value=""/>
+              <toolTipText value="Collapse Nodes"/>
+            </properties>
+          </component>
+          <component id="a23ec" class="javax.swing.JToolBar$Separator" binding="toolbarSeparatorOther">
+            <constraints/>
+            <properties>
+              <opaque value="true"/>
+            </properties>
+          </component>
+        </children>
+      </toolbar>
     </children>
   </grid>
 </form>

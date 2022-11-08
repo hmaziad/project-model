@@ -2,8 +2,9 @@
 
 package org.intellij.sdk.project.model;
 
-import static org.intellij.sdk.project.model.components.BorderHandler.addBottomBorder;
 import static org.intellij.sdk.project.model.components.ButtonHandler.handleButton;
+import static org.intellij.sdk.project.model.components.ButtonHandler.handleToolbar;
+import static org.intellij.sdk.project.model.components.ButtonHandler.handleToolbarSeperator;
 
 import javax.swing.*;
 import javax.swing.event.TreeModelEvent;
@@ -19,7 +20,6 @@ public class DebuggerWindow {
 
     @Getter
     private JPanel DebuggerWindowContent;
-    private JPanel topSideBar;
     private JPanel rightSideBar;
     private JButton snapButton;
     private JButton saveButton;
@@ -27,16 +27,18 @@ public class DebuggerWindow {
     private JLayeredPane layeredPane;
     private JScrollPane treePane;
     private JTree debugTree;
+    private JToolBar toolbar;
+    private JToolBar.Separator toolbarSeparatorCore;
+    private JButton clearButton;
+    private JButton expandButton;
+    private JButton collapseButton;
+    private JToolBar.Separator toolbarSeparatorOther;
     private final JLabel noModelLabel = new JLabel("No session selected");
+
 
     /**
      * todo next
-     *
-     * use jtoolbar for icons on top
      * use Jlayered Pane for label and tree pane
-     * then show data
-     * add clear button to clear the model
-     * use jseperator for between icons, called jtoolbar seperator
      * maybe jpane splitter for right side bar
      */
 
@@ -44,7 +46,12 @@ public class DebuggerWindow {
         handleButton(this.snapButton, ButtonType.SNAP);
         handleButton(this.saveButton, ButtonType.SAVE);
         handleButton(this.diffButton, ButtonType.DIFF);
-        addBottomBorder(this.topSideBar);
+        handleButton(this.clearButton, ButtonType.CLEAR);
+        handleButton(this.expandButton, ButtonType.EXPAND);
+        handleButton(this.collapseButton, ButtonType.COLLAPSE);
+        handleToolbarSeperator(this.toolbarSeparatorCore);
+        handleToolbar(this.toolbar);
+
         this.debugTree.setRootVisible(false);
         this.treePane.add(this.noModelLabel);
         this.debugTree.setModel(new DefaultTreeModel(null));
