@@ -6,5 +6,7 @@ public enum ButtonType {
     DIFF,
     CLEAR,
     EXPAND,
-    COLLAPSE
+    COLLAPSE,
+    PREVIOUS,
+    NEXT;
 }

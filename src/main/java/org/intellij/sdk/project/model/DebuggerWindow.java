@@ -33,14 +33,9 @@ public class DebuggerWindow {
     private JButton expandButton;
     private JButton collapseButton;
     private JToolBar.Separator toolbarSeparatorOther;
+    private JButton previousButton;
+    private JButton nextButton;
     private final JLabel noModelLabel = new JLabel("No session selected");
-
-
-    /**
-     * todo next
-     * use Jlayered Pane for label and tree pane
-     * maybe jpane splitter for right side bar
-     */
 
     public DebuggerWindow() {
         handleButton(this.snapButton, ButtonType.SNAP);
@@ -49,6 +44,8 @@ public class DebuggerWindow {
         handleButton(this.clearButton, ButtonType.CLEAR);
         handleButton(this.expandButton, ButtonType.EXPAND);
         handleButton(this.collapseButton, ButtonType.COLLAPSE);
+        handleButton(this.previousButton, ButtonType.PREVIOUS);
+        handleButton(this.nextButton, ButtonType.NEXT);
         handleToolbarSeperator(this.toolbarSeparatorCore);
         handleToolbarSeperator(this.toolbarSeparatorOther);
         handleToolbar(this.toolbar);

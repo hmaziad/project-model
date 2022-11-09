@@ -35,6 +35,12 @@ public class ButtonHandler {
             case COLLAPSE:
                 button.setIcon(SdkIcons.COLLAPSE_ICON);
                 break;
+            case PREVIOUS:
+                button.setIcon(SdkIcons.PREVIOUS_ICON);
+                break;
+            case NEXT:
+                button.setIcon(SdkIcons.NEXT_ICON);
+                break;
             default:
                 throw new IllegalArgumentException(String.format("Could not handle button type %s", buttonType));
         }
