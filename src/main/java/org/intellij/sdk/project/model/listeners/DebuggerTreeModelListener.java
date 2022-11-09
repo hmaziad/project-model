@@ -12,9 +12,11 @@ import javax.swing.tree.DefaultTreeModel;
 
 public class DebuggerTreeModelListener implements TreeModelListener {
     private JLabel feedbackLabel;
+    private JButton clearButton;
 
-    public DebuggerTreeModelListener(JLabel feedbackLabel) {
+    public DebuggerTreeModelListener(JLabel feedbackLabel, JButton clearButton) {
         this.feedbackLabel = feedbackLabel;
+        this.clearButton = clearButton;
     }
 
     @Override
@@ -35,6 +37,12 @@ public class DebuggerTreeModelListener implements TreeModelListener {
     @Override
     public void treeStructureChanged(TreeModelEvent e) {
         boolean isRootNull = Objects.isNull(((DefaultTreeModel) e.getSource()).getRoot());
-        this.feedbackLabel.setText(isRootNull ? TAKE_DEBUGGER_SNAP : DEBUGGER_SNAP_TAKEN);
+        if (isRootNull) {
+            this.feedbackLabel.setText(TAKE_DEBUGGER_SNAP);
+            this.clearButton.setEnabled(false);
+        } else {
+            this.feedbackLabel.setText(DEBUGGER_SNAP_TAKEN);
+            this.clearButton.setEnabled(true);
+        }
     }
 }

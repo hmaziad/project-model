@@ -51,6 +51,7 @@
             <properties>
               <borderPainted value="false"/>
               <contentAreaFilled value="false"/>
+              <enabled value="false"/>
               <foreground color="-12828863"/>
               <icon value="icons/snap/snapshotGutter_dark.png"/>
               <maximumSize width="30" height="30"/>
@@ -65,6 +66,7 @@
             <properties>
               <borderPainted value="false"/>
               <contentAreaFilled value="false"/>
+              <enabled value="false"/>
               <icon value="icons/save/download_dark.png"/>
               <maximumSize width="30" height="30"/>
               <preferredSize width="30" height="30"/>
@@ -77,6 +79,7 @@
             <properties>
               <borderPainted value="false"/>
               <contentAreaFilled value="false"/>
+              <enabled value="false"/>
               <foreground color="-12828863"/>
               <icon value="icons/clear/delete.png"/>
               <maximumSize width="30" height="30"/>

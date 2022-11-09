@@ -11,9 +11,11 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.components.ButtonType;
+import org.intellij.sdk.project.model.components.DeleteHandler;
+import org.intellij.sdk.project.model.components.SaveHandler;
 import org.intellij.sdk.project.model.components.SnapHandler;
+import org.intellij.sdk.project.model.components.ToolHandler;
 import org.intellij.sdk.project.model.listeners.DebuggerTreeModelListener;
-import org.intellij.sdk.project.model.services.ComputeChildrenService;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.project.Project;
 
@@ -22,8 +24,6 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public class DebuggerWindow {
-
-    private static final ComputeChildrenService computeChildrenService = new ComputeChildrenService();
 
     @Getter
     private JPanel debuggerWindowContent;
@@ -68,20 +68,18 @@ public class DebuggerWindow {
         // initialize
         this.debugTree.setRootVisible(true);
         this.feedbackLabel.setText(TAKE_DEBUGGER_SNAP);
-        this.debugTree.getModel().addTreeModelListener(new DebuggerTreeModelListener(this.feedbackLabel));
         DefaultTreeModel treeModel = (DefaultTreeModel) this.debugTree.getModel();
         treeModel.setRoot(null);
-        SnapHandler snapHandler = new SnapHandler(computeChildrenService, project, this.feedbackLabel);
+        this.debugTree.getModel().addTreeModelListener(new DebuggerTreeModelListener(this.feedbackLabel, this.clearButton));
+        ToolHandler snapHandler = new SnapHandler(project, this.feedbackLabel);
+        ToolHandler deleteHandler = new DeleteHandler(this.feedbackLabel);
+        ToolHandler saveHandler = new SaveHandler(this.feedbackLabel);
 
-        this.clearButton.addActionListener(e -> treeModel.setRoot(null));
-        this.snapButton.addActionListener(e -> snapHandler.snap(treeModel));
+        this.clearButton.addActionListener(e -> deleteHandler.handle(treeModel));
+        this.snapButton.addActionListener(e -> snapHandler.handle(treeModel));
+        this.saveButton.addActionListener(e -> saveHandler.handle(treeModel));
+
         // test button to be removed eventually
-
-        /** todo next
-         * succesfully cleared message
-         * disable icons base on objects
-         */
-
         testButton.addActionListener(e -> {
             if (toggleNode) {
                 treeModel.setRoot(null);
