@@ -11,13 +11,19 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.components.ButtonType;
+import org.intellij.sdk.project.model.components.SnapHandler;
 import org.intellij.sdk.project.model.listeners.DebuggerTreeModelListener;
+import org.intellij.sdk.project.model.services.ComputeChildrenService;
+import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.project.Project;
 
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public class DebuggerWindow {
+
+    private static final ComputeChildrenService computeChildrenService = new ComputeChildrenService();
 
     @Getter
     private JPanel debuggerWindowContent;
@@ -40,7 +46,7 @@ public class DebuggerWindow {
     private JLabel feedbackLabel;
     private boolean toggleNode;
 
-    public DebuggerWindow() {
+    public DebuggerWindow(@NotNull Project project) {
         // toolbar
         handleToolbar(this.toolbar);
 
@@ -65,8 +71,16 @@ public class DebuggerWindow {
         this.debugTree.getModel().addTreeModelListener(new DebuggerTreeModelListener(this.feedbackLabel));
         DefaultTreeModel treeModel = (DefaultTreeModel) this.debugTree.getModel();
         treeModel.setRoot(null);
+        SnapHandler snapHandler = new SnapHandler(computeChildrenService, project, this.feedbackLabel);
+
+        this.clearButton.addActionListener(e -> treeModel.setRoot(null));
+        this.snapButton.addActionListener(e -> snapHandler.snap(treeModel));
         // test button to be removed eventually
 
+        /** todo next
+         * succesfully cleared message
+         * disable icons base on objects
+         */
 
         testButton.addActionListener(e -> {
             if (toggleNode) {
