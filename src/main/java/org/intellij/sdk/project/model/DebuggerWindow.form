@@ -172,6 +172,18 @@
               <toolTipText value="Collapse Nodes"/>
             </properties>
           </component>
+          <component id="81a8f" class="javax.swing.JButton" binding="testButton">
+            <constraints/>
+            <properties>
+              <text value="test"/>
+            </properties>
+          </component>
+          <component id="e1487" class="javax.swing.JLabel" binding="feedbackLabel">
+            <constraints/>
+            <properties>
+              <text value="Label"/>
+            </properties>
+          </component>
         </children>
       </toolbar>
     </children>
