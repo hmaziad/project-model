@@ -36,6 +36,7 @@ public class DebuggerWindow {
     private JButton previousButton;
     private JButton nextButton;
     private JButton testButton;
+    private JToolBar.Separator toolbarSeparatorFeedback;
     private JLabel feedbackLabel;
     private boolean toggleNode;
 
@@ -56,15 +57,18 @@ public class DebuggerWindow {
         // toolbar separators
         handleToolbarSeperator(this.toolbarSeparatorCore);
         handleToolbarSeperator(this.toolbarSeparatorOther);
+        handleToolbarSeperator(this.toolbarSeparatorFeedback);
 
         // initialize
         this.debugTree.setRootVisible(true);
         this.feedbackLabel.setText(TAKE_DEBUGGER_SNAP);
         this.debugTree.getModel().addTreeModelListener(new DebuggerTreeModelListener(this.feedbackLabel));
-
+        DefaultTreeModel treeModel = (DefaultTreeModel) this.debugTree.getModel();
+        treeModel.setRoot(null);
         // test button to be removed eventually
+
+
         testButton.addActionListener(e -> {
-            DefaultTreeModel treeModel = (DefaultTreeModel) this.debugTree.getModel();
             if (toggleNode) {
                 treeModel.setRoot(null);
                 toggleNode = false;

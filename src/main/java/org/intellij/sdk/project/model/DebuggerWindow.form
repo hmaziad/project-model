@@ -172,6 +172,12 @@
               <toolTipText value="Collapse Nodes"/>
             </properties>
           </component>
+          <component id="7abf7" class="javax.swing.JToolBar$Separator" binding="toolbarSeparatorFeedback">
+            <constraints/>
+            <properties>
+              <opaque value="true"/>
+            </properties>
+          </component>
           <component id="81a8f" class="javax.swing.JButton" binding="testButton">
             <constraints/>
             <properties>
