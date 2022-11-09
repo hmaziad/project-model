@@ -44,6 +44,7 @@ public class DebuggerWindow {
     private JButton testButton;
     private JToolBar.Separator toolbarSeparatorFeedback;
     private JLabel feedbackLabel;
+    private JComboBox savedSnapsDropdown;
     private boolean toggleNode;
 
     public DebuggerWindow(@NotNull Project project) {
@@ -78,6 +79,10 @@ public class DebuggerWindow {
         this.clearButton.addActionListener(e -> deleteHandler.handle(treeModel));
         this.snapButton.addActionListener(e -> snapHandler.handle(treeModel));
         this.saveButton.addActionListener(e -> saveHandler.handle(treeModel));
+
+        /**
+         * Add observer when adding new node to persistency service to update dropdown box
+         */
 
         // test button to be removed eventually
         testButton.addActionListener(e -> {
