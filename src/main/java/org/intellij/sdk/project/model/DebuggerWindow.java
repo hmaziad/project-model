@@ -11,7 +11,9 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.components.ButtonType;
+import org.intellij.sdk.project.model.components.ClearHandler;
 import org.intellij.sdk.project.model.components.DeleteHandler;
+import org.intellij.sdk.project.model.components.DropdownObserver;
 import org.intellij.sdk.project.model.components.SaveHandler;
 import org.intellij.sdk.project.model.components.SnapHandler;
 import org.intellij.sdk.project.model.components.ToolHandler;
@@ -44,7 +46,9 @@ public class DebuggerWindow {
     private JButton testButton;
     private JToolBar.Separator toolbarSeparatorFeedback;
     private JLabel feedbackLabel;
-    private JComboBox savedSnapsDropdown;
+    private JComboBox<String> savedSnapsDropdown;
+    private JButton deleteButton;
+    private JToolBar.Separator toolbarSeperatorSnap;
     private boolean toggleNode;
 
     public DebuggerWindow(@NotNull Project project) {
@@ -56,6 +60,7 @@ public class DebuggerWindow {
         handleButton(this.saveButton, ButtonType.SAVE);
         handleButton(this.diffButton, ButtonType.DIFF);
         handleButton(this.clearButton, ButtonType.CLEAR);
+        handleButton(this.deleteButton, ButtonType.DELETE);
         handleButton(this.expandButton, ButtonType.EXPAND);
         handleButton(this.collapseButton, ButtonType.COLLAPSE);
         handleButton(this.previousButton, ButtonType.PREVIOUS);
@@ -65,6 +70,7 @@ public class DebuggerWindow {
         handleToolbarSeperator(this.toolbarSeparatorCore);
         handleToolbarSeperator(this.toolbarSeparatorOther);
         handleToolbarSeperator(this.toolbarSeparatorFeedback);
+        handleToolbarSeperator(this.toolbarSeperatorSnap);
 
         // initialize
         this.debugTree.setRootVisible(true);
@@ -72,16 +78,20 @@ public class DebuggerWindow {
         DefaultTreeModel treeModel = (DefaultTreeModel) this.debugTree.getModel();
         treeModel.setRoot(null);
         this.debugTree.getModel().addTreeModelListener(new DebuggerTreeModelListener(this.feedbackLabel, this.clearButton));
+        DropdownObserver dropdownObserver = new DropdownObserver(this.savedSnapsDropdown);
         ToolHandler snapHandler = new SnapHandler(project, this.feedbackLabel);
-        ToolHandler deleteHandler = new DeleteHandler(this.feedbackLabel);
-        ToolHandler saveHandler = new SaveHandler(this.feedbackLabel);
+        ToolHandler clearHandler = new ClearHandler(this.feedbackLabel);
+        ToolHandler saveHandler = new SaveHandler(this.feedbackLabel, dropdownObserver, project);
+        ToolHandler deleteHandler = new DeleteHandler(this.feedbackLabel, dropdownObserver, project);
 
-        this.clearButton.addActionListener(e -> deleteHandler.handle(treeModel));
+        this.clearButton.addActionListener(e -> clearHandler.handle(treeModel));
         this.snapButton.addActionListener(e -> snapHandler.handle(treeModel));
         this.saveButton.addActionListener(e -> saveHandler.handle(treeModel));
+        this.deleteButton.addActionListener(e -> deleteHandler.handle(treeModel));
+
 
         /**
-         * Add observer when adding new node to persistency service to update dropdown box
+         * Let project be retrieved from static class instead of being passed around everywhere
          */
 
         // test button to be removed eventually

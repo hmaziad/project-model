@@ -10,7 +10,8 @@ public class SdkIcons {
   public static final Icon SNAP_ICON = IconLoader.getIcon("/icons/snap/snapshotGutter_dark.svg", SdkIcons.class);
   public static final Icon SAVE_ICON = IconLoader.getIcon("/icons/save/download_dark.svg", SdkIcons.class);
   public static final Icon DIFF_ICON = IconLoader.getIcon("/icons/diff/diff_dark.svg", SdkIcons.class);
-  public static final Icon CLEAR_ICON = IconLoader.getIcon("/icons/clear/delete.svg", SdkIcons.class);
+  public static final Icon CLEAR_ICON = IconLoader.getIcon("/icons/clear/db_invalid_breakpoint_dark.svg", SdkIcons.class);
+  public static final Icon DELETE_ICON = IconLoader.getIcon("/icons/delete/delete.svg", SdkIcons.class);
   public static final Icon EXPAND_ICON = IconLoader.getIcon("/icons/expand/expandall_dark.svg", SdkIcons.class);
   public static final Icon COLLAPSE_ICON = IconLoader.getIcon("/icons/collapse/collapseall_dark.svg", SdkIcons.class);
   public static final Icon PREVIOUS_ICON = IconLoader.getIcon("/icons/previous/previousOccurence_dark.svg", SdkIcons.class);

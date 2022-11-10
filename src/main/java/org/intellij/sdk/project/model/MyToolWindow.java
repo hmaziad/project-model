@@ -53,7 +53,7 @@ public class MyToolWindow {
     private JButton upButton;
     private JButton downButton;
     private JButton refreshButton;
-    private JButton deleteButton;
+    private JButton clearButton;
     private JButton takeSnapshot;
     private List<String> diffLines;
     private List<XTestCompositeNode> diffNodes = new ArrayList<>();
@@ -93,7 +93,7 @@ public class MyToolWindow {
         });
         this.sourceShotsBox.addActionListener(e -> selectShot());
         this.otherShotsBox.addActionListener(e -> this.nodeNavigatorService.reset());
-        this.deleteButton.addActionListener(e -> deleteShot());
+        this.clearButton.addActionListener(e -> deleteShot());
         this.refreshButton.addActionListener(e -> {
             this.sourceShotsBox.removeAllItems();
             this.otherShotsBox.removeAllItems();

@@ -8,5 +8,6 @@ public enum ButtonType {
     EXPAND,
     COLLAPSE,
     PREVIOUS,
-    NEXT;
+    NEXT,
+    DELETE
 }

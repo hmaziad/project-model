@@ -29,6 +29,9 @@ public class ButtonHandler {
             case CLEAR:
                 button.setIcon(SdkIcons.CLEAR_ICON);
                 break;
+            case DELETE:
+                button.setIcon(SdkIcons.DELETE_ICON);
+                break;
             case EXPAND:
                 button.setIcon(SdkIcons.EXPAND_ICON);
                 break;
