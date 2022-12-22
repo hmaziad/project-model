@@ -13,10 +13,11 @@ import name.fraser.neil.plaintext.diff_match_patch;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Log4j2
 public class DiffService {
-    public static List<String> diffStrings(List<String> original, List<String> revised) {
+    public static List<String> diffStrings(List<String> original, List<String> revised, short dualThreshold) {
         diff_match_patch dmp = new diff_match_patch(new StandardBreakScorer());
         String originalString = String.join("\n", original);
         String revisedString = String.join("\n", revised);
+        dmp.Diff_DualThreshold = dualThreshold;
         LinkedList<diff_match_patch.Diff> diff = dmp.diff_main(originalString, revisedString);
         StringBuilder sb = new StringBuilder();
         diff.forEach(item -> {
@@ -30,6 +31,10 @@ public class DiffService {
             }
         );
         return Arrays.asList(sb.toString().split("\n"));
+    }
+
+    public static List<String> diffStrings(List<String> original, List<String> revised) {
+        return diffStrings(original, revised, (short) 1000);
     }
 
     private static void appendWithSign(StringBuilder sb, diff_match_patch.Diff item, String sign) {

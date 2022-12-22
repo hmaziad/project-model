@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import org.intellij.sdk.project.model.services.DiffService;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class DiffServiceTest {
@@ -20,6 +20,39 @@ public class DiffServiceTest {
         List<String> expectedDiff = Files.readAllLines(Path.of("src/test/resources/nodeAsString/diff-result-numbers.txt"));
         List<String> actualDiff = DiffService.diffStrings(original, revised);
 
+        assertEquals(expectedDiff.size(), actualDiff.size());
+        IntStream //
+            .range(0, expectedDiff.size()) //
+            .forEach(index -> assertEquals(expectedDiff.get(index), actualDiff.get(index)));
+    }
+
+    @Test
+    public void test_diff_two_strings_corner_case_1_success() throws IOException {
+        /**
+         * TODO BE TESTED, revert Dual Line, apply same test, there will be an error in parsing
+         */
+        List<String> original = Files.readAllLines(Path.of("src/test/resources/nodeAsString/corner-case-1/original.txt"));
+        List<String> revised = Files.readAllLines(Path.of("src/test/resources/nodeAsString/corner-case-1/revised.txt"));
+
+        List<String> expectedDiff = Files.readAllLines(Path.of("src/test/resources/nodeAsString/corner-case-1/expected-diff.txt"));
+        List<String> actualDiff = DiffService.diffStrings(original, revised);
+        assertEquals(expectedDiff.size(), actualDiff.size());
+        IntStream //
+            .range(0, expectedDiff.size()) //
+            .forEach(index -> assertEquals(expectedDiff.get(index), actualDiff.get(index)));
+    }
+
+    @Test
+    @Ignore("The diff tool is random in this case")
+    public void test_diff_two_strings_corner_case_1_success_fail() throws IOException {
+        /**
+         * TODO BE TESTED, revert Dual Line, apply same test, there will be an error in parsing
+         */
+        List<String> original = Files.readAllLines(Path.of("src/test/resources/nodeAsString/corner-case-1/original.txt"));
+        List<String> revised = Files.readAllLines(Path.of("src/test/resources/nodeAsString/corner-case-1/revised.txt"));
+
+        List<String> expectedDiff = Files.readAllLines(Path.of("src/test/resources/nodeAsString/corner-case-1/expected-diff.txt"));
+        List<String> actualDiff = DiffService.diffStrings(original, revised, (short) 32);
         assertEquals(expectedDiff.size(), actualDiff.size());
         IntStream //
             .range(0, expectedDiff.size()) //

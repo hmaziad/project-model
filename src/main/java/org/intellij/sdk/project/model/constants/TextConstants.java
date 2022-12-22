@@ -14,6 +14,9 @@ public class TextConstants {
     public static final String WINDOW_IS_ALREADY_CLEAR = "Window is already clear";
     public static final String NO_SAVED_NODES = "There are no saved nodes";
     public static final String DELETE_THE_SAVED_NODE_Q = "Are you sure you want to delete the saved node \"%s\"?";
+    public static final String SELECTED_LABEL_IS_NULL = "Selected label is null";
+    public static final String SELECTED_NODE_IS_NULL = "Selected node is null";
+    public static final String RETRIEVED_NODE_FROM_STORAGE = "Successfully retrieved \"%s\" from storage";
 
 
 }

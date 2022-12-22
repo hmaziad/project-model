@@ -57,7 +57,7 @@ public class ParserService {
     }
 
     public static XTestCompositeNode convertDiffStringsToNode(List<String> lines) {
-        // lines preprocessed to contain <<'sign' at the beginning only and >> at the end only
+        // lines preprocessed to contain "<<'sign'" at the beginning only and ">>" at the end only
         preprocessing(lines);
         List<String> signedLines = addSignsPerLine(lines);
         return convertStringsToNode(signedLines);

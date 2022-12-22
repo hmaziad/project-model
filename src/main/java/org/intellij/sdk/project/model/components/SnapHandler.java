@@ -4,10 +4,12 @@ import static org.intellij.sdk.project.model.constants.TextConstants.START_DEBUG
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.services.ComputeChildrenService;
+import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
@@ -21,12 +23,14 @@ public class SnapHandler implements ToolHandler {
     private static final ComputeChildrenService computeChildrenService = new ComputeChildrenService();
     private final Project project;
     private final JLabel feedbackLabel;
+    private final Consumer<XTestCompositeNode> consumer;
 
     public void handle(DefaultTreeModel treeModel) {
+        // treeModel not used here
         XDebuggerManager xDebuggerManager = XDebuggerManager.getInstance(this.project);
         boolean isLoaded = loadDebuggerSession(xDebuggerManager);
         if (isLoaded) {
-            CompletableFuture.runAsync(() -> computeChildrenService.execute(treeModel::setRoot));
+            CompletableFuture.runAsync(() -> computeChildrenService.execute(this.consumer));
         }
     }
 

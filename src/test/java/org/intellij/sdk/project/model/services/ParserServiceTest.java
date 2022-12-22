@@ -85,8 +85,8 @@ public class ParserServiceTest {
 
     @Test
     public void test_parse_diff_strings_to_node_dfs() throws IOException {
-        // todo complete this test
         List<String> lines = Files.readAllLines(Path.of("src/test/resources/nodeAsString/diff-result-numbers.txt"));
-        convertDiffStringsToNode(lines);
+        var outputNode = convertDiffStringsToNode(lines);
+        ParserService.print(outputNode);
     }
 }

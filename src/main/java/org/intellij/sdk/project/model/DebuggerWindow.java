@@ -2,17 +2,15 @@
 
 package org.intellij.sdk.project.model;
 
-import static org.intellij.sdk.project.model.components.ButtonHandler.handleButton;
-import static org.intellij.sdk.project.model.components.ButtonHandler.handleToolbar;
-import static org.intellij.sdk.project.model.components.ButtonHandler.handleToolbarSeperator;
-import static org.intellij.sdk.project.model.constants.TextConstants.TAKE_DEBUGGER_SNAP;
-
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import org.intellij.sdk.project.model.components.ButtonHandler;
 import org.intellij.sdk.project.model.components.ButtonType;
 import org.intellij.sdk.project.model.components.ClearHandler;
 import org.intellij.sdk.project.model.components.DeleteHandler;
+import org.intellij.sdk.project.model.components.DiffHandler;
+import org.intellij.sdk.project.model.components.DropdownHandler;
 import org.intellij.sdk.project.model.components.DropdownObserver;
 import org.intellij.sdk.project.model.components.SaveHandler;
 import org.intellij.sdk.project.model.components.SnapHandler;
@@ -48,54 +46,60 @@ public class DebuggerWindow {
     private JLabel feedbackLabel;
     private JComboBox<String> savedSnapsDropdown;
     private JButton deleteButton;
-    private JToolBar.Separator toolbarSeperatorSnap;
+    private JToolBar.Separator toolbarSeparatorSnap;
     private boolean toggleNode;
 
     public DebuggerWindow(@NotNull Project project) {
+        ButtonHandler buttonHandler = new ButtonHandler();
         // toolbar
-        handleToolbar(this.toolbar);
+        buttonHandler.handleToolbar(this.toolbar);
 
         // icon buttons in toolbar
-        handleButton(this.snapButton, ButtonType.SNAP);
-        handleButton(this.saveButton, ButtonType.SAVE);
-        handleButton(this.diffButton, ButtonType.DIFF);
-        handleButton(this.clearButton, ButtonType.CLEAR);
-        handleButton(this.deleteButton, ButtonType.DELETE);
-        handleButton(this.expandButton, ButtonType.EXPAND);
-        handleButton(this.collapseButton, ButtonType.COLLAPSE);
-        handleButton(this.previousButton, ButtonType.PREVIOUS);
-        handleButton(this.nextButton, ButtonType.NEXT);
+        buttonHandler.handleButton(this.snapButton, ButtonType.SNAP);
+        buttonHandler.handleButton(this.saveButton, ButtonType.SAVE);
+        buttonHandler.handleButton(this.diffButton, ButtonType.DIFF);
+        buttonHandler.handleButton(this.clearButton, ButtonType.CLEAR);
+        buttonHandler.handleButton(this.deleteButton, ButtonType.DELETE);
+        buttonHandler.handleButton(this.expandButton, ButtonType.EXPAND);
+        buttonHandler.handleButton(this.collapseButton, ButtonType.COLLAPSE);
+        buttonHandler.handleButton(this.previousButton, ButtonType.PREVIOUS);
+        buttonHandler.handleButton(this.nextButton, ButtonType.NEXT);
 
         // toolbar separators
-        handleToolbarSeperator(this.toolbarSeparatorCore);
-        handleToolbarSeperator(this.toolbarSeparatorOther);
-        handleToolbarSeperator(this.toolbarSeparatorFeedback);
-        handleToolbarSeperator(this.toolbarSeperatorSnap);
+        buttonHandler.handleToolbarSeperator(this.toolbarSeparatorCore);
+        buttonHandler.handleToolbarSeperator(this.toolbarSeparatorOther);
+        buttonHandler.handleToolbarSeperator(this.toolbarSeparatorFeedback);
+        buttonHandler.handleToolbarSeperator(this.toolbarSeparatorSnap);
 
-        // initialize
-        this.debugTree.setRootVisible(true);
-        this.feedbackLabel.setText(TAKE_DEBUGGER_SNAP);
+        this.debugTree.setRootVisible(false);
+        this.debugTree
+            .getModel()
+            .addTreeModelListener(new DebuggerTreeModelListener(this.feedbackLabel, buttonHandler.getAllButtons()));
+        this.debugTree.setCellRenderer(new DebuggerTreeRenderer());
+
         DefaultTreeModel treeModel = (DefaultTreeModel) this.debugTree.getModel();
         treeModel.setRoot(null);
-        this.debugTree.getModel().addTreeModelListener(new DebuggerTreeModelListener(this.feedbackLabel, this.clearButton));
+
+        // components
         DropdownObserver dropdownObserver = new DropdownObserver(this.savedSnapsDropdown);
-        ToolHandler snapHandler = new SnapHandler(project, this.feedbackLabel);
+        SnapHandler snapHandler = new SnapHandler(project, this.feedbackLabel, treeModel::setRoot);
         ToolHandler clearHandler = new ClearHandler(this.feedbackLabel);
         ToolHandler saveHandler = new SaveHandler(this.feedbackLabel, dropdownObserver, project);
         ToolHandler deleteHandler = new DeleteHandler(this.feedbackLabel, dropdownObserver, project);
+        ToolHandler diffHandler = new DiffHandler(this.feedbackLabel, project);
+        ToolHandler dropDownHandler = new DropdownHandler(this.feedbackLabel, dropdownObserver);
 
         this.clearButton.addActionListener(e -> clearHandler.handle(treeModel));
         this.snapButton.addActionListener(e -> snapHandler.handle(treeModel));
         this.saveButton.addActionListener(e -> saveHandler.handle(treeModel));
         this.deleteButton.addActionListener(e -> deleteHandler.handle(treeModel));
-
-
-        /**
-         * Let project be retrieved from static class instead of being passed around everywhere
-         */
+        this.diffButton.addActionListener(e -> diffHandler.handle(treeModel));
+        this.savedSnapsDropdown.addActionListener(e -> dropDownHandler.handle(treeModel));
 
         // test button to be removed eventually
-        testButton.addActionListener(e -> {
+        this.testButton.setVisible(false);
+        this.toolbarSeparatorFeedback.setVisible(false);
+        this.testButton.addActionListener(e -> {
             if (toggleNode) {
                 treeModel.setRoot(null);
                 toggleNode = false;

@@ -37,4 +37,9 @@
         <applicationService serviceImplementation="org.intellij.sdk.project.model.services.PersistencyService" serviceInterface="org.intellij.sdk.project.model.services.PersistencyService"/>
         <applicationService serviceImplementation="org.intellij.sdk.project.model.services.AppStateService" serviceInterface="org.intellij.sdk.project.model.services.AppStateService"/>
     </extensions>
+    <projectListeners>
+        <listener
+                class="org.intellij.sdk.project.model.components.SessionStartedListener"
+                topic="com.intellij.debugger.impl.DebuggerManagerListener"/>
+    </projectListeners>
 </idea-plugin>

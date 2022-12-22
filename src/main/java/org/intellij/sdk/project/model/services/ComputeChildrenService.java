@@ -33,12 +33,16 @@ public class ComputeChildrenService {
         Set<Integer> childrenRefs = new HashSet<>();
         XTestCompositeNode rootNode = new XTestCompositeNode(nodesQueue, container);
         nodesQueue.add(rootNode);
+        int maxDepth = 10; // todo make this configurable
 
-        while (!nodesQueue.isEmpty()) {
+        while (!nodesQueue.isEmpty() && maxDepth > 0) {
             int nodesQueueSize = nodesQueue.size();
+            maxDepth--;
             for (int i = 0; i < nodesQueueSize; i++) {
                 XTestCompositeNode currentNode = nodesQueue.poll();
-                Objects.requireNonNull(currentNode, "Pulled node from Queue is null").retrieveNodeIdAndRef();
+                Objects
+                    .requireNonNull(currentNode, "Pulled node from Queue is null")
+                    .retrieveNodeIdAndRef();
                 // checks for loops in graph
                 if (currentNode.getRef() != 0 && childrenRefs.contains(currentNode.getRef())) {
                     continue;
@@ -54,7 +58,7 @@ public class ComputeChildrenService {
                 }
             }
         }
-        LOG.debug("Computed Debug Node {}", rootNode);
+        LOG.info("Computed Debug Node {}", rootNode);
         saveSessionConsumer.accept(rootNode);
         ParserService.print(rootNode);
     }
@@ -63,5 +67,6 @@ public class ComputeChildrenService {
         currentNode.getContainer().computeChildren(currentNode);
         currentNode.getFuture().join();
         currentNode.retrieveNodeIdAndRef();
+        LOG.debug("Computing: {}", currentNode.getNodeId());
     }
 }
