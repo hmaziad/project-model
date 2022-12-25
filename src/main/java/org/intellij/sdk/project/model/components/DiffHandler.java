@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.services.DiffService;
 import org.intellij.sdk.project.model.services.ParserService;
-import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
+import org.intellij.sdk.project.model.xnodes.DebugNode;
 import com.intellij.openapi.project.Project;
 
 import lombok.AllArgsConstructor;
@@ -16,12 +16,12 @@ public class DiffHandler implements ToolHandler {
 
     @Override
     public void handle(DefaultTreeModel treeModel) {
-        XTestCompositeNode originalNode = (XTestCompositeNode) treeModel.getRoot();
+        DebugNode originalNode = (DebugNode) treeModel.getRoot();
         ToolHandler snapHandler = new SnapHandler(this.project, this.feedbackLabel, revisedNode -> computeDiff(originalNode, revisedNode, treeModel));
         snapHandler.handle(treeModel);
     }
 
-    private void computeDiff(XTestCompositeNode originalNode, XTestCompositeNode revisedNode, DefaultTreeModel treeModel) {
+    private void computeDiff(DebugNode originalNode, DebugNode revisedNode, DefaultTreeModel treeModel) {
         var originalStrings = ParserService.convertNodeToStrings(originalNode);
         var revisedStrings = ParserService.convertNodeToStrings(revisedNode);
         var diffStrings = DiffService.diffStrings(originalStrings, revisedStrings);

@@ -75,7 +75,7 @@ public class DebuggerWindow {
         this.debugTree
             .getModel()
             .addTreeModelListener(new DebuggerTreeModelListener(this.feedbackLabel, buttonHandler.getAllButtons()));
-        this.debugTree.setCellRenderer(new DebuggerTreeRenderer());
+//        this.debugTree.setCellRenderer(new DebuggerTreeRenderer());
 
         DefaultTreeModel treeModel = (DefaultTreeModel) this.debugTree.getModel();
         treeModel.setRoot(null);

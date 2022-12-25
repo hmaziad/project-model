@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
-import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
+import org.intellij.sdk.project.model.xnodes.DebugNode;
 import org.jetbrains.annotations.NotNull;
 
 import lombok.AccessLevel;
@@ -32,23 +32,23 @@ public class ParserService {
     private static final String OPENING = "<<";
     private static final String CLOSING = ">>";
 
-    public static XTestCompositeNode convertStringsToNode(List<String> lines) {
+    public static DebugNode convertStringsToNode(List<String> lines) {
         try {
             List<String[]> lineArrays = new ArrayList<>();
             for (String line : lines) {
                 String[] lineArray = line.split(",", PARTS);
                 lineArrays.add(lineArray);
             }
-            Map<Integer, XTestCompositeNode> nodePerIndex = new HashMap<>();
+            Map<Integer, DebugNode> nodePerIndex = new HashMap<>();
             nodePerIndex.put(-1, createDummyNode());
             for (int lineNumber = 0; lineNumber < lineArrays.size(); lineNumber++) {
                 String[] lineArray = lineArrays.get(lineNumber);
                 String signedIndent = lineArray[INDENTS_PART];
                 char sign = signedIndent.length() == 2 ? signedIndent.charAt(0) : SPACE;
                 int numberOfIndents = Integer.parseInt(String.valueOf(signedIndent.length() == 2 ? signedIndent.charAt(1) : signedIndent.charAt(0)));
-                XTestCompositeNode newNode = createNode(lineArray, sign, lineNumber);
+                DebugNode newNode = createNode(lineArray, sign, lineNumber);
                 nodePerIndex.put(numberOfIndents, newNode);
-                nodePerIndex.get(numberOfIndents - 1).addChild(newNode);
+                nodePerIndex.get(numberOfIndents - 1).add(newNode);
             }
             return nodePerIndex.get(-1);
         } catch (Exception e) {
@@ -56,7 +56,7 @@ public class ParserService {
         }
     }
 
-    public static XTestCompositeNode convertDiffStringsToNode(List<String> lines) {
+    public static DebugNode convertDiffStringsToNode(List<String> lines) {
         // lines preprocessed to contain "<<'sign'" at the beginning only and ">>" at the end only
         preprocessing(lines);
         List<String> signedLines = addSignsPerLine(lines);
@@ -123,35 +123,31 @@ public class ParserService {
     }
 
     @NotNull
-    private static XTestCompositeNode createDummyNode() {
+    private static DebugNode createDummyNode() {
         return createNode(new String[] {"", "name", "nodeId", "value"}, SPACE, -1);
     }
 
-    private static XTestCompositeNode createNode(String[] next, char signOrSpace, int lineNumber) {
-        return XTestCompositeNode.createNode(next[NAME_PART], next[TYPE_PART], next[VALUE_PART], signOrSpace, lineNumber);
+    private static DebugNode createNode(String[] next, char signOrSpace, int lineNumber) {
+        return DebugNode.createNode(next[NAME_PART], next[TYPE_PART], next[VALUE_PART], signOrSpace, lineNumber);
     }
 
-    public static List<String> convertNodeToStrings(XTestCompositeNode node) {
+    public static List<String> convertNodeToStrings(DebugNode node) {
         StringBuilder sb = new StringBuilder();
         addLines(sb, node.getChildren(), 0);
         return Arrays.stream(sb.toString().split("\n")).collect(Collectors.toList());
     }
 
-    private static void addLines(StringBuilder sb, List<XTestCompositeNode> nodes, int indents) {
+    private static void addLines(StringBuilder sb, List<DebugNode> nodes, int indents) {
         nodes.forEach(child -> {
             appendData(sb, child, indents);
             addLines(sb, child.getChildren(), indents + 1);
         });
     }
 
-    private static void appendData(StringBuilder sb, XTestCompositeNode node, int indents) {
+    private static void appendData(StringBuilder sb, DebugNode node, int indents) {
         sb.append(indents) //
             .append(",") //
-            .append(node.getContainer().toString()) //
-            .append(",") //
-            .append(node.getNodeId()) //
-            .append(",") //
-            .append(node.getValue()) //
+            .append(node.getText()) //
             .append("\n");
     }
 
@@ -159,12 +155,12 @@ public class ParserService {
      * not needed here, to be moved
      */
 
-    public static void print(XTestCompositeNode node) {
+    public static void print(DebugNode node) {
         print(node, "");
     }
 
-    private static void print(XTestCompositeNode node, String tab) {
-        LOG.info(tab + node.getContainer().toString() + " " + node.getNodeId() + " " + node.getValue());
-        node.getChildren().forEach(child -> print(child, tab + "\t"));
+    private static void print(DebugNode node, String tab) {
+//        LOG.info(tab + node.getContainer().toString() + " " + node.getNodeId() + " " + node.getValue());
+//        node.getChildren().forEach(child -> print(child, tab + "\t"));
     }
 }

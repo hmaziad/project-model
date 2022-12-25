@@ -9,7 +9,7 @@ import java.util.Objects;
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.services.PersistencyService;
-import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
+import org.intellij.sdk.project.model.xnodes.DebugNode;
 import com.intellij.openapi.components.ServiceManager;
 
 import lombok.AllArgsConstructor;
@@ -26,7 +26,7 @@ public class DropdownHandler implements ToolHandler {
         if (Objects.isNull(selectedItemLabel)) {
             this.feedbackLabel.setText(SELECTED_LABEL_IS_NULL);
         }
-        XTestCompositeNode selectedNode = persistencyService.getNodes().get(selectedItemLabel);
+        DebugNode selectedNode = persistencyService.getNodes().get(selectedItemLabel);
         if (Objects.isNull(selectedNode)) {
             this.feedbackLabel.setText(SELECTED_NODE_IS_NULL);
         }

@@ -3,7 +3,7 @@ package org.intellij.sdk.project.model.services;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
+import org.intellij.sdk.project.model.xnodes.DebugNode;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
@@ -18,22 +18,22 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class PersistencyService implements PersistentStateComponent<PersistencyService> {
 
-    Map<String, XTestCompositeNode> nodes;
+    Map<String, DebugNode> nodes;
 
     public PersistencyService() {
         nodes = new HashMap<>();
         LOG.debug("Persistency Service Constructed");
     }
 
-    public void addNode(String name, XTestCompositeNode node) {
+    public void addNode(String name, DebugNode node) {
         this.nodes.put(name, node);
     }
 
-    public Map<String, XTestCompositeNode> getNodes() {
+    public Map<String, DebugNode> getNodes() {
         return nodes;
     }
 
-    public void setNodes(Map<String, XTestCompositeNode> nodes) {
+    public void setNodes(Map<String, DebugNode> nodes) {
         this.nodes = nodes;
     }
 

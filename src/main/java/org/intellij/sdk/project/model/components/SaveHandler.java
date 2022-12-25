@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.services.PersistencyService;
-import org.intellij.sdk.project.model.xnodes.XTestCompositeNode;
+import org.intellij.sdk.project.model.xnodes.DebugNode;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 
@@ -25,7 +25,7 @@ public class SaveHandler implements ToolHandler {
     private final Project project;
 
     public void handle(DefaultTreeModel treeModel) {
-        XTestCompositeNode rootNode = (XTestCompositeNode) treeModel.getRoot();
+        DebugNode rootNode = (DebugNode) treeModel.getRoot();
         if (Objects.isNull(rootNode)) {
             this.feedbackLabel.setText("Please take a snap shot first");
             return;
