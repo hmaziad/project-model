@@ -5,17 +5,21 @@ import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
+import org.jetbrains.annotations.VisibleForTesting;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueContainerNode;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueGroupNodeImpl;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @NoArgsConstructor(force = true)
 public class DebugNode extends DefaultMutableTreeNode {
     private final String text;
+    @VisibleForTesting
+    @Setter
     private List<DebugNode> children = new ArrayList<>();
 
     public DebugNode(XValueContainerNode xNode) {
@@ -49,11 +53,6 @@ public class DebugNode extends DefaultMutableTreeNode {
     public void add(DebugNode newChild) {
         this.children.add(newChild);
         add((MutableTreeNode) newChild);
-    }
-
-    @Override
-    public void add(MutableTreeNode newChild) {
-        super.add(newChild);
     }
 
     @Override
