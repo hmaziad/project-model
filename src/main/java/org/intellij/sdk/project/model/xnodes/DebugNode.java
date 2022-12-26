@@ -20,7 +20,15 @@ public class DebugNode extends DefaultMutableTreeNode {
     private final String text;
     @VisibleForTesting
     @Setter
-    private List<DebugNode> children = new ArrayList<>();
+    private List<DebugNode> myChildren = new ArrayList<>();
+
+    public DebugNode(String text) {
+        this.text = text;
+    }
+
+    public static DebugNode createNode(String text) {
+        return new DebugNode(text);
+    }
 
     public DebugNode(XValueContainerNode xNode) {
         this.text = xNode.getText().toString();
@@ -35,23 +43,13 @@ public class DebugNode extends DefaultMutableTreeNode {
                 DebugNode debugNode = new DebugNode(xChild.getText().toString());
                 add(debugNode);
             } else {
-                throw new RuntimeException("Could not cast node of class " + child.getClass());
+                throw new IllegalStateException("Could not cast node of class " + child.getClass());
             }
-
         }
     }
 
-    public DebugNode(String text) {
-        this.text = text;
-    }
-
-    public static DebugNode createNode(String s, String s1, String s2, char signOrSpace, int lineNumber) {
-        String text = String.format("%s,%s,%s", s, s1, s2);
-        return new DebugNode(text);
-    }
-
     public void add(DebugNode newChild) {
-        this.children.add(newChild);
+        this.myChildren.add(newChild);
         add((MutableTreeNode) newChild);
     }
 

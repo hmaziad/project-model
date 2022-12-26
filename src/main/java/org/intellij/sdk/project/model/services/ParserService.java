@@ -1,13 +1,10 @@
 package org.intellij.sdk.project.model.services;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import org.apache.commons.lang.StringUtils;
 import org.intellij.sdk.project.model.xnodes.DebugNode;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,15 +19,9 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class ParserService {
     private static final int INDENTS_PART = 0;
-    private static final int NAME_PART = 1;
-    private static final int TYPE_PART = 2;
-    private static final int VALUE_PART = 3;
+    private static final int TEXT_PART = 1;
     private static final int PARTS = 4;
-    private static final char SPACE = ' ';
-    private static final char INSERT = '+';
-    private static final char DELETE = '-';
-    private static final String OPENING = "<<";
-    private static final String CLOSING = ">>";
+    private static final String SPACE = " ";
 
     public static DebugNode convertStringsToNode(List<String> lines) {
         try {
@@ -41,12 +32,10 @@ public class ParserService {
             }
             Map<Integer, DebugNode> nodePerIndex = new HashMap<>();
             nodePerIndex.put(-1, createDummyNode());
-            for (int lineNumber = 0; lineNumber < lineArrays.size(); lineNumber++) {
-                String[] lineArray = lineArrays.get(lineNumber);
-                String signedIndent = lineArray[INDENTS_PART];
-                char sign = signedIndent.length() == 2 ? signedIndent.charAt(0) : SPACE;
-                int numberOfIndents = Integer.parseInt(String.valueOf(signedIndent.length() == 2 ? signedIndent.charAt(1) : signedIndent.charAt(0)));
-                DebugNode newNode = createNode(lineArray, sign, lineNumber);
+            for (String[] lineArray : lineArrays) {
+                String indents = lineArray[INDENTS_PART];
+                int numberOfIndents = indents.length();
+                DebugNode newNode = createNode(lineArray[TEXT_PART]);
                 nodePerIndex.put(numberOfIndents, newNode);
                 nodePerIndex.get(numberOfIndents - 1).add(newNode);
             }
@@ -56,111 +45,31 @@ public class ParserService {
         }
     }
 
-    public static DebugNode convertDiffStringsToNode(List<String> lines) {
-        // lines preprocessed to contain "<<'sign'" at the beginning only and ">>" at the end only
-        preprocessing(lines);
-        List<String> signedLines = addSignsPerLine(lines);
-        return convertStringsToNode(signedLines);
-    }
-
-    private static void preprocessing(List<String> lines) {
-        for (int i = 0; i < lines.size(); i++) {
-            String currentLine = lines.get(i);
-            if (currentLine.endsWith("<<+") || currentLine.endsWith("<<-")) {
-                // add the sign to the next line
-                lines.set(i + 1, currentLine.substring(currentLine.length() - 3) + lines.get(i + 1));
-                // remove it from current line
-                lines.set(i, currentLine.substring(0, currentLine.length() - 3));
-            }
-            if (currentLine.startsWith(">>")) {
-                // remove sign from current line
-                lines.set(i, currentLine.substring(2));
-                // add sign to previous line
-                lines.set(i - 1, lines.get(i - 1) + ">>");
-            }
-        }
-    }
-
-    private static List<String> addSignsPerLine(List<String> lines) {
-        List<String> signedLines = new ArrayList<>();
-        boolean isInserting = false;
-        boolean isDeleting = false;
-        for (int i = 0; i < lines.size(); i++) {
-            String line = lines.get(i);
-            if ((!line.contains("<<") && !line.contains(">>") && !isInserting && !isDeleting)) {
-                signedLines.add(line);
-                continue;
-            } else if (line.contains(">><<")) {
-                String[] values = StringUtils.substringsBetween(line, "<<", ">>");
-                String lineWithNoValue = line.substring(0, line.indexOf("<<"));
-                signedLines.add('-' + lineWithNoValue + values[0].substring(1));
-                signedLines.add('+' + lineWithNoValue + values[1].substring(1));
-            } else {
-                if (line.startsWith("<<+")) {
-                    isInserting = true;
-                    signedLines.add('+' + line.substring(3));
-                } else if (isInserting) {
-                    signedLines.add('+' + line);
-                }
-
-                if (line.startsWith("<<-")) {
-                    isDeleting = true;
-                    signedLines.add('-' + line.substring(3));
-                } else if (isDeleting) {
-                    signedLines.add('-' + line);
-                }
-
-                if ((isInserting || isDeleting) && line.endsWith(">>")) {
-                    int lastIndex = signedLines.size() - 1;
-                    String currentSignedLine = signedLines.get(lastIndex);
-                    signedLines.set(lastIndex, currentSignedLine.substring(0, currentSignedLine.length() - 2));
-                    isInserting = false;
-                    isDeleting = false;
-                }
-            }
-        }
-        return signedLines;
-    }
-
     @NotNull
     private static DebugNode createDummyNode() {
-        return createNode(new String[] {"", "name", "nodeId", "value"}, SPACE, -1);
+        return createNode("name nodeId value");
     }
 
-    private static DebugNode createNode(String[] next, char signOrSpace, int lineNumber) {
-        return DebugNode.createNode(next[NAME_PART], next[TYPE_PART], next[VALUE_PART], signOrSpace, lineNumber);
+    private static DebugNode createNode(String text) {
+        return DebugNode.createNode(text);
     }
 
-    public static List<String> convertNodeToStrings(DebugNode node) {
+    public static String convertNodeToStrings(DebugNode node) {
         StringBuilder sb = new StringBuilder();
-        addLines(sb, node.getChildren(), 0);
-        return Arrays.stream(sb.toString().split("\n")).collect(Collectors.toList());
+        addLines(sb, node.getMyChildren(), 0);
+        return sb.toString().trim();
     }
 
     private static void addLines(StringBuilder sb, List<DebugNode> nodes, int indents) {
         nodes.forEach(child -> {
-            appendData(sb, child, indents);
-            addLines(sb, child.getChildren(), indents + 1);
+            appendData(sb, child, indents > 0 ? SPACE.repeat(indents * 2) : "");
+            addLines(sb, child.getMyChildren(), indents + 1);
         });
     }
 
-    private static void appendData(StringBuilder sb, DebugNode node, int indents) {
+    private static void appendData(StringBuilder sb, DebugNode node, String indents) {
         sb.append(indents) //
-            .append(",") //
             .append(node.getText()) //
             .append("\n");
-    }
-
-    /**
-     * not needed here, to be moved
-     */
-
-    public static void print(DebugNode node) {
-        print(node, "");
-    }
-
-    private static void print(DebugNode node, String tab) {
-//        LOG.info(tab + node.getContainer().toString() + " " + node.getNodeId() + " " + node.getValue());
-//        node.getChildren().forEach(child -> print(child, tab + "\t"));
     }
 }

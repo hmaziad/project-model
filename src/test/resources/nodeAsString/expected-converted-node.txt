@@ -1,8 +1,8 @@
-0,container,childAA_nodeId,childAA_value
-1,container,childA1_nodeId,childA1_value
-1,container,childA2_nodeId,childA2_value
-1,container,childA3_nodeId,childA3_value
-0,container,childBB_nodeId,childBB_value
-1,container,childB1_nodeId,childB1_value
-1,container,childB2_nodeId,childB2_value
-1,container,childB3_nodeId,childB3_value
+container childAA_nodeId childAA_value
+  container childA1_nodeId childA1_value
+  container childA2_nodeId childA2_value
+  container childA3_nodeId childA3_value
+container childBB_nodeId childBB_value
+  container childB1_nodeId childB1_value
+  container childB2_nodeId childB2_value
+  container childB3_nodeId childB3_value
