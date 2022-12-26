@@ -16,6 +16,7 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.components.ButtonType;
+import org.intellij.sdk.project.model.components.ToolHandler;
 
 import lombok.AllArgsConstructor;
 
@@ -23,6 +24,7 @@ import lombok.AllArgsConstructor;
 public class DebuggerTreeModelListener implements TreeModelListener {
     private final JLabel feedbackLabel;
     private Map<ButtonType, JButton> allButtons;
+    private ToolHandler expandTreeHandler;
 
     @Override
     public void treeNodesChanged(TreeModelEvent e) {
@@ -41,7 +43,8 @@ public class DebuggerTreeModelListener implements TreeModelListener {
 
     @Override
     public void treeStructureChanged(TreeModelEvent e) {
-        boolean isRootNull = Objects.isNull(((DefaultTreeModel) e.getSource()).getRoot());
+        DefaultTreeModel treeModel = (DefaultTreeModel) e.getSource();
+        boolean isRootNull = Objects.isNull(treeModel.getRoot());
         this.allButtons = new EnumMap<>(ButtonType.class); // todo, removed when session listener is implemented
         if (isRootNull) {
             this.feedbackLabel.setText(TAKE_DEBUGGER_SNAP);
@@ -55,6 +58,7 @@ public class DebuggerTreeModelListener implements TreeModelListener {
                 .filter(entry -> enabledOnNewNode.contains(entry.getKey()))
                 .map(Map.Entry::getValue)
                 .forEach(button -> button.setEnabled(true));
+            expandTreeHandler.handle(treeModel);
         }
     }
 }

@@ -147,34 +147,6 @@
               <toolTipText value="Diff Debugger Current Session with Taken Snap Below "/>
             </properties>
           </component>
-          <component id="c0fdf" class="javax.swing.JButton" binding="previousButton">
-            <constraints/>
-            <properties>
-              <borderPainted value="false"/>
-              <contentAreaFilled value="false"/>
-              <foreground color="-12828863"/>
-              <icon value="icons/previous/previousOccurence_dark.png"/>
-              <maximumSize width="30" height="30"/>
-              <minimumSize width="30" height="30"/>
-              <preferredSize width="30" height="30"/>
-              <text value=""/>
-              <toolTipText value="Collapse Nodes"/>
-            </properties>
-          </component>
-          <component id="4d18f" class="javax.swing.JButton" binding="nextButton">
-            <constraints/>
-            <properties>
-              <borderPainted value="false"/>
-              <contentAreaFilled value="false"/>
-              <foreground color="-12828863"/>
-              <icon value="icons/next/nextOccurence_dark.png"/>
-              <maximumSize width="30" height="30"/>
-              <minimumSize width="30" height="30"/>
-              <preferredSize width="30" height="30"/>
-              <text value=""/>
-              <toolTipText value="Collapse Nodes"/>
-            </properties>
-          </component>
           <component id="a23ec" class="javax.swing.JToolBar$Separator" binding="toolbarSeparatorOther">
             <constraints/>
             <properties>
