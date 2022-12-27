@@ -3,7 +3,7 @@
 package org.intellij.sdk.project.model;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.components.ButtonHandler;
 import org.intellij.sdk.project.model.components.ButtonType;
@@ -11,6 +11,7 @@ import org.intellij.sdk.project.model.components.ClearHandler;
 import org.intellij.sdk.project.model.components.CollapseTreeHandler;
 import org.intellij.sdk.project.model.components.DeleteHandler;
 import org.intellij.sdk.project.model.components.DiffHandler;
+import org.intellij.sdk.project.model.components.DiffRefHandler;
 import org.intellij.sdk.project.model.components.DropdownHandler;
 import org.intellij.sdk.project.model.components.DropdownObserver;
 import org.intellij.sdk.project.model.components.ExpandTreeHandler;
@@ -41,15 +42,20 @@ public class DebuggerWindow {
     private JButton expandButton;
     private JButton collapseButton;
     private JToolBar.Separator toolbarSeparatorOther;
-    private JButton testButton;
     private JToolBar.Separator toolbarSeparatorFeedback;
     private JLabel feedbackLabel;
     private JComboBox<String> savedSnapsDropdown;
     private JButton deleteButton;
     private JToolBar.Separator toolbarSeparatorSnap;
-    private boolean toggleNode;
+    private JLabel savedNodesLabel;
+    private JComboBox<String> refSavedSnapsDropdown;
+    private JButton diffRefButton;
+    private JLabel diffSavedNodesLabel;
+    private JLabel refSavedNodesLabel;
 
     public DebuggerWindow(@NotNull Project project) {
+        this.feedbackLabel.setBorder(new EmptyBorder(0, 10, 0, 0));
+
         ButtonHandler buttonHandler = new ButtonHandler();
         // toolbar
         buttonHandler.handleToolbar(this.toolbar);
@@ -62,6 +68,7 @@ public class DebuggerWindow {
         buttonHandler.handleButton(this.deleteButton, ButtonType.DELETE);
         buttonHandler.handleButton(this.expandButton, ButtonType.EXPAND);
         buttonHandler.handleButton(this.collapseButton, ButtonType.COLLAPSE);
+        buttonHandler.handleButton(this.diffRefButton, ButtonType.DIFF);
 
         // toolbar separators
         buttonHandler.handleToolbarSeperator(this.toolbarSeparatorCore);
@@ -72,13 +79,15 @@ public class DebuggerWindow {
         treeModel.setRoot(null);
 
         // components
-        DropdownObserver dropdownObserver = new DropdownObserver(this.savedSnapsDropdown);
+        DropdownObserver savedDropdownObserver = new DropdownObserver(this.savedSnapsDropdown);
+        DropdownObserver refDropdownObserver = new DropdownObserver(this.refSavedSnapsDropdown);
         SnapHandler snapHandler = new SnapHandler(project, this.feedbackLabel, treeModel::setRoot);
         ToolHandler clearHandler = new ClearHandler(this.feedbackLabel);
-        ToolHandler saveHandler = new SaveHandler(this.feedbackLabel, dropdownObserver, project);
-        ToolHandler deleteHandler = new DeleteHandler(this.feedbackLabel, dropdownObserver, project);
+        ToolHandler saveHandler = new SaveHandler(this.feedbackLabel, savedDropdownObserver, refDropdownObserver);
+        ToolHandler deleteHandler = new DeleteHandler(this.feedbackLabel, savedDropdownObserver, project);
         ToolHandler diffHandler = new DiffHandler(this.feedbackLabel, project);
-        ToolHandler dropDownHandler = new DropdownHandler(this.feedbackLabel, dropdownObserver);
+        ToolHandler diffRefHandler = new DiffRefHandler(this.feedbackLabel, project, savedDropdownObserver, refDropdownObserver);
+        ToolHandler savedDropDownHandler = new DropdownHandler(this.feedbackLabel, savedDropdownObserver);
         ToolHandler expandTreeHandler = new ExpandTreeHandler(debugTree);
         ToolHandler collapseTreeHandler = new CollapseTreeHandler(debugTree);
 
@@ -96,20 +105,8 @@ public class DebuggerWindow {
         this.diffButton.addActionListener(e -> diffHandler.handle(treeModel));
         this.expandButton.addActionListener(e -> expandTreeHandler.handle(treeModel));
         this.collapseButton.addActionListener(e -> collapseTreeHandler.handle(treeModel));
-        this.savedSnapsDropdown.addActionListener(e -> dropDownHandler.handle(treeModel));
-
-        // test button to be removed eventually
-        this.testButton.setVisible(false);
-        this.toolbarSeparatorFeedback.setVisible(false);
-        this.testButton.addActionListener(e -> {
-            if (toggleNode) {
-                treeModel.setRoot(null);
-                toggleNode = false;
-            } else {
-                treeModel.setRoot(new DefaultMutableTreeNode("hello"));
-                toggleNode = true;
-            }
-        });
+        this.savedSnapsDropdown.addActionListener(e -> savedDropDownHandler.handle(treeModel));
+        this.diffRefButton.addActionListener(e -> diffRefHandler.handle(treeModel));
 
     }
 
