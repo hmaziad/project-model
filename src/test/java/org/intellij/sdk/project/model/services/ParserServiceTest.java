@@ -7,44 +7,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.intellij.sdk.project.model.xnodes.DebugNode;
 import org.junit.Test;
 
 public class ParserServiceTest {
-
-    @Test
-    public void test_parse_normal_strings_to_node_dfs() throws IOException {
-        assertParsingForFile("src/test/resources/nodeAsString/source-numbers.txt");
-        assertParsingForFile("src/test/resources/nodeAsString/destination-numbers.txt");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void test_parse_corrupted_string_handled() throws IOException {
-        assertParsingForFile("src/test/resources/nodeAsString/corrupted-strings.txt");
-    }
-
-
-    private void assertParsingForFile(String path) throws IOException {
-        List<String> lines = Files.readAllLines(Path.of(path));
-        DebugNode rootNode = ParserService.convertStringsToNode(lines);
-        assertNodeValues(rootNode.getMyChildren(), lines, new AtomicInteger(0));
-    }
-
-    private void assertNodeValues(List<DebugNode> children, List<String> lines, AtomicInteger index) {
-        if (CollectionUtils.isNotEmpty(children)) {
-            for (var currentNode : children) {
-                String errorMessage = String.format("Current node of value %s does not equal %s", currentNode.getText(), lines.get(index.get()));
-                String[] actualValues = currentNode.getText().split(",");
-                String[] expectedValues = lines.get(index.getAndIncrement()).split(",");
-                assertEquals(errorMessage, actualValues[0], expectedValues[1]);
-                assertNodeValues(currentNode.getMyChildren(), lines, index);
-            }
-        }
-    }
 
     @Test
     public void test_convert_node_to_strings() throws IOException {

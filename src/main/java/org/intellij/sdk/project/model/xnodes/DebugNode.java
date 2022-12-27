@@ -2,22 +2,28 @@ package org.intellij.sdk.project.model.xnodes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import org.jetbrains.annotations.VisibleForTesting;
+import com.intellij.openapi.util.IconLoader;
+import com.intellij.ui.LayeredIcon;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueContainerNode;
-import com.intellij.xdebugger.impl.ui.tree.nodes.XValueGroupNodeImpl;
-import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 
 @Getter
 @NoArgsConstructor(force = true)
+@Log4j2
 public class DebugNode extends DefaultMutableTreeNode {
     private final String text;
+    private String iconPath;
     @VisibleForTesting
     @Setter
     private List<DebugNode> myChildren = new ArrayList<>();
@@ -26,26 +32,43 @@ public class DebugNode extends DefaultMutableTreeNode {
         this.text = text;
     }
 
-    public static DebugNode createNode(String text) {
-        return new DebugNode(text);
+    // exclude Mark
+    public DebugNode(XValueContainerNode<?> xNode) {
+        this.text = xNode.getText().toString();
+        this.iconPath = getIconPath(xNode.getIcon()).orElse(null);
+        try {
+            IconLoader.CachedImageIcon icon = (IconLoader.CachedImageIcon) xNode.getIcon();
+            if (Objects.nonNull(icon)) {
+                this.iconPath = icon.getOriginalPath(); // e.g. nodes/parameter.svg
+            }
+        } catch (Exception e) {
+            LOG.error("Could not get icon path: {}", e.toString());
+        }
+
+        List<? extends XValueContainerNode<?>> children = xNode.getLoadedChildren();
+        children.forEach(child -> {
+            DebugNode debugNode = new DebugNode(child);
+            add(debugNode);
+        });
     }
 
-    public DebugNode(XValueContainerNode xNode) {
-        this.text = xNode.getText().toString();
-        List children = xNode.getLoadedChildren();
-        for (var child : children) {
-            if (child instanceof XValueNodeImpl) {
-                XValueNodeImpl xChild = (XValueNodeImpl) child;
-                DebugNode debugNode = new DebugNode(xChild);
-                add(debugNode);
-            } else if (child instanceof XValueGroupNodeImpl) {
-                XValueGroupNodeImpl xChild = (XValueGroupNodeImpl) child;
-                DebugNode debugNode = new DebugNode(xChild.getText().toString());
-                add(debugNode);
-            } else {
-                throw new IllegalStateException("Could not cast node of class " + child.getClass());
+    private Optional<String> getIconPath(Icon icon) {
+        if (icon instanceof LayeredIcon) {
+            var layeredIcon = (LayeredIcon) icon;
+            for (var currentIcon : layeredIcon.getAllLayers()) {
+                Optional<String> path = getIconPath(currentIcon);
+                if (path.isPresent() && !path.get().contains("Mark")) {
+                    return path;
+                }
+            }
+        } else if (icon instanceof IconLoader.CachedImageIcon) {
+            IconLoader.CachedImageIcon imageIcon = (IconLoader.CachedImageIcon) icon;
+            if (Objects.nonNull(imageIcon)) {
+                return Optional.of(imageIcon.getOriginalPath()); // e.g. nodes/parameter.svg
             }
         }
+        LOG.error("Could not get Icon path for icon class {}", icon);
+        return Optional.empty();
     }
 
     public void add(DebugNode newChild) {

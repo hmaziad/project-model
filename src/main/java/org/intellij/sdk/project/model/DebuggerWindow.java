@@ -83,6 +83,7 @@ public class DebuggerWindow {
         ToolHandler collapseTreeHandler = new CollapseTreeHandler(debugTree);
 
         this.debugTree.setRootVisible(false);
+        this.debugTree.setCellRenderer(new DebuggerTreeRenderer());
         this.debugTree
             .getModel()
             .addTreeModelListener(new DebuggerTreeModelListener(this.feedbackLabel, buttonHandler.getAllButtons(), expandTreeHandler));

@@ -196,7 +196,7 @@
           <component id="e1487" class="javax.swing.JLabel" binding="feedbackLabel">
             <constraints/>
             <properties>
-              <text value="Label"/>
+              <text value="Try taking a debugging snapshot"/>
             </properties>
           </component>
         </children>
