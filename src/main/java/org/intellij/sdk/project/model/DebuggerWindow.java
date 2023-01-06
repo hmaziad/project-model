@@ -89,7 +89,7 @@ public class DebuggerWindow {
         SnapHandler snapHandler = new SnapHandler(project, this.feedbackLabel, treeModel::setRoot);
         ToolHandler clearHandler = new ClearHandler(this.feedbackLabel);
         ToolHandler saveHandler = new SaveHandler(this.feedbackLabel, savedDropdownObserver, refDropdownObserver);
-        ToolHandler deleteHandler = new DeleteHandler(this.feedbackLabel, savedDropdownObserver, refDropdownObserver, project);
+        DeleteHandler deleteHandler = new DeleteHandler(this.feedbackLabel, savedDropdownObserver, refDropdownObserver, project);
         ToolHandler diffHandler = new DiffHandler(this.feedbackLabel, project);
         ToolHandler diffRefHandler = new DiffRefHandler(this.feedbackLabel, project, savedDropdownObserver, refDropdownObserver);
         ToolHandler savedDropDownHandler = new DropdownHandler(this.feedbackLabel, savedDropdownObserver);
@@ -112,7 +112,7 @@ public class DebuggerWindow {
         this.collapseButton.addActionListener(e -> collapseTreeHandler.handle(treeModel));
         this.savedSnapsDropdown.addActionListener(e -> savedDropDownHandler.handle(treeModel));
         this.diffRefButton.addActionListener(e -> diffRefHandler.handle(treeModel));
-        this.viewSavedNodesButton.addActionListener(e -> new SavedNodesView().showAndGet());
+        this.viewSavedNodesButton.addActionListener(e -> new SavedNodesView(deleteHandler, treeModel).showAndGet());
 
     }
 

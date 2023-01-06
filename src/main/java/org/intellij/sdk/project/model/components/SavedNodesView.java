@@ -5,9 +5,11 @@ import static org.intellij.sdk.project.model.services.ParserService.convertNodeT
 import java.awt.*;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.services.PersistencyService;
 import org.intellij.sdk.project.model.xnodes.DebugNode;
 import org.jetbrains.annotations.NotNull;
@@ -19,9 +21,14 @@ import com.intellij.ui.components.JBScrollPane;
 
 public class SavedNodesView extends DialogWrapper {
     private static final PersistencyService persistencyService = ServiceManager.getService(PersistencyService.class);
+    private DeleteHandler deleteHandler;
+    private DefaultTreeModel treeModel;
+    private JBList<String> keysList;
 
-    public SavedNodesView() {
+    public SavedNodesView(DeleteHandler deleteHandler, DefaultTreeModel treeModel) {
         super(true); // use current window as parent
+        this.deleteHandler = deleteHandler;
+        this.treeModel = treeModel;
         setTitle("Manage Saved Nodes");
         init();
     }
@@ -32,8 +39,6 @@ public class SavedNodesView extends DialogWrapper {
         setSize(1300, 1100);
         Map<String, DebugNode> nodes = persistencyService.getNodes();
         JPanel dialogPanel = new JPanel(new GridBagLayout());
-//        dialogPanel.setPreferredSize(new Dimension(1300, 1100));
-//        dialogPanel.setSize(new Dimension(1300, 1100));
 
         JScrollPane scrollableNodesPanel = getScrollableNodesPanel();
         JScrollPane scrollableKeysPanel = getScrollableKeysPanel(nodes, scrollableNodesPanel);
@@ -62,7 +67,14 @@ public class SavedNodesView extends DialogWrapper {
         panel.setBorder(new EmptyBorder(50, 5, 0, 5));
         BoxLayout boxLayout = new BoxLayout(panel, BoxLayout.Y_AXIS);
         panel.setLayout(boxLayout);
-        panel.add(new JButton("Delete"));
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.addActionListener( e-> {
+            deleteHandler.handle(treeModel, this.keysList.getSelectedValue());
+            DefaultListModel<String> model = new DefaultListModel<>();
+            model.addAll(persistencyService.getNodes().keySet().stream().sorted().collect(Collectors.toList()));
+            this.keysList.setModel(model);
+        });
+        panel.add(deleteButton);
         panel.add(new JButton("Rename"));
         return panel;
     }
@@ -75,12 +87,12 @@ public class SavedNodesView extends DialogWrapper {
         scrollableKeysPanel.setMinimumSize(new Dimension(350, 1100));
         scrollableKeysPanel.setBorder(BorderFactory.createTitledBorder("Saved Node names"));
 
-        JList<String> keysList = new JBList<>(nodes.keySet().toArray(new String[0]));
-        keysList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        keysList.addListSelectionListener(e -> onKeySelected(nodes, scrollableNodesPanel, keysList));
+        this.keysList = new JBList<>(persistencyService.getNodes().keySet().stream().sorted().toArray(String[]::new));
+        this.keysList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        this.keysList.addListSelectionListener(e -> onKeySelected(nodes, scrollableNodesPanel));
 
         JPanel keysPanel = new JPanel(new BorderLayout());
-        keysPanel.add(keysList, BorderLayout.WEST);
+        keysPanel.add(this.keysList, BorderLayout.WEST);
         scrollableKeysPanel.setViewportView(keysPanel);
 
         return scrollableKeysPanel;
@@ -94,8 +106,8 @@ public class SavedNodesView extends DialogWrapper {
         return scrollableNodesPanel;
     }
 
-    private void onKeySelected(Map<String, DebugNode> nodes, JScrollPane scrollableNodesPanel, JList<String> keysList) {
-        String selectedValue = keysList.getSelectedValue();
+    private void onKeySelected(Map<String, DebugNode> nodes, JScrollPane scrollableNodesPanel) {
+        String selectedValue = this.keysList.getSelectedValue();
         DebugNode debugNode = nodes.get(selectedValue);
         String text = "Node does not contain any text...";
         if (Objects.nonNull(debugNode)) {
