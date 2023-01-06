@@ -18,6 +18,6 @@ public class SdkIcons {
   public static final Icon DELETE_ICON = IconLoader.getIcon("/icons/delete/delete.svg", SdkIcons.class);
   public static final Icon EXPAND_ICON = IconLoader.getIcon("/icons/expand/expandall_dark.svg", SdkIcons.class);
   public static final Icon COLLAPSE_ICON = IconLoader.getIcon("/icons/collapse/collapseall_dark.svg", SdkIcons.class);
-  public static final Icon LEAF_ICON = IconLoader.getIcon("/nodes/parameter.svg", SdkIcons.class);
+  public static final Icon VIEW_NODES_ICON = IconLoader.getIcon("/icons/view_saved_nodes/manageDataSources_dark.svg", SdkIcons.class);
 
 }

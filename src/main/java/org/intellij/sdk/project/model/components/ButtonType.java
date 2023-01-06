@@ -7,7 +7,6 @@ public enum ButtonType {
     CLEAR,
     EXPAND,
     COLLAPSE,
-    PREVIOUS,
-    NEXT,
-    DELETE
+    DELETE,
+    VIEW_NODES
 }

@@ -41,6 +41,9 @@ public class ButtonHandler {
             case COLLAPSE:
                 button.setIcon(SdkIcons.COLLAPSE_ICON);
                 break;
+            case VIEW_NODES:
+                button.setIcon(SdkIcons.VIEW_NODES_ICON);
+                break;
             default:
                 throw new IllegalArgumentException(String.format("Could not handle button type %s", buttonType));
         }

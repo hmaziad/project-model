@@ -16,7 +16,7 @@ import lombok.extern.log4j.Log4j2;
 public class ParserService {
     private static final String SPACE = " ";
 
-    public static String convertNodeToStrings(DebugNode node) {
+    public static String convertNodeToString(DebugNode node) {
         StringBuilder sb = new StringBuilder();
         addLines(sb, node.getMyChildren(), 0);
         return sb.toString().trim();

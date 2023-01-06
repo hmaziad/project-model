@@ -3,7 +3,7 @@ package org.intellij.sdk.project.model.components;
 import static org.intellij.sdk.project.model.constants.TextConstants.SAVED_SNAP_MESSAGE;
 
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.UUID;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
@@ -21,7 +21,6 @@ import lombok.extern.log4j.Log4j2;
 public class SaveHandler implements ToolHandler {
     static PersistencyService persistencyService = ServiceManager.getService(PersistencyService.class);
     JLabel feedbackLabel;
-    AtomicInteger counter = new AtomicInteger();
     DropdownObserver savedDropdownObserver;
     DropdownObserver refDropdownObserver;
 
@@ -31,7 +30,7 @@ public class SaveHandler implements ToolHandler {
             this.feedbackLabel.setText("Please take a snap shot first");
             return;
         }
-        String nodeName = String.format("Saved-Node-%s", counter.getAndIncrement());
+        String nodeName = String.format("node-%s", UUID.randomUUID());
         persistencyService.addNode(nodeName, rootNode);
         this.savedDropdownObserver.addItem(nodeName);
         this.refDropdownObserver.addItem(nodeName);

@@ -1,6 +1,6 @@
 package org.intellij.sdk.project.model.services;
 
-import static org.intellij.sdk.project.model.services.ParserService.convertNodeToStrings;
+import static org.intellij.sdk.project.model.services.ParserService.convertNodeToString;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
@@ -30,7 +30,7 @@ public class ParserServiceTest {
         childBB.setMyChildren(List.of(childB1, childB2, childB3));
 
         List<String> expectedStrings = Files.readAllLines(Path.of("src/test/resources/nodeAsString/expected-converted-node.txt"));
-        String actualStrings = convertNodeToStrings(rootNode);
+        String actualStrings = convertNodeToString(rootNode);
         assertEquals(Strings.join(expectedStrings, '\n'), actualStrings);
     }
 

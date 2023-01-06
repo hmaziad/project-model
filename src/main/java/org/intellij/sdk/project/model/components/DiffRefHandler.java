@@ -35,8 +35,8 @@ public class DiffRefHandler implements ToolHandler {
         DebugNode savedNode = getNodeFromDropdown(this.savedDropdownObserver);
         DebugNode refSavedNode = getNodeFromDropdown(this.refDropdownObserver);
 
-        String savedSnapString = ParserService.convertNodeToStrings(savedNode);
-        String debuggingSessionString = ParserService.convertNodeToStrings(refSavedNode);
+        String savedSnapString = ParserService.convertNodeToString(savedNode);
+        String debuggingSessionString = ParserService.convertNodeToString(refSavedNode);
         DiffContent content1 = new DocumentContentImpl(this.project, new DocumentImpl(debuggingSessionString), null);
         DiffContent content2 = new DocumentContentImpl(this.project, new DocumentImpl(savedSnapString), null);
         @NotNull MutableDiffRequestChain chain = new MutableDiffRequestChain(content1, content2);
@@ -61,8 +61,8 @@ public class DiffRefHandler implements ToolHandler {
     }
 
     private void computeDiff(DebugNode originalNode, DebugNode revisedNode) {
-        String savedSnapString = ParserService.convertNodeToStrings(originalNode);
-        String debuggingSessionString = ParserService.convertNodeToStrings(revisedNode);
+        String savedSnapString = ParserService.convertNodeToString(originalNode);
+        String debuggingSessionString = ParserService.convertNodeToString(revisedNode);
         DiffContent content1 = new DocumentContentImpl(this.project, new DocumentImpl(debuggingSessionString), null);
         DiffContent content2 = new DocumentContentImpl(this.project, new DocumentImpl(savedSnapString), null);
         @NotNull MutableDiffRequestChain chain = new MutableDiffRequestChain(content1, content2);
