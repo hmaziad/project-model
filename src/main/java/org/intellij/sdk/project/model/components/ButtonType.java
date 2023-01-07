@@ -7,8 +7,8 @@ public enum ButtonType {
     CLEAR,
     EXPAND,
     COLLAPSE,
-    DELETE,
     VIEW_NODES,
     DIFF_SAVED,
-    DIFF_SCALED
+    DIFF_SCALED,
+    UPLOAD
 }

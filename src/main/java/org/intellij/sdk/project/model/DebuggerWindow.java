@@ -17,6 +17,7 @@ import org.intellij.sdk.project.model.components.SaveHandler;
 import org.intellij.sdk.project.model.components.SavedNodesSettingsView;
 import org.intellij.sdk.project.model.components.SnapHandler;
 import org.intellij.sdk.project.model.components.ToolHandler;
+import org.intellij.sdk.project.model.components.UploadNodesView;
 import org.intellij.sdk.project.model.listeners.DebuggerTreeModelListener;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.project.Project;
@@ -42,11 +43,11 @@ public class DebuggerWindow {
     private JToolBar.Separator toolbarSeparatorOther;
     private JToolBar.Separator toolbarSeparatorFeedback;
     private JLabel feedbackLabel;
-    private JButton deleteButton;
     private JToolBar.Separator toolbarSeparatorSnap;
     private JButton viewSavedNodesButton;
     private JToolBar.Separator toolbarSeparatorViewNodes;
     private JButton diffSavedButton;
+    private JButton uploadButton;
 
     public DebuggerWindow(@NotNull Project project) {
         JButton diffRefButton = new JButton();
@@ -61,9 +62,9 @@ public class DebuggerWindow {
         // icon buttons in toolbar
         buttonHandler.handleButton(this.snapButton, ButtonType.SNAP);
         buttonHandler.handleButton(this.saveButton, ButtonType.SAVE);
+        buttonHandler.handleButton(this.uploadButton, ButtonType.UPLOAD);
         buttonHandler.handleButton(this.diffButton, ButtonType.DIFF);
         buttonHandler.handleButton(this.clearButton, ButtonType.CLEAR);
-        buttonHandler.handleButton(this.deleteButton, ButtonType.DELETE);
         buttonHandler.handleButton(this.expandButton, ButtonType.EXPAND);
         buttonHandler.handleButton(this.collapseButton, ButtonType.COLLAPSE);
         buttonHandler.handleButton(diffRefButton, ButtonType.DIFF_SCALED);
@@ -97,13 +98,12 @@ public class DebuggerWindow {
         this.clearButton.addActionListener(e -> clearHandler.handle(treeModel));
         this.snapButton.addActionListener(e -> snapHandler.handle(treeModel));
         this.saveButton.addActionListener(e -> saveHandler.handle(treeModel));
-        this.deleteButton.addActionListener(e -> deleteHandler.handle(treeModel));
         this.diffButton.addActionListener(e -> diffHandler.handle(treeModel));
         this.expandButton.addActionListener(e -> expandTreeHandler.handle(treeModel));
         this.collapseButton.addActionListener(e -> collapseTreeHandler.handle(treeModel));
-//        this.diffRefButton.addActionListener(e -> diffRefHandler.handle(treeModel));
         this.viewSavedNodesButton.addActionListener(e -> new SavedNodesSettingsView(project,saveHandler, deleteHandler, treeModel).showAndGet());
         this.diffSavedButton.addActionListener(e -> new DiffSavedNodesView(project, diffRefButton).showAndGet());
+        this.uploadButton.addActionListener(e -> new UploadNodesView(project, treeModel).showAndGet());
 
     }
 

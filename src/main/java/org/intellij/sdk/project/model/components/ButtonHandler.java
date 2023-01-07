@@ -32,9 +32,6 @@ public class ButtonHandler {
             case CLEAR:
                 button.setIcon(SdkIcons.CLEAR_ICON);
                 break;
-            case DELETE:
-                button.setIcon(SdkIcons.DELETE_ICON);
-                break;
             case EXPAND:
                 button.setIcon(SdkIcons.EXPAND_ICON);
                 break;
@@ -49,6 +46,9 @@ public class ButtonHandler {
                 break;
             case DIFF_SCALED:
                 button.setIcon(SdkIcons.DIFF_SCALED);
+                break;
+            case UPLOAD:
+                button.setIcon(SdkIcons.UPLOAD);
                 break;
             default:
                 throw new IllegalArgumentException(String.format("Could not handle button type %s", buttonType));

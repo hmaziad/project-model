@@ -88,20 +88,17 @@
               <toolTipText value="Save Debugger Session"/>
             </properties>
           </component>
-          <component id="e2981" class="javax.swing.JButton" binding="deleteButton">
+          <component id="2760a" class="javax.swing.JButton" binding="uploadButton">
             <constraints/>
             <properties>
               <borderPainted value="false"/>
               <contentAreaFilled value="false"/>
               <enabled value="true"/>
-              <foreground color="-12828863"/>
-              <icon value="icons/delete/delete.png"/>
+              <icon value="icons/save/download_dark.png"/>
               <maximumSize width="30" height="30"/>
-              <minimumSize width="30" height="30"/>
               <preferredSize width="30" height="30"/>
-              <rolloverEnabled value="true"/>
               <text value=""/>
-              <toolTipText value="Delete Current Saved Debugger Session"/>
+              <toolTipText value="Save Debugger Session"/>
             </properties>
           </component>
           <component id="ed64f" class="javax.swing.JToolBar$Separator" binding="toolbarSeparatorCore">
