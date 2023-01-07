@@ -9,6 +9,7 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import org.jetbrains.annotations.VisibleForTesting;
+import com.google.gson.annotations.Expose;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.LayeredIcon;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueContainerNode;
@@ -16,16 +17,19 @@ import com.intellij.xdebugger.impl.ui.tree.nodes.XValueContainerNode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.extern.log4j.Log4j2;
 
 @Getter
 @NoArgsConstructor(force = true)
-@Log4j2
+//@Log4j2
 public class DebugNode extends DefaultMutableTreeNode {
+    @Expose
     private final String text;
+    @Expose
     private String iconPath;
+
     @VisibleForTesting
     @Setter
+    @Expose
     private List<DebugNode> myChildren = new ArrayList<>();
 
     public DebugNode(String text) {
@@ -42,10 +46,20 @@ public class DebugNode extends DefaultMutableTreeNode {
                 this.iconPath = icon.getOriginalPath(); // e.g. nodes/parameter.svg
             }
         } catch (Exception e) {
-            LOG.error("Could not get icon path: {}", e.toString());
+//            LOG.error("Could not get icon path: {}", e.toString());
         }
 
         List<? extends XValueContainerNode<?>> children = xNode.getLoadedChildren();
+        children.forEach(child -> {
+            DebugNode debugNode = new DebugNode(child);
+            add(debugNode);
+        });
+    }
+
+    public DebugNode(DebugNode value) {
+        this.text = value.getText();
+        this.iconPath = value.getIconPath();
+        var children = value.getMyChildren();
         children.forEach(child -> {
             DebugNode debugNode = new DebugNode(child);
             add(debugNode);
@@ -67,7 +81,7 @@ public class DebugNode extends DefaultMutableTreeNode {
                 return Optional.of(imageIcon.getOriginalPath()); // e.g. nodes/parameter.svg
             }
         }
-        LOG.error("Could not get Icon path for icon class {}", icon);
+//        LOG.error("Could not get Icon path for icon class {}", icon);
         return Optional.empty();
     }
 

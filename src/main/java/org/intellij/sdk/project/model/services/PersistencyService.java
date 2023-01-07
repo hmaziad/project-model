@@ -8,6 +8,7 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import com.intellij.util.xmlb.annotations.OptionTag;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -18,6 +19,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class PersistencyService implements PersistentStateComponent<PersistencyService> {
 
+    @OptionTag(converter = DebugNodeConverter.class)
     Map<String, DebugNode> nodes;
 
     public PersistencyService() {
@@ -38,12 +40,12 @@ public class PersistencyService implements PersistentStateComponent<PersistencyS
     }
 
     public void loadState(PersistencyService state) {
-        LOG.debug("Load State called");
+        LOG.debug("Load State called, {}", state.getNodes());
         XmlSerializerUtil.copyBean(state, this);
     }
 
     public PersistencyService getState() {
-        LOG.debug("Get State called with {} nodes", this.nodes.size());
+        LOG.debug("Get State called nodes {}", this.nodes);
         return this;
     }
 
