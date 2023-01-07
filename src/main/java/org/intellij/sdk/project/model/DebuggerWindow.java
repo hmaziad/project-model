@@ -16,7 +16,7 @@ import org.intellij.sdk.project.model.components.DropdownHandler;
 import org.intellij.sdk.project.model.components.DropdownObserver;
 import org.intellij.sdk.project.model.components.ExpandTreeHandler;
 import org.intellij.sdk.project.model.components.SaveHandler;
-import org.intellij.sdk.project.model.components.SavedNodesView;
+import org.intellij.sdk.project.model.components.SavedNodesSettingsView;
 import org.intellij.sdk.project.model.components.SnapHandler;
 import org.intellij.sdk.project.model.components.ToolHandler;
 import org.intellij.sdk.project.model.listeners.DebuggerTreeModelListener;
@@ -88,7 +88,7 @@ public class DebuggerWindow {
         DropdownObserver refDropdownObserver = new DropdownObserver(this.refSavedSnapsDropdown);
         SnapHandler snapHandler = new SnapHandler(project, this.feedbackLabel, treeModel::setRoot);
         ToolHandler clearHandler = new ClearHandler(this.feedbackLabel);
-        ToolHandler saveHandler = new SaveHandler(this.feedbackLabel, savedDropdownObserver, refDropdownObserver);
+        SaveHandler saveHandler = new SaveHandler(this.feedbackLabel, savedDropdownObserver, refDropdownObserver);
         DeleteHandler deleteHandler = new DeleteHandler(this.feedbackLabel, savedDropdownObserver, refDropdownObserver, project);
         ToolHandler diffHandler = new DiffHandler(this.feedbackLabel, project);
         ToolHandler diffRefHandler = new DiffRefHandler(this.feedbackLabel, project, savedDropdownObserver, refDropdownObserver);
@@ -112,7 +112,7 @@ public class DebuggerWindow {
         this.collapseButton.addActionListener(e -> collapseTreeHandler.handle(treeModel));
         this.savedSnapsDropdown.addActionListener(e -> savedDropDownHandler.handle(treeModel));
         this.diffRefButton.addActionListener(e -> diffRefHandler.handle(treeModel));
-        this.viewSavedNodesButton.addActionListener(e -> new SavedNodesView(deleteHandler, treeModel).showAndGet());
+        this.viewSavedNodesButton.addActionListener(e -> new SavedNodesSettingsView(project,saveHandler, deleteHandler, treeModel).showAndGet());
 
     }
 

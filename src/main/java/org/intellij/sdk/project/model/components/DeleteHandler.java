@@ -27,25 +27,25 @@ public class DeleteHandler implements ToolHandler {
 
     public void handle(DefaultTreeModel treeModel) {
         String currentItem = this.saveDropdownObserver.getCurrentItem();
-        delete(treeModel, currentItem);
+        delete(treeModel, currentItem, false);
     }
 
-    public void handle(DefaultTreeModel treeModel, String nodeKeyName) {
-        delete(treeModel, nodeKeyName);
+    public void handle(DefaultTreeModel treeModel, String nodeKeyName, boolean withOutDialogue) {
+        delete(treeModel, nodeKeyName, withOutDialogue);
     }
 
-    private void delete(DefaultTreeModel treeModel, String nodeKeyName) {
+    private void delete(DefaultTreeModel treeModel, String nodeKeyName, boolean withOutDialogue) {
         if (Objects.isNull(nodeKeyName)) {
             this.feedbackLabel.setText(NO_SAVED_NODES);
             return;
         }
         String message = String.format(DELETE_THE_SAVED_NODE_Q, nodeKeyName);
-        boolean isSure = MessageDialogues.getYesNoMessageDialogue(message, "Delete Snap", this.project);
+        boolean isSure = withOutDialogue || MessageDialogues.getYesNoMessageDialogue(message, "Delete Snap", this.project);
         if (isSure) {
             persistencyService.getNodes().remove(nodeKeyName);
             this.saveDropdownObserver.removeItem(nodeKeyName);
             this.refDropdownObserver.removeItem(nodeKeyName);
-            if (this.saveDropdownObserver.getCurrentItem().equals(nodeKeyName)) {
+            if (!this.saveDropdownObserver.isEmpty() && this.saveDropdownObserver.getCurrentItem().equals(nodeKeyName)) {
                 treeModel.setRoot(null);
             }
             this.feedbackLabel.setText(DELETE_SNAP_MESSAGE);

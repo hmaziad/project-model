@@ -25,4 +25,9 @@ public class DropdownObserver {
     public String getCurrentItem() {
         return (String) this.jComboBox.getSelectedItem();
     }
+
+    public boolean isEmpty() {
+        return this.jComboBox.getItemCount() == 0;
+    }
+
 }

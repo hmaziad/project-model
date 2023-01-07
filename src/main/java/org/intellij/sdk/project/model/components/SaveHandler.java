@@ -10,6 +10,7 @@ import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.services.PersistencyService;
 import org.intellij.sdk.project.model.xnodes.DebugNode;
 import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.util.text.StringUtil;
 
 import lombok.AllArgsConstructor;
 import lombok.Value;
@@ -31,10 +32,17 @@ public class SaveHandler implements ToolHandler {
             return;
         }
         String nodeName = String.format("node-%s", UUID.randomUUID());
+        savedNode(nodeName, rootNode);
+        this.feedbackLabel.setText(SAVED_SNAP_MESSAGE);
+    }
+
+    public void savedNode(String nodeName, DebugNode rootNode) {
+        if (StringUtil.isEmpty(nodeName)) {
+            throw new IllegalArgumentException("Node name is empty or null " + nodeName);
+        }
         persistencyService.addNode(nodeName, rootNode);
         this.savedDropdownObserver.addItem(nodeName);
         this.refDropdownObserver.addItem(nodeName);
-        this.feedbackLabel.setText(SAVED_SNAP_MESSAGE);
     }
 
 }
