@@ -22,8 +22,6 @@ import lombok.extern.log4j.Log4j2;
 public class SaveHandler implements ToolHandler {
     static PersistencyService persistencyService = ServiceManager.getService(PersistencyService.class);
     JLabel feedbackLabel;
-    DropdownObserver savedDropdownObserver;
-    DropdownObserver refDropdownObserver;
 
     public void handle(DefaultTreeModel treeModel) {
         DebugNode rootNode = (DebugNode) treeModel.getRoot();
@@ -41,8 +39,6 @@ public class SaveHandler implements ToolHandler {
             throw new IllegalArgumentException("Node name is empty or null " + nodeName);
         }
         persistencyService.addNode(nodeName, rootNode);
-        this.savedDropdownObserver.addItem(nodeName);
-        this.refDropdownObserver.addItem(nodeName);
     }
 
 }

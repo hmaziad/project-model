@@ -19,5 +19,7 @@ public class SdkIcons {
   public static final Icon EXPAND_ICON = IconLoader.getIcon("/icons/expand/expandall_dark.svg", SdkIcons.class);
   public static final Icon COLLAPSE_ICON = IconLoader.getIcon("/icons/collapse/collapseall_dark.svg", SdkIcons.class);
   public static final Icon VIEW_NODES_ICON = IconLoader.getIcon("/icons/view_saved_nodes/manageDataSources_dark.svg", SdkIcons.class);
+  public static final Icon DIFF_SAVED = IconLoader.getIcon("/icons/diff_saved/diffWithClipboard_dark.svg", SdkIcons.class);
+  public static final Icon DIFF_SCALED = IconLoader.getIcon("/icons/diff_saved/diff_dark_scaled.svg", SdkIcons.class);
 
 }

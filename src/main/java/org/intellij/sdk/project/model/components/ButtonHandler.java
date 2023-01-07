@@ -44,6 +44,12 @@ public class ButtonHandler {
             case VIEW_NODES:
                 button.setIcon(SdkIcons.VIEW_NODES_ICON);
                 break;
+            case DIFF_SAVED:
+                button.setIcon(SdkIcons.DIFF_SAVED);
+                break;
+            case DIFF_SCALED:
+                button.setIcon(SdkIcons.DIFF_SCALED);
+                break;
             default:
                 throw new IllegalArgumentException(String.format("Could not handle button type %s", buttonType));
         }

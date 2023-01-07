@@ -20,13 +20,11 @@ import lombok.extern.log4j.Log4j2;
 @AllArgsConstructor
 public class DeleteHandler implements ToolHandler {
     private final JLabel feedbackLabel;
-    private final DropdownObserver saveDropdownObserver;
-    private final DropdownObserver refDropdownObserver;
     private final Project project;
     private static final PersistencyService persistencyService = ServiceManager.getService(PersistencyService.class);
 
     public void handle(DefaultTreeModel treeModel) {
-        String currentItem = this.saveDropdownObserver.getCurrentItem();
+        String currentItem = null;// todo later: this.saveDropdownObserver.getCurrentItem();
         delete(treeModel, currentItem, false);
     }
 
@@ -43,11 +41,11 @@ public class DeleteHandler implements ToolHandler {
         boolean isSure = withOutDialogue || MessageDialogues.getYesNoMessageDialogue(message, "Delete Snap", this.project);
         if (isSure) {
             persistencyService.getNodes().remove(nodeKeyName);
-            this.saveDropdownObserver.removeItem(nodeKeyName);
-            this.refDropdownObserver.removeItem(nodeKeyName);
-            if (!this.saveDropdownObserver.isEmpty() && this.saveDropdownObserver.getCurrentItem().equals(nodeKeyName)) {
-                treeModel.setRoot(null);
-            }
+//            this.saveDropdownObserver.removeItem(nodeKeyName);
+//            this.refDropdownObserver.removeItem(nodeKeyName);
+//            if (!this.saveDropdownObserver.isEmpty() && this.saveDropdownObserver.getCurrentItem().equals(nodeKeyName)) {
+//                treeModel.setRoot(null);
+//            }
             this.feedbackLabel.setText(DELETE_SNAP_MESSAGE);
         }
     }

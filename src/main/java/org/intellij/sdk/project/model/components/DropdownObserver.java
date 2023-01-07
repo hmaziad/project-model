@@ -4,6 +4,9 @@ import javax.swing.*;
 import org.intellij.sdk.project.model.services.PersistencyService;
 import com.intellij.openapi.components.ServiceManager;
 
+import lombok.Getter;
+
+@Getter
 public class DropdownObserver {
     private static final PersistencyService persistencyService = ServiceManager.getService(PersistencyService.class);
     private final JComboBox<String> jComboBox;

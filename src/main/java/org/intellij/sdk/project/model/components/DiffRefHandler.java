@@ -1,11 +1,7 @@
 package org.intellij.sdk.project.model.components;
 
-import static org.intellij.sdk.project.model.constants.TextConstants.SELECTED_LABEL_IS_NULL;
-import static org.intellij.sdk.project.model.constants.TextConstants.SELECTED_NODE_IS_NULL;
-
 import java.util.Objects;
 
-import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.services.ParserService;
 import org.intellij.sdk.project.model.services.PersistencyService;
@@ -25,52 +21,38 @@ import lombok.Value;
 @Value
 public class DiffRefHandler implements ToolHandler {
     static PersistencyService persistencyService = ServiceManager.getService(PersistencyService.class);
-    JLabel feedbackLabel;
     Project project;
-    DropdownObserver savedDropdownObserver;
-    DropdownObserver refDropdownObserver;
+    DropdownObserver leftDropdownObserver;
+    DropdownObserver rightDropdownObserver;
 
     @Override
     public void handle(DefaultTreeModel treeModel) {
-        DebugNode savedNode = getNodeFromDropdown(this.savedDropdownObserver);
-        DebugNode refSavedNode = getNodeFromDropdown(this.refDropdownObserver);
+        DebugNode leftNode = getNodeFromDropdown(this.leftDropdownObserver);
+        DebugNode rightNode = getNodeFromDropdown(this.rightDropdownObserver);
 
-        String savedSnapString = ParserService.convertNodeToString(savedNode);
-        String debuggingSessionString = ParserService.convertNodeToString(refSavedNode);
-        DiffContent content1 = new DocumentContentImpl(this.project, new DocumentImpl(debuggingSessionString), null);
-        DiffContent content2 = new DocumentContentImpl(this.project, new DocumentImpl(savedSnapString), null);
+        String leftNodeString = ParserService.convertNodeToString(leftNode);
+        String rightNodeString = ParserService.convertNodeToString(rightNode);
+        DiffContent content1 = new DocumentContentImpl(this.project, new DocumentImpl(leftNodeString), null);
+        DiffContent content2 = new DocumentContentImpl(this.project, new DocumentImpl(rightNodeString), null);
         @NotNull MutableDiffRequestChain chain = new MutableDiffRequestChain(content1, content2);
-        chain.setTitle1("Saved Node");
-        chain.setTitle2("Ref Saved Node");
+        chain.setTitle1("Left Node");
+        chain.setTitle2("Right Node");
         chain.setWindowTitle("Comparing Saved nodes");
         DiffManager.getInstance().showDiff(this.project, chain, DiffDialogHints.DEFAULT);
-        this.feedbackLabel.setText("Successfully computed diff");
     }
 
     private DebugNode getNodeFromDropdown(DropdownObserver dropdownObserver) {
         String selectedItemLabel = dropdownObserver.getCurrentItem();
         if (Objects.isNull(selectedItemLabel)) {
-            this.feedbackLabel.setText(SELECTED_LABEL_IS_NULL);
+//            this.feedbackLabel.setText(SELECTED_LABEL_IS_NULL);
         }
 
         DebugNode selectedNode = persistencyService.getNodes().get(selectedItemLabel);
         if (Objects.isNull(selectedNode)) {
-            this.feedbackLabel.setText(SELECTED_NODE_IS_NULL);
+//            this.feedbackLabel.setText(SELECTED_NODE_IS_NULL);
         }
         return selectedNode;
     }
 
-    private void computeDiff(DebugNode originalNode, DebugNode revisedNode) {
-        String savedSnapString = ParserService.convertNodeToString(originalNode);
-        String debuggingSessionString = ParserService.convertNodeToString(revisedNode);
-        DiffContent content1 = new DocumentContentImpl(this.project, new DocumentImpl(debuggingSessionString), null);
-        DiffContent content2 = new DocumentContentImpl(this.project, new DocumentImpl(savedSnapString), null);
-        @NotNull MutableDiffRequestChain chain = new MutableDiffRequestChain(content1, content2);
-        chain.setTitle1("Debugger Session");
-        chain.setTitle2("Snapshot Session");
-        chain.setWindowTitle("Comparing Debugger and Snapshot session");
-        DiffManager.getInstance().showDiff(this.project, chain, DiffDialogHints.DEFAULT);
-        this.feedbackLabel.setText("Successfully computed diff");
-    }
 }
 

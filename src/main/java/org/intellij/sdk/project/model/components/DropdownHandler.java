@@ -18,11 +18,10 @@ import lombok.AllArgsConstructor;
 public class DropdownHandler implements ToolHandler {
     private static final PersistencyService persistencyService = ServiceManager.getService(PersistencyService.class);
     private final JLabel feedbackLabel;
-    private final DropdownObserver dropdownObserver;
 
     @Override
     public void handle(DefaultTreeModel treeModel) {
-        String selectedItemLabel = dropdownObserver.getCurrentItem();
+        String selectedItemLabel = null; // to do later
         if (Objects.isNull(selectedItemLabel)) {
             this.feedbackLabel.setText(SELECTED_LABEL_IS_NULL);
         }
