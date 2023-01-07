@@ -95,11 +95,16 @@ public class SavedNodesSettingsView extends DialogWrapper {
 
         renameButton.addActionListener(e -> {
             String selectedKey = this.keysList.getSelectedValue();
-            DebugNode debugNode = persistencyService.getNodes().get(selectedKey);
-
-            String newNodeName = MessageDialogues.getRenameDialogue(this.project);
-            this.saveHandler.savedNode(newNodeName, debugNode);
-            deleteNodeAndRefreshJList(selectedKey, true);
+            Map<String, DebugNode> nodes = persistencyService.getNodes();
+            DebugNode debugNode = nodes.get(selectedKey);
+            String newNodeName = MessageDialogues.getRenameDialogue(this.project,null);
+            while (nodes.containsKey(newNodeName)) {
+                newNodeName = MessageDialogues.getRenameDialogue(this.project, String.format("\"%s\" already exists", newNodeName));
+            }
+            if (Objects.nonNull(newNodeName)) {
+                this.saveHandler.savedNode(newNodeName, debugNode);
+                deleteNodeAndRefreshJList(selectedKey, true);
+            }
         });
 
         panel.add(renameButton);

@@ -16,8 +16,8 @@ public class MessageDialogues {
         Messages.showMessageDialog(project,message, "Error", Messages.getErrorIcon());
     }
 
-    public static @Nullable @NlsSafe String getRenameDialogue(Project project) {
-        return Messages.showInputDialog(project, "Enter new name for node", "Rename Node", null, null, new CustomInputValidator());
+    public static @Nullable @NlsSafe String getRenameDialogue(Project project, String newNodeName) {
+        return Messages.showInputDialog(project, "Enter new name for node", "Rename Node", null, null, new CustomInputValidator(), null, newNodeName);
     }
 
     private static class CustomInputValidator implements InputValidator {
