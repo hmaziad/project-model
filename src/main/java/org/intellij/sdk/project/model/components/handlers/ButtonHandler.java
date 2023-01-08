@@ -1,10 +1,12 @@
-package org.intellij.sdk.project.model.components;
+package org.intellij.sdk.project.model.components.handlers;
 
 import java.awt.*;
 import java.util.EnumMap;
 import java.util.Map;
 
 import javax.swing.*;
+
+import org.intellij.sdk.project.model.components.ButtonType;
 
 import icons.SdkIcons;
 import lombok.Getter;

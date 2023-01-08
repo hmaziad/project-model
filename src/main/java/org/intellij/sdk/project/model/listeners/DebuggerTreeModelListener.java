@@ -16,7 +16,7 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.components.ButtonType;
-import org.intellij.sdk.project.model.components.ToolHandler;
+import org.intellij.sdk.project.model.components.handlers.ToolHandler;
 
 import lombok.AllArgsConstructor;
 

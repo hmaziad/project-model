@@ -1,4 +1,4 @@
-package org.intellij.sdk.project.model.components;
+package org.intellij.sdk.project.model.components.views;
 
 import static org.intellij.sdk.project.model.services.ParserService.convertNodeToString;
 
@@ -7,6 +7,8 @@ import java.util.Map;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import org.intellij.sdk.project.model.components.handlers.DiffRefHandler;
+import org.intellij.sdk.project.model.components.DropdownObserver;
 import org.intellij.sdk.project.model.services.PersistencyService;
 import org.intellij.sdk.project.model.xnodes.DebugNode;
 import org.jetbrains.annotations.NotNull;

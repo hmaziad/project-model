@@ -1,4 +1,4 @@
-package org.intellij.sdk.project.model.components;
+package org.intellij.sdk.project.model.components.handlers;
 
 import static org.intellij.sdk.project.model.constants.TextConstants.RETRIEVED_NODE_FROM_STORAGE;
 import static org.intellij.sdk.project.model.constants.TextConstants.SELECTED_LABEL_IS_NULL;

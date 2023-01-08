@@ -1,4 +1,4 @@
-package org.intellij.sdk.project.model.components;
+package org.intellij.sdk.project.model.components.handlers;
 
 import static org.intellij.sdk.project.model.constants.TextConstants.DELETE_SNAP_MESSAGE;
 import static org.intellij.sdk.project.model.constants.TextConstants.DELETE_THE_SAVED_NODE_Q;

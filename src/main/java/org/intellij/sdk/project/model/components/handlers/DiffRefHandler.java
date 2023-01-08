@@ -1,8 +1,9 @@
-package org.intellij.sdk.project.model.components;
+package org.intellij.sdk.project.model.components.handlers;
 
 import java.util.Objects;
 
 import javax.swing.tree.DefaultTreeModel;
+import org.intellij.sdk.project.model.components.DropdownObserver;
 import org.intellij.sdk.project.model.services.ParserService;
 import org.intellij.sdk.project.model.services.PersistencyService;
 import org.intellij.sdk.project.model.xnodes.DebugNode;
@@ -27,27 +28,28 @@ public class DiffRefHandler implements ToolHandler {
 
     @Override
     public void handle(DefaultTreeModel treeModel) {
-        DebugNode leftNode = getNodeFromDropdown(this.leftDropdownObserver);
-        DebugNode rightNode = getNodeFromDropdown(this.rightDropdownObserver);
+        String leftNodeName = this.leftDropdownObserver.getCurrentItem();
+        DebugNode leftNode = getNodeFromDropdown(leftNodeName);
+        String rightNodeName = this.rightDropdownObserver.getCurrentItem();
+        DebugNode rightNode = getNodeFromDropdown(rightNodeName);
 
         String leftNodeString = ParserService.convertNodeToString(leftNode);
         String rightNodeString = ParserService.convertNodeToString(rightNode);
         DiffContent content1 = new DocumentContentImpl(this.project, new DocumentImpl(leftNodeString), null);
         DiffContent content2 = new DocumentContentImpl(this.project, new DocumentImpl(rightNodeString), null);
         @NotNull MutableDiffRequestChain chain = new MutableDiffRequestChain(content1, content2);
-        chain.setTitle1("Left Node");
-        chain.setTitle2("Right Node");
+        chain.setTitle1(leftNodeName);
+        chain.setTitle2(rightNodeName);
         chain.setWindowTitle("Comparing Saved nodes");
         DiffManager.getInstance().showDiff(this.project, chain, DiffDialogHints.DEFAULT);
     }
 
-    private DebugNode getNodeFromDropdown(DropdownObserver dropdownObserver) {
-        String selectedItemLabel = dropdownObserver.getCurrentItem();
-        if (Objects.isNull(selectedItemLabel)) {
+    private DebugNode getNodeFromDropdown(String nodeName) {
+        if (Objects.isNull(nodeName)) {
 //            this.feedbackLabel.setText(SELECTED_LABEL_IS_NULL);
         }
 
-        DebugNode selectedNode = persistencyService.getNodes().get(selectedItemLabel);
+        DebugNode selectedNode = persistencyService.getNodes().get(nodeName);
         if (Objects.isNull(selectedNode)) {
 //            this.feedbackLabel.setText(SELECTED_NODE_IS_NULL);
         }
