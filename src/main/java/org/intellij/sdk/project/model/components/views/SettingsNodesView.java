@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.components.handlers.DeleteHandler;
 import org.intellij.sdk.project.model.components.handlers.SaveHandler;
@@ -24,16 +23,19 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.util.ui.JBUI;
 
-public class SavedNodesSettingsView extends DialogWrapper {
+public class SettingsNodesView extends DialogWrapper {
     private static final PersistencyService persistencyService = ServiceManager.getService(PersistencyService.class);
     private Project project;
     private SaveHandler saveHandler;
     private DeleteHandler deleteHandler;
     private DefaultTreeModel treeModel;
     private JBList<String> keysList;
+    private JScrollPane scrollableNodesPanel;
+    private JScrollPane scrollableKeysPanel;
 
-    public SavedNodesSettingsView(@NotNull Project project, SaveHandler saveHandler, DeleteHandler deleteHandler, DefaultTreeModel treeModel) {
+    public SettingsNodesView(@NotNull Project project, SaveHandler saveHandler, DeleteHandler deleteHandler, DefaultTreeModel treeModel) {
         super(true); // use current window as parent
         this.project = project;
         this.saveHandler = saveHandler;
@@ -47,11 +49,10 @@ public class SavedNodesSettingsView extends DialogWrapper {
     @Override
     protected JComponent createCenterPanel() {
         setSize(1300, 1100);
-        Map<String, DebugNode> nodes = persistencyService.getNodes();
         JPanel dialogPanel = new JPanel(new GridBagLayout());
 
-        JScrollPane scrollableNodesPanel = getScrollableNodesPanel();
-        JScrollPane scrollableKeysPanel = getScrollableKeysPanel(nodes, scrollableNodesPanel);
+        this.scrollableNodesPanel = getScrollableNodesPanel();
+        this.scrollableKeysPanel = getScrollableKeysPanel();
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
@@ -72,63 +73,68 @@ public class SavedNodesSettingsView extends DialogWrapper {
         return dialogPanel;
     }
 
+    private Map<String, DebugNode> getNodes() {
+        return persistencyService.getNodes();
+    }
+
     private JPanel getButtonsPanel() {
         JPanel panel = new JPanel();
-        panel.setBorder(new EmptyBorder(50, 5, 0, 5));
+        panel.setBorder(JBUI.Borders.empty(50, 5, 0, 5));
         BoxLayout boxLayout = new BoxLayout(panel, BoxLayout.Y_AXIS);
         panel.setLayout(boxLayout);
+        // delete button
         JButton deleteButton = new JButton("Delete");
-        deleteButton.setEnabled(false);
-
         deleteButton.addActionListener(e -> deleteNodeAndRefreshJList(this.keysList.getSelectedValue(), false));
-
         panel.add(deleteButton);
+        // rename button
         JButton renameButton = new JButton("Rename");
-        renameButton.setEnabled(false);
-        this.keysList.addListSelectionListener(e -> {
-            if (e.getFirstIndex() > -1) {
-                deleteButton.setEnabled(true);
-                renameButton.setEnabled(true);
-            } else {
-                deleteButton.setEnabled(false);
-                renameButton.setEnabled(false);
-            }
-        });
-
-        renameButton.addActionListener(e -> {
-            String selectedKey = this.keysList.getSelectedValue();
-            Map<String, DebugNode> nodes = persistencyService.getNodes();
-            DebugNode debugNode = nodes.get(selectedKey);
-            String newNodeName = MessageDialogues.getRenameDialogue(this.project,null);
-            while (nodes.containsKey(newNodeName)) {
-                newNodeName = MessageDialogues.getRenameDialogue(this.project, String.format("\"%s\" already exists", newNodeName));
-            }
-            if (Objects.nonNull(newNodeName)) {
-                this.saveHandler.savedNode(newNodeName, debugNode);
-                deleteNodeAndRefreshJList(selectedKey, true);
-            }
-        });
-
+        renameButton.addActionListener(e -> renameNodeName());
         panel.add(renameButton);
+
+        enableButtons(this.keysList.getItemsCount() != 0, deleteButton, renameButton);
+        this.keysList.addListSelectionListener(e -> enableButtons(this.keysList.getItemsCount() != 0, deleteButton, renameButton));
         return panel;
+    }
+
+    private void enableButtons(boolean enable, JButton deleteButton, JButton renameButton) {
+        deleteButton.setEnabled(enable);
+        renameButton.setEnabled(enable);
+    }
+
+    private void renameNodeName() {
+        String selectedKey = this.keysList.getSelectedValue();
+        Map<String, DebugNode> nodes = getNodes();
+        DebugNode debugNode = nodes.get(selectedKey);
+        String newNodeName = MessageDialogues.getRenameDialogue(this.project, selectedKey, false);
+        while (nodes.containsKey(newNodeName)) {
+            newNodeName = MessageDialogues.getRenameDialogue(this.project, newNodeName, true);
+        }
+        if (Objects.nonNull(newNodeName)) {
+            this.saveHandler.savedNode(newNodeName, debugNode);
+            deleteNodeAndRefreshJList(selectedKey, true);
+        }
     }
 
     private void deleteNodeAndRefreshJList(String selectedNode, boolean withOutDialogue) {
         deleteHandler.handle(treeModel, selectedNode, withOutDialogue);
         DefaultListModel<String> model = new DefaultListModel<>();
-        model.addAll(persistencyService.getNodes().keySet().stream().sorted().collect(Collectors.toList()));
+        model.addAll(getNodes().keySet().stream().sorted().collect(Collectors.toList()));
         this.keysList.setModel(model);
+        nextSelection();
+    }
+
+    private void nextSelection() {
+        this.keysList.setSelectedIndex(this.keysList.getItemsCount() > -1 ? 0 : -1);
+        showSelectedNodeContent();
     }
 
     @NotNull
-    private JScrollPane getScrollableKeysPanel(Map<String, DebugNode> nodes, JScrollPane scrollableNodesPanel) {
+    private JScrollPane getScrollableKeysPanel() {
         JScrollPane scrollableKeysPanel = new JBScrollPane();
-//        scrollableKeysPanel.setPreferredSize(new Dimension(350, 1100));
-//        scrollableKeysPanel.setSize(new Dimension(350, 1100));
         scrollableKeysPanel.setMinimumSize(new Dimension(350, 1100));
         scrollableKeysPanel.setBorder(BorderFactory.createTitledBorder("Saved Node names"));
 
-        String[] keyStrings = Optional.ofNullable(persistencyService.getNodes()) //
+        String[] keyStrings = Optional.ofNullable(getNodes()) //
             .orElse(new HashMap<>()) //
             .keySet() //
             .stream() //
@@ -137,7 +143,10 @@ public class SavedNodesSettingsView extends DialogWrapper {
 
         this.keysList = new JBList<>(keyStrings);
         this.keysList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        this.keysList.addListSelectionListener(e -> onKeySelected(nodes, scrollableNodesPanel));
+        int currentIndex = this.keysList.getItemsCount() > -1 ? 0 : -1;
+        this.keysList.setSelectedIndex(currentIndex);
+        showSelectedNodeContent();
+        this.keysList.addListSelectionListener(e -> showSelectedNodeContent());
 
         JPanel keysPanel = new JPanel(new BorderLayout());
         keysPanel.add(this.keysList, BorderLayout.WEST);
@@ -154,19 +163,21 @@ public class SavedNodesSettingsView extends DialogWrapper {
         return scrollableNodesPanel;
     }
 
-    private void onKeySelected(Map<String, DebugNode> nodes, JScrollPane scrollableNodesPanel) {
+    private void showSelectedNodeContent() {
+        String text = "Nothing to show...";
         String selectedValue = this.keysList.getSelectedValue();
-        DebugNode debugNode = nodes.get(selectedValue);
-        String text = "Node does not contain any text...";
-        if (Objects.nonNull(debugNode)) {
-            text = convertNodeToString(debugNode);
+        if (Objects.nonNull(selectedValue)) {
+            DebugNode debugNode = getNodes().get(selectedValue);
+            if (Objects.nonNull(debugNode)) {
+                text = convertNodeToString(debugNode);
+            }
         }
         JTextArea textArea = new JTextArea();
         textArea.setEditable(false);
         textArea.setText(text);
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(textArea);
-        scrollableNodesPanel.setViewportView(panel);
+        this.scrollableNodesPanel.setViewportView(panel);
     }
 
 }

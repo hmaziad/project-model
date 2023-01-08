@@ -16,8 +16,10 @@ public class MessageDialogues {
         Messages.showMessageDialog(project,message, "Error", Messages.getErrorIcon());
     }
 
-    public static @Nullable @NlsSafe String getRenameDialogue(Project project, String newNodeName) {
-        return Messages.showInputDialog(project, "Enter new name for node", "Rename Node", null, null, new CustomInputValidator(), null, newNodeName);
+    public static @Nullable @NlsSafe String getRenameDialogue(Project project, String newNodeName, boolean showComment) {
+        String dialogueDescription = String.format("Enter new name for node %s", newNodeName);
+        String dialogueErrorMessage = showComment ? String.format("\"%s\" already exists", newNodeName) : null;
+        return Messages.showInputDialog(project, dialogueDescription, "Rename Node", null, null, new CustomInputValidator(), null, dialogueErrorMessage);
     }
 
     private static class CustomInputValidator implements InputValidator {

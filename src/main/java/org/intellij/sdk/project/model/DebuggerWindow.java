@@ -5,21 +5,24 @@ package org.intellij.sdk.project.model;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultTreeModel;
-import org.intellij.sdk.project.model.components.handlers.ButtonHandler;
 import org.intellij.sdk.project.model.components.ButtonType;
+import org.intellij.sdk.project.model.components.handlers.ButtonHandler;
 import org.intellij.sdk.project.model.components.handlers.ClearHandler;
 import org.intellij.sdk.project.model.components.handlers.CollapseTreeHandler;
 import org.intellij.sdk.project.model.components.handlers.DeleteHandler;
 import org.intellij.sdk.project.model.components.handlers.DiffHandler;
-import org.intellij.sdk.project.model.components.views.DiffSavedNodesView;
 import org.intellij.sdk.project.model.components.handlers.ExpandTreeHandler;
 import org.intellij.sdk.project.model.components.handlers.SaveHandler;
-import org.intellij.sdk.project.model.components.views.SavedNodesSettingsView;
 import org.intellij.sdk.project.model.components.handlers.SnapHandler;
 import org.intellij.sdk.project.model.components.handlers.ToolHandler;
+import org.intellij.sdk.project.model.components.views.DiffNodesView;
+import org.intellij.sdk.project.model.components.views.SettingsNodesView;
 import org.intellij.sdk.project.model.components.views.UploadNodesView;
+import org.intellij.sdk.project.model.constants.MessageDialogues;
 import org.intellij.sdk.project.model.listeners.DebuggerTreeModelListener;
+import org.intellij.sdk.project.model.services.PersistencyService;
 import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 
 import lombok.Getter;
@@ -27,6 +30,7 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public class DebuggerWindow {
+    private static final PersistencyService persistencyService = ServiceManager.getService(PersistencyService.class);
 
     @Getter
     private JPanel debuggerWindowContent;
@@ -101,8 +105,14 @@ public class DebuggerWindow {
         this.diffButton.addActionListener(e -> diffHandler.handle(treeModel));
         this.expandButton.addActionListener(e -> expandTreeHandler.handle(treeModel));
         this.collapseButton.addActionListener(e -> collapseTreeHandler.handle(treeModel));
-        this.viewSavedNodesButton.addActionListener(e -> new SavedNodesSettingsView(project,saveHandler, deleteHandler, treeModel).showAndGet());
-        this.diffSavedButton.addActionListener(e -> new DiffSavedNodesView(project, diffRefButton).showAndGet());
+        this.viewSavedNodesButton.addActionListener(e -> new SettingsNodesView(project,saveHandler, deleteHandler, treeModel).showAndGet());
+        this.diffSavedButton.addActionListener(e -> {
+            if (persistencyService.getNodes().size() == 0) {
+                MessageDialogues.getErrorMessageDialogue("You haven't saved any nodes yet", project);
+            } else {
+                new DiffNodesView(project, diffRefButton).showAndGet();
+            }
+        });
         this.uploadButton.addActionListener(e -> new UploadNodesView(project, treeModel).showAndGet());
 
     }

@@ -37,8 +37,9 @@ public class SaveHandler implements ToolHandler {
     public void savedNode(String nodeName, DebugNode rootNode) {
         if (StringUtil.isEmpty(nodeName)) {
             throw new IllegalArgumentException("Node name is empty or null " + nodeName);
+        } else {
+            persistencyService.addNode(nodeName, rootNode);
         }
-        persistencyService.addNode(nodeName, rootNode);
     }
 
 }

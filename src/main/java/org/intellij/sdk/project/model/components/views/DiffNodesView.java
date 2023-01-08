@@ -7,8 +7,8 @@ import java.util.Map;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import org.intellij.sdk.project.model.components.handlers.DiffRefHandler;
 import org.intellij.sdk.project.model.components.DropdownObserver;
+import org.intellij.sdk.project.model.components.handlers.DiffRefHandler;
 import org.intellij.sdk.project.model.services.PersistencyService;
 import org.intellij.sdk.project.model.xnodes.DebugNode;
 import org.jetbrains.annotations.NotNull;
@@ -19,12 +19,12 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBScrollPane;
 
-public class DiffSavedNodesView extends DialogWrapper {
+public class DiffNodesView extends DialogWrapper {
     private static final PersistencyService persistencyService = ServiceManager.getService(PersistencyService.class);
     private Project project;
     private JButton diffRefButton;
 
-    public DiffSavedNodesView(@NotNull Project project, JButton diffRefButton) {
+    public DiffNodesView(@NotNull Project project, JButton diffRefButton) {
         super(true); // use current window as parent
         this.project = project;
         this.diffRefButton = diffRefButton;
@@ -39,9 +39,11 @@ public class DiffSavedNodesView extends DialogWrapper {
 
         JComboBox<String> leftSnapsDropdown = new ComboBox<>();
         DropdownObserver leftDropdownObserver = new DropdownObserver(leftSnapsDropdown);
+        leftSnapsDropdown.setSelectedIndex(0);
 
-        JComboBox<String> rightSavedSnapsDropdown = new ComboBox<>();
-        DropdownObserver rightDropdownObserver = new DropdownObserver(rightSavedSnapsDropdown);
+        JComboBox<String> rightSnapsDropdown = new ComboBox<>();
+        DropdownObserver rightDropdownObserver = new DropdownObserver(rightSnapsDropdown);
+        rightSnapsDropdown.setSelectedIndex(nodes.size() > 1 ? 1 : 0);
 
         setSize(1300, 1100);
         JPanel dialogPanel = new JPanel(new GridBagLayout());
@@ -57,11 +59,6 @@ public class DiffSavedNodesView extends DialogWrapper {
         gbc.gridx = 1;
         gbc.weightx = 0;
         gbc.fill = GridBagConstraints.NONE;
-        this.diffRefButton.setBorder(new EmptyBorder(10,20,10,20));
-        this.diffRefButton.addActionListener(e -> {
-            DiffRefHandler diffRefHandler = new DiffRefHandler(this.project, leftDropdownObserver, rightDropdownObserver);
-            diffRefHandler.handle(null);
-        });
 
         dialogPanel.add(this.diffRefButton, gbc);
 
@@ -70,6 +67,11 @@ public class DiffSavedNodesView extends DialogWrapper {
         gbc.weightx = 1;
         dialogPanel.add(getNodesPanel(rightDropdownObserver), gbc);
 
+        this.diffRefButton.setBorder(new EmptyBorder(10,20,10,20));
+        this.diffRefButton.addActionListener(e -> {
+            DiffRefHandler diffRefHandler = new DiffRefHandler(this.project, leftDropdownObserver, rightDropdownObserver);
+            diffRefHandler.handle(null);
+        });
         return dialogPanel;
     }
 
@@ -79,18 +81,21 @@ public class DiffSavedNodesView extends DialogWrapper {
         scrollPane.setPreferredSize(new Dimension(0, 100));
         scrollPane.setViewportView(new JTextArea());
         JComboBox<String> jComboBox = dropdownObserver.getJComboBox();
-        jComboBox.addActionListener(e -> {
-            String selectedItem = dropdownObserver.getCurrentItem();
-            DebugNode debugNode = persistencyService.getNodes().get(selectedItem);
-            String debugNodeString = convertNodeToString(debugNode);
-            JTextArea textArea = new JTextArea();
-            textArea.setEditable(false);
-            textArea.setText(debugNodeString);
-            scrollPane.setViewportView(textArea);
-        });
+        showSelectedNodeContent(dropdownObserver, scrollPane);
+        jComboBox.addActionListener(e -> showSelectedNodeContent(dropdownObserver, scrollPane));
         mainPanel.add(jComboBox, BorderLayout.NORTH);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         return mainPanel;
+    }
+
+    private void showSelectedNodeContent(DropdownObserver dropdownObserver, JScrollPane scrollPane) {
+        String selectedItem = dropdownObserver.getCurrentItem();
+        DebugNode debugNode = persistencyService.getNodes().get(selectedItem);
+        String debugNodeString = convertNodeToString(debugNode);
+        JTextArea textArea = new JTextArea();
+        textArea.setEditable(false);
+        textArea.setText(debugNodeString);
+        scrollPane.setViewportView(textArea);
     }
 
 }
