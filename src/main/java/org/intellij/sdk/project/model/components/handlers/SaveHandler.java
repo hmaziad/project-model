@@ -2,8 +2,8 @@ package org.intellij.sdk.project.model.components.handlers;
 
 import static org.intellij.sdk.project.model.constants.TextConstants.SAVED_SNAP_MESSAGE;
 
+import java.time.Instant;
 import java.util.Objects;
-import java.util.UUID;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
@@ -29,7 +29,7 @@ public class SaveHandler implements ToolHandler {
             this.feedbackLabel.setText("Please take a snap shot first");
             return;
         }
-        String nodeName = String.format("node-%s", UUID.randomUUID());
+        String nodeName = String.format("node-%s", Instant.now().toEpochMilli());
         savedNode(nodeName, rootNode);
         this.feedbackLabel.setText(SAVED_SNAP_MESSAGE);
     }
