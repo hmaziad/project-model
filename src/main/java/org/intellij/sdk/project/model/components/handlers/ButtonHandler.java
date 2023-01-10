@@ -25,9 +25,6 @@ public class ButtonHandler {
             case SNAP:
                 button.setIcon(SdkIcons.SNAP_ICON);
                 break;
-            case SAVE:
-                button.setIcon(SdkIcons.SAVE_ICON);
-                break;
             case DIFF:
                 button.setIcon(SdkIcons.DIFF_ICON);
                 break;

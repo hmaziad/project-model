@@ -35,7 +35,6 @@ public class DebuggerWindow {
     @Getter
     private JPanel debuggerWindowContent;
     private JButton snapButton;
-    private JButton saveButton;
     private JButton diffButton;
     private JScrollPane treePane;
     private JTree debugTree;
@@ -65,7 +64,6 @@ public class DebuggerWindow {
 
         // icon buttons in toolbar
         buttonHandler.handleButton(this.snapButton, ButtonType.SNAP);
-        buttonHandler.handleButton(this.saveButton, ButtonType.SAVE);
         buttonHandler.handleButton(this.uploadButton, ButtonType.UPLOAD);
         buttonHandler.handleButton(this.diffButton, ButtonType.DIFF);
         buttonHandler.handleButton(this.clearButton, ButtonType.CLEAR);
@@ -100,8 +98,10 @@ public class DebuggerWindow {
 
         // action listeners
         this.clearButton.addActionListener(e -> clearHandler.handle(treeModel));
-        this.snapButton.addActionListener(e -> snapHandler.handle(treeModel));
-        this.saveButton.addActionListener(e -> saveHandler.handle(treeModel));
+        this.snapButton.addActionListener(e -> {
+            snapHandler.handle(treeModel);
+            saveHandler.handle(treeModel);
+        });
         this.diffButton.addActionListener(e -> diffHandler.handle(treeModel));
         this.expandButton.addActionListener(e -> expandTreeHandler.handle(treeModel));
         this.collapseButton.addActionListener(e -> collapseTreeHandler.handle(treeModel));
