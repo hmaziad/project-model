@@ -1,6 +1,6 @@
 package org.intellij.sdk.project.model.components.handlers;
 
-import java.util.Objects;
+import static org.intellij.sdk.project.model.components.DropdownObserver.CURRENT_DEBUGGER_SESSION;
 
 import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.components.DropdownObserver;
@@ -25,9 +25,10 @@ public class DiffRefHandler implements ToolHandler {
     Project project;
     DropdownObserver leftDropdownObserver;
     DropdownObserver rightDropdownObserver;
+    DebugNode currentSession;
 
     @Override
-    public void handle(DefaultTreeModel treeModel) {
+    public void handle(DefaultTreeModel treeModel) { // remove the leftDownObservers and only send the needed nodes
         String leftNodeName = this.leftDropdownObserver.getCurrentItem();
         DebugNode leftNode = getNodeFromDropdown(leftNodeName);
         String rightNodeName = this.rightDropdownObserver.getCurrentItem();
@@ -45,15 +46,10 @@ public class DiffRefHandler implements ToolHandler {
     }
 
     private DebugNode getNodeFromDropdown(String nodeName) {
-        if (Objects.isNull(nodeName)) {
-//            this.feedbackLabel.setText(SELECTED_LABEL_IS_NULL);
+        if (CURRENT_DEBUGGER_SESSION.equals(nodeName)) {
+            return this.currentSession;
         }
-
-        DebugNode selectedNode = persistencyService.getNodes().get(nodeName);
-        if (Objects.isNull(selectedNode)) {
-//            this.feedbackLabel.setText(SELECTED_NODE_IS_NULL);
-        }
-        return selectedNode;
+        return persistencyService.getNodes().get(nodeName);
     }
 
 }

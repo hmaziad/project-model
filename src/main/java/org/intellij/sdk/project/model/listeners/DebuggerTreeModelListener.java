@@ -1,7 +1,6 @@
 package org.intellij.sdk.project.model.listeners;
 
 import static org.intellij.sdk.project.model.components.ButtonType.CLEAR;
-import static org.intellij.sdk.project.model.components.ButtonType.SAVE;
 import static org.intellij.sdk.project.model.components.ButtonType.SNAP;
 import static org.intellij.sdk.project.model.constants.TextConstants.DEBUGGER_SNAP_TAKEN;
 import static org.intellij.sdk.project.model.constants.TextConstants.TAKE_DEBUGGER_SNAP;
@@ -51,7 +50,7 @@ public class DebuggerTreeModelListener implements TreeModelListener {
             this.allButtons.values().forEach(button -> button.setEnabled(false));
         } else {
             this.feedbackLabel.setText(DEBUGGER_SNAP_TAKEN);
-            Set<ButtonType> enabledOnNewNode = Set.of(SNAP, CLEAR, SAVE);
+            Set<ButtonType> enabledOnNewNode = Set.of(SNAP, CLEAR);
             this.allButtons
                 .entrySet()
                 .stream()

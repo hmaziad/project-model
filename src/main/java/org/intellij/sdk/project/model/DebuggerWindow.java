@@ -18,7 +18,6 @@ import org.intellij.sdk.project.model.components.handlers.ToolHandler;
 import org.intellij.sdk.project.model.components.views.DiffNodesView;
 import org.intellij.sdk.project.model.components.views.SettingsNodesView;
 import org.intellij.sdk.project.model.components.views.UploadNodesView;
-import org.intellij.sdk.project.model.constants.MessageDialogues;
 import org.intellij.sdk.project.model.listeners.DebuggerTreeModelListener;
 import org.intellij.sdk.project.model.services.PersistencyService;
 import org.jetbrains.annotations.NotNull;
@@ -49,11 +48,10 @@ public class DebuggerWindow {
     private JToolBar.Separator toolbarSeparatorSnap;
     private JButton viewSavedNodesButton;
     private JToolBar.Separator toolbarSeparatorViewNodes;
-    private JButton diffSavedButton;
     private JButton uploadButton;
 
     public DebuggerWindow(@NotNull Project project) {
-        JButton diffRefButton = new JButton();
+        JButton scaledDiffButton = new JButton();
         this.feedbackLabel.setBorder(new EmptyBorder(0, 10, 0, 0));
         DefaultTreeModel treeModel = (DefaultTreeModel) this.debugTree.getModel();
         treeModel.setRoot(null);
@@ -69,8 +67,7 @@ public class DebuggerWindow {
         buttonHandler.handleButton(this.clearButton, ButtonType.CLEAR);
         buttonHandler.handleButton(this.expandButton, ButtonType.EXPAND);
         buttonHandler.handleButton(this.collapseButton, ButtonType.COLLAPSE);
-        buttonHandler.handleButton(diffRefButton, ButtonType.DIFF_SCALED);
-        buttonHandler.handleButton(this.diffSavedButton, ButtonType.DIFF_SAVED);
+        buttonHandler.handleButton(scaledDiffButton, ButtonType.DIFF_SCALED);
         buttonHandler.handleButton(this.viewSavedNodesButton, ButtonType.VIEW_NODES);
 
         // toolbar separators
@@ -102,17 +99,17 @@ public class DebuggerWindow {
             snapHandler.handle(treeModel);
             saveHandler.handle(treeModel);
         });
-        this.diffButton.addActionListener(e -> diffHandler.handle(treeModel));
+        this.diffButton.addActionListener(e -> new DiffNodesView(project, scaledDiffButton).showAndGet());
         this.expandButton.addActionListener(e -> expandTreeHandler.handle(treeModel));
         this.collapseButton.addActionListener(e -> collapseTreeHandler.handle(treeModel));
         this.viewSavedNodesButton.addActionListener(e -> new SettingsNodesView(project,saveHandler, deleteHandler, treeModel).showAndGet());
-        this.diffSavedButton.addActionListener(e -> {
-            if (persistencyService.getNodes().size() == 0) {
-                MessageDialogues.getErrorMessageDialogue("You haven't saved any nodes yet", project);
-            } else {
-                new DiffNodesView(project, diffRefButton).showAndGet();
-            }
-        });
+//        this.diffSavedButton.addActionListener(e -> {
+//            if (persistencyService.getNodes().size() == 0) {
+//                MessageDialogues.getErrorMessageDialogue("You haven't saved any nodes yet", project);
+//            } else {
+//                new DiffNodesView(project, scaledDiffButton).showAndGet();
+//            }
+//        });
         this.uploadButton.addActionListener(e -> new UploadNodesView(project, treeModel).showAndGet());
 
     }

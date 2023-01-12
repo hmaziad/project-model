@@ -112,19 +112,6 @@
               <toolTipText value="Diff Debugger Current Session with Taken Snap Below "/>
             </properties>
           </component>
-          <component id="50615" class="javax.swing.JButton" binding="diffSavedButton">
-            <constraints/>
-            <properties>
-              <borderPainted value="false"/>
-              <contentAreaFilled value="false"/>
-              <foreground color="-12828863"/>
-              <icon value="icons/diff/diff_dark.png"/>
-              <maximumSize width="30" height="30"/>
-              <preferredSize width="30" height="30"/>
-              <text value=""/>
-              <toolTipText value="Diff Debugger Current Session with Taken Snap Below "/>
-            </properties>
-          </component>
           <component id="a23ec" class="javax.swing.JToolBar$Separator" binding="toolbarSeparatorOther">
             <constraints/>
             <properties>
