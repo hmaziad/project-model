@@ -64,12 +64,12 @@ public class SettingsNodesView extends DialogWrapper {
         dialogPanel.add(scrollableKeysPanel, gbc);
 
         gbc.gridx = 1;
-        gbc.weightx = 0;
-        dialogPanel.add(getButtonsPanel(), gbc);
-
-        gbc.gridx = 2;
         gbc.weightx = 1;
         dialogPanel.add(scrollableNodesPanel, gbc);
+
+        gbc.gridx = 2;
+        gbc.weightx = 0;
+        dialogPanel.add(getButtonsPanel(), gbc);
         return dialogPanel;
     }
 
@@ -91,14 +91,28 @@ public class SettingsNodesView extends DialogWrapper {
         renameButton.addActionListener(e -> renameNodeName());
         panel.add(renameButton);
 
-        enableButtons(this.keysList.getItemsCount() != 0, deleteButton, renameButton);
-        this.keysList.addListSelectionListener(e -> enableButtons(this.keysList.getItemsCount() != 0, deleteButton, renameButton));
+        // delete all button
+        JButton deleteAllButton = new JButton("Delete All");
+        deleteAllButton.addActionListener(e -> deleteAll());
+        panel.add(deleteAllButton);
+
+        enableButtons(this.keysList.getItemsCount() != 0, deleteButton, renameButton, deleteAllButton);
+        this.keysList.addListSelectionListener(e -> enableButtons(this.keysList.getItemsCount() != 0, deleteButton, renameButton, deleteAllButton));
         return panel;
     }
 
-    private void enableButtons(boolean enable, JButton deleteButton, JButton renameButton) {
+    private void deleteAll() {
+        boolean userAgrees = MessageDialogues.getYesNoMessageDialogue("Are you sure you want to delete all the node", "Delete All Saved Sessions", this.project);
+        if (userAgrees) {
+            persistencyService.getNodes().clear();
+            this.keysList.setModel(new DefaultListModel<>());
+        }
+    }
+
+    private void enableButtons(boolean enable, JButton deleteButton, JButton renameButton, JButton deleteAllButton) {
         deleteButton.setEnabled(enable);
         renameButton.setEnabled(enable);
+        deleteAllButton.setEnabled(enable);
     }
 
     private void renameNodeName() {
