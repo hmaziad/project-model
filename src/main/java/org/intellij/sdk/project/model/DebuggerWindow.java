@@ -10,14 +10,12 @@ import org.intellij.sdk.project.model.components.handlers.ButtonHandler;
 import org.intellij.sdk.project.model.components.handlers.ClearHandler;
 import org.intellij.sdk.project.model.components.handlers.CollapseTreeHandler;
 import org.intellij.sdk.project.model.components.handlers.DeleteHandler;
-import org.intellij.sdk.project.model.components.handlers.DiffHandler;
 import org.intellij.sdk.project.model.components.handlers.ExpandTreeHandler;
 import org.intellij.sdk.project.model.components.handlers.SaveHandler;
 import org.intellij.sdk.project.model.components.handlers.SnapHandler;
 import org.intellij.sdk.project.model.components.handlers.ToolHandler;
 import org.intellij.sdk.project.model.components.views.DiffNodesView;
 import org.intellij.sdk.project.model.components.views.SettingsNodesView;
-import org.intellij.sdk.project.model.components.views.UploadNodesView;
 import org.intellij.sdk.project.model.listeners.DebuggerTreeModelListener;
 import org.intellij.sdk.project.model.services.PersistencyService;
 import org.jetbrains.annotations.NotNull;
@@ -48,7 +46,6 @@ public class DebuggerWindow {
     private JToolBar.Separator toolbarSeparatorSnap;
     private JButton viewSavedNodesButton;
     private JToolBar.Separator toolbarSeparatorViewNodes;
-    private JButton uploadButton;
 
     public DebuggerWindow(@NotNull Project project) {
         JButton scaledDiffButton = new JButton();
@@ -62,7 +59,6 @@ public class DebuggerWindow {
 
         // icon buttons in toolbar
         buttonHandler.handleButton(this.snapButton, ButtonType.SNAP);
-        buttonHandler.handleButton(this.uploadButton, ButtonType.UPLOAD);
         buttonHandler.handleButton(this.diffButton, ButtonType.DIFF);
         buttonHandler.handleButton(this.clearButton, ButtonType.CLEAR);
         buttonHandler.handleButton(this.expandButton, ButtonType.EXPAND);
@@ -83,7 +79,6 @@ public class DebuggerWindow {
         ToolHandler clearHandler = new ClearHandler(this.feedbackLabel);
         SaveHandler saveHandler = new SaveHandler(this.feedbackLabel);
         DeleteHandler deleteHandler = new DeleteHandler(this.feedbackLabel, project);
-        ToolHandler diffHandler = new DiffHandler(this.feedbackLabel, project);
         ToolHandler expandTreeHandler = new ExpandTreeHandler(debugTree);
         ToolHandler collapseTreeHandler = new CollapseTreeHandler(debugTree);
 
@@ -103,15 +98,6 @@ public class DebuggerWindow {
         this.expandButton.addActionListener(e -> expandTreeHandler.handle(treeModel));
         this.collapseButton.addActionListener(e -> collapseTreeHandler.handle(treeModel));
         this.viewSavedNodesButton.addActionListener(e -> new SettingsNodesView(project,saveHandler, deleteHandler, treeModel).showAndGet());
-//        this.diffSavedButton.addActionListener(e -> {
-//            if (persistencyService.getNodes().size() == 0) {
-//                MessageDialogues.getErrorMessageDialogue("You haven't saved any nodes yet", project);
-//            } else {
-//                new DiffNodesView(project, scaledDiffButton).showAndGet();
-//            }
-//        });
-        this.uploadButton.addActionListener(e -> new UploadNodesView(project, treeModel).showAndGet());
-
     }
 
 }

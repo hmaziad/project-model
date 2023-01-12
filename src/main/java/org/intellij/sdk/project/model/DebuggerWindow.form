@@ -75,19 +75,6 @@
               <opaque value="true"/>
             </properties>
           </component>
-          <component id="2760a" class="javax.swing.JButton" binding="uploadButton">
-            <constraints/>
-            <properties>
-              <borderPainted value="false"/>
-              <contentAreaFilled value="false"/>
-              <enabled value="true"/>
-              <icon value="icons/save/download_dark.png"/>
-              <maximumSize width="30" height="30"/>
-              <preferredSize width="30" height="30"/>
-              <text value=""/>
-              <toolTipText value="Save Debugger Session"/>
-            </properties>
-          </component>
           <component id="ed64f" class="javax.swing.JToolBar$Separator" binding="toolbarSeparatorCore">
             <constraints/>
             <properties>

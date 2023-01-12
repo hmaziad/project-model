@@ -90,15 +90,25 @@ public class SettingsNodesView extends DialogWrapper {
         JButton renameButton = new JButton("Rename");
         renameButton.addActionListener(e -> renameNodeName());
         panel.add(renameButton);
-
+        // load button
+        JButton loadButton = new JButton("Show");
+        loadButton.addActionListener(e -> loadNode());
+        panel.add(loadButton);
         // delete all button
         JButton deleteAllButton = new JButton("Delete All");
         deleteAllButton.addActionListener(e -> deleteAll());
         panel.add(deleteAllButton);
 
-        enableButtons(this.keysList.getItemsCount() != 0, deleteButton, renameButton, deleteAllButton);
-        this.keysList.addListSelectionListener(e -> enableButtons(this.keysList.getItemsCount() != 0, deleteButton, renameButton, deleteAllButton));
+        enableButtons(this.keysList.getItemsCount() != 0, deleteButton, renameButton, loadButton, deleteAllButton);
+        this.keysList.addListSelectionListener(e -> enableButtons(this.keysList.getItemsCount() != 0, deleteButton, renameButton, deleteAllButton, deleteAllButton));
         return panel;
+    }
+
+    private void loadNode() {
+        String selectedKey = this.keysList.getSelectedValue();
+        Map<String, DebugNode> nodes = getNodes();
+        DebugNode debugNode = nodes.get(selectedKey);
+        this.treeModel.setRoot(debugNode);
     }
 
     private void deleteAll() {
@@ -109,9 +119,10 @@ public class SettingsNodesView extends DialogWrapper {
         }
     }
 
-    private void enableButtons(boolean enable, JButton deleteButton, JButton renameButton, JButton deleteAllButton) {
+    private void enableButtons(boolean enable, JButton deleteButton, JButton renameButton, JButton loadButton, JButton deleteAllButton) {
         deleteButton.setEnabled(enable);
         renameButton.setEnabled(enable);
+        loadButton.setEnabled(enable);
         deleteAllButton.setEnabled(enable);
     }
 

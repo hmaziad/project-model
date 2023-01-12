@@ -43,9 +43,6 @@ public class ButtonHandler {
             case DIFF_SCALED:
                 button.setIcon(SdkIcons.DIFF_SCALED);
                 break;
-            case UPLOAD:
-                button.setIcon(SdkIcons.UPLOAD);
-                break;
             default:
                 throw new IllegalArgumentException(String.format("Could not handle button type %s", buttonType));
         }
