@@ -2,7 +2,8 @@ package org.intellij.sdk.project.model.components.handlers;
 
 import static org.intellij.sdk.project.model.constants.TextConstants.SAVED_SNAP_MESSAGE;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 import javax.swing.*;
@@ -29,7 +30,8 @@ public class SaveHandler implements ToolHandler {
             this.feedbackLabel.setText("Please take a snap shot first");
             return;
         }
-        String nodeName = String.format("node-%s", Instant.now().toEpochMilli());
+        String dateTimeNow = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-hh-mm-SSS"));
+        String nodeName = String.format("node-%s", dateTimeNow);
         savedNode(nodeName, rootNode);
         this.feedbackLabel.setText(SAVED_SNAP_MESSAGE);
     }
