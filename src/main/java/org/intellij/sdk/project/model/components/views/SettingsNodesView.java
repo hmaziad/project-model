@@ -1,7 +1,5 @@
 package org.intellij.sdk.project.model.components.views;
 
-import static org.intellij.sdk.project.model.services.ParserService.convertNodeToString;
-
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
+import org.intellij.sdk.project.model.DebuggerTreeRenderer;
 import org.intellij.sdk.project.model.components.handlers.DeleteHandler;
 import org.intellij.sdk.project.model.components.handlers.SaveHandler;
 import org.intellij.sdk.project.model.constants.MessageDialogues;
@@ -23,6 +22,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
 
 public class SettingsNodesView extends DialogWrapper {
@@ -189,19 +189,20 @@ public class SettingsNodesView extends DialogWrapper {
     }
 
     private void showSelectedNodeContent() {
-        String text = "Nothing to show...";
         String selectedValue = this.keysList.getSelectedValue();
+        DebugNode debugNode = null;
         if (Objects.nonNull(selectedValue)) {
-            DebugNode debugNode = getNodes().get(selectedValue);
-            if (Objects.nonNull(debugNode)) {
-                text = convertNodeToString(debugNode);
-            }
+            debugNode = getNodes().get(selectedValue);
         }
-        JTextArea textArea = new JTextArea();
-        textArea.setEditable(false);
-        textArea.setText(text);
+
+        JTree debugTree = new Tree();
+        debugTree.setRootVisible(false);
+        debugTree.setCellRenderer(new DebuggerTreeRenderer());
+        DefaultTreeModel localTreeModel = (DefaultTreeModel) debugTree.getModel();
+        localTreeModel.setRoot(debugNode);
+
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(textArea);
+        panel.add(debugTree);
         this.scrollableNodesPanel.setViewportView(panel);
     }
 

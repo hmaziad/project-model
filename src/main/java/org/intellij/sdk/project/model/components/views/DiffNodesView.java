@@ -1,13 +1,14 @@
 package org.intellij.sdk.project.model.components.views;
 
 import static org.intellij.sdk.project.model.components.DropdownObserver.CURRENT_DEBUGGER_SESSION;
-import static org.intellij.sdk.project.model.services.ParserService.convertNodeToString;
 
 import java.awt.*;
 import java.util.Map;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.tree.DefaultTreeModel;
+import org.intellij.sdk.project.model.DebuggerTreeRenderer;
 import org.intellij.sdk.project.model.components.DropdownObserver;
 import org.intellij.sdk.project.model.components.handlers.DiffRefHandler;
 import org.intellij.sdk.project.model.components.handlers.SnapHandler;
@@ -20,6 +21,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.treeStructure.Tree;
 
 public class DiffNodesView extends DialogWrapper {
     private static final PersistencyService persistencyService = ServiceManager.getService(PersistencyService.class);
@@ -103,11 +105,14 @@ public class DiffNodesView extends DialogWrapper {
         } else {
             debugNode = persistencyService.getNodes().get(selectedItem);
         }
-        String debugNodeString = convertNodeToString(debugNode);
-        JTextArea textArea = new JTextArea();
-        textArea.setEditable(false);
-        textArea.setText(debugNodeString);
-        scrollPane.setViewportView(textArea);
+        JTree debugTree = new Tree();
+        debugTree.setRootVisible(false);
+        debugTree.setCellRenderer(new DebuggerTreeRenderer());
+        DefaultTreeModel localTreeModel = (DefaultTreeModel) debugTree.getModel();
+        localTreeModel.setRoot(debugNode);
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(debugTree);
+        scrollPane.setViewportView(panel);
     }
 
 }
