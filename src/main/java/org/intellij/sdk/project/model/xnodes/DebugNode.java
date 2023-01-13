@@ -12,6 +12,7 @@ import org.jetbrains.annotations.VisibleForTesting;
 import com.google.gson.annotations.Expose;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.LayeredIcon;
+import com.intellij.ui.SimpleColoredText;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueContainerNode;
 
 import lombok.Getter;
@@ -27,6 +28,9 @@ public class DebugNode extends DefaultMutableTreeNode {
     @Expose
     private String iconPath;
 
+//    @Expose
+    private SimpleColoredText coloredText;
+
     @VisibleForTesting
     @Setter
     @Expose
@@ -40,6 +44,7 @@ public class DebugNode extends DefaultMutableTreeNode {
     public DebugNode(XValueContainerNode<?> xNode) {
         this.text = xNode.getText().toString();
         this.iconPath = getIconPath(xNode.getIcon()).orElse(null);
+        this.coloredText = xNode.getText();
         try {
             IconLoader.CachedImageIcon icon = (IconLoader.CachedImageIcon) xNode.getIcon();
             if (Objects.nonNull(icon)) {
