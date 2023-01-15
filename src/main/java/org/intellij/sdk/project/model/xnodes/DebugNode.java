@@ -1,5 +1,6 @@
 package org.intellij.sdk.project.model.xnodes;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -13,6 +14,7 @@ import com.google.gson.annotations.Expose;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.LayeredIcon;
 import com.intellij.ui.SimpleColoredText;
+import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueContainerNode;
 
 import lombok.Getter;
@@ -23,28 +25,38 @@ import lombok.Setter;
 @NoArgsConstructor(force = true)
 //@Log4j2
 public class DebugNode extends DefaultMutableTreeNode {
+
     @Expose
-    private final String text;
+    private List<String> texts = new ArrayList<>();
+    @Expose
+    private List<Integer> colors = new ArrayList<>();
+
     @Expose
     private String iconPath;
-
-//    @Expose
-    private SimpleColoredText coloredText;
 
     @VisibleForTesting
     @Setter
     @Expose
     private List<DebugNode> myChildren = new ArrayList<>();
 
+    @VisibleForTesting
     public DebugNode(String text) {
-        this.text = text;
+
     }
 
     // exclude Mark
     public DebugNode(XValueContainerNode<?> xNode) {
-        this.text = xNode.getText().toString();
         this.iconPath = getIconPath(xNode.getIcon()).orElse(null);
-        this.coloredText = xNode.getText();
+        SimpleColoredText simpleColoredText = xNode.getText();
+        ArrayList<String> texts = simpleColoredText.getTexts();
+        ArrayList<SimpleTextAttributes> attributes = simpleColoredText.getAttributes();
+        for (int i = 0; i < attributes.size(); i++) {
+            this.texts.add(texts.get(i));
+            Color fgColor = attributes.get(i).getFgColor();
+            Integer rgb = Objects.isNull(fgColor) ? null : fgColor.getRGB();
+            colors.add(rgb);
+        }
+
         try {
             IconLoader.CachedImageIcon icon = (IconLoader.CachedImageIcon) xNode.getIcon();
             if (Objects.nonNull(icon)) {
@@ -62,7 +74,8 @@ public class DebugNode extends DefaultMutableTreeNode {
     }
 
     public DebugNode(DebugNode value) {
-        this.text = value.getText();
+        this.texts = value.getTexts();
+        this.colors = value.getColors();
         this.iconPath = value.getIconPath();
         var children = value.getMyChildren();
         children.forEach(child -> {
@@ -97,7 +110,6 @@ public class DebugNode extends DefaultMutableTreeNode {
 
     @Override
     public String toString() {
-        return this.text;
+        return String.join("", this.texts);
     }
-
 }

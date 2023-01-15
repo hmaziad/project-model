@@ -8,9 +8,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-// use this tool instead https://github.com/google/diff-match-patch
-
-
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Log4j2
 public class ParserService {
@@ -31,7 +28,7 @@ public class ParserService {
 
     private static void appendData(StringBuilder sb, DebugNode node, String indents) {
         sb.append(indents) //
-            .append(node.getText()) //
+            .append(String.join("", node.getTexts())) //
             .append("\n");
     }
 }
