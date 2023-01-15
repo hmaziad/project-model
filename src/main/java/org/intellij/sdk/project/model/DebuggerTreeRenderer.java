@@ -24,7 +24,7 @@ public class DebuggerTreeRenderer extends ColoredTreeCellRenderer {
         List<Integer> colors = node.getColors();
         for (int i = 0; i < texts.size(); i++) {
             Integer rgb = colors.get(i);
-            Color color = Objects.isNull(rgb) ? null : new Color(rgb);
+            Color color = Objects.isNull(rgb) ? Color.lightGray : new Color(rgb);
             simpleColoredText.append(texts.get(i), new SimpleTextAttributes(STYLE_PLAIN, color));
         }
         simpleColoredText.appendToComponent(this);
