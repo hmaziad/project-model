@@ -4,16 +4,17 @@ package org.intellij.sdk.project.model;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Enumeration;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import org.intellij.sdk.project.model.components.ButtonType;
 import org.intellij.sdk.project.model.components.handlers.ButtonHandler;
 import org.intellij.sdk.project.model.components.handlers.ClearHandler;
-import org.intellij.sdk.project.model.components.handlers.CollapseTreeHandler;
 import org.intellij.sdk.project.model.components.handlers.DeleteHandler;
-import org.intellij.sdk.project.model.components.handlers.ExpandTreeHandler;
 import org.intellij.sdk.project.model.components.handlers.SaveHandler;
 import org.intellij.sdk.project.model.components.handlers.SnapHandler;
 import org.intellij.sdk.project.model.components.handlers.ToolHandler;
@@ -42,14 +43,11 @@ public class DebuggerWindow {
     private JToolBar toolbar;
     private JToolBar.Separator toolbarSeparatorCore;
     private JButton clearButton;
-    private JButton expandButton;
-    private JButton collapseButton;
     private JToolBar.Separator toolbarSeparatorOther;
     private JToolBar.Separator toolbarSeparatorFeedback;
     private JLabel feedbackLabel;
     private JToolBar.Separator toolbarSeparatorSnap;
     private JButton viewSavedNodesButton;
-    private JToolBar.Separator toolbarSeparatorViewNodes;
 
     public DebuggerWindow(Project project) {
         this.snapButton.setEnabled(false);
@@ -68,6 +66,7 @@ public class DebuggerWindow {
                     int row = debugTree.getRowForLocation(e.getX(), e.getY());
                     debugTree.setSelectionRow(row);
                     if (row >= 0) {
+                        treePopup.setRow(row);
                         treePopup.show(e.getComponent(), e.getX(), e.getY());
                     }
                 }
@@ -80,8 +79,6 @@ public class DebuggerWindow {
         buttonHandler.handleButton(this.snapButton, ButtonType.SNAP);
         buttonHandler.handleButton(this.diffButton, ButtonType.DIFF);
         buttonHandler.handleButton(this.clearButton, ButtonType.CLEAR);
-        buttonHandler.handleButton(this.expandButton, ButtonType.EXPAND);
-        buttonHandler.handleButton(this.collapseButton, ButtonType.COLLAPSE);
         buttonHandler.handleButton(scaledDiffButton, ButtonType.DIFF_SCALED);
         buttonHandler.handleButton(this.viewSavedNodesButton, ButtonType.VIEW_NODES);
 
@@ -90,7 +87,6 @@ public class DebuggerWindow {
         buttonHandler.handleToolbarSeperator(this.toolbarSeparatorOther);
         buttonHandler.handleToolbarSeperator(this.toolbarSeparatorFeedback);
         buttonHandler.handleToolbarSeperator(this.toolbarSeparatorSnap);
-        buttonHandler.handleToolbarSeperator(this.toolbarSeparatorViewNodes);
 
         // components
 
@@ -98,14 +94,11 @@ public class DebuggerWindow {
         ToolHandler clearHandler = new ClearHandler(this.feedbackLabel);
         SaveHandler saveHandler = new SaveHandler(this.feedbackLabel);
         DeleteHandler deleteHandler = new DeleteHandler(this.feedbackLabel, project);
-        ToolHandler expandTreeHandler = new ExpandTreeHandler(debugTree);
-        ToolHandler collapseTreeHandler = new CollapseTreeHandler(debugTree);
-
         this.debugTree.setRootVisible(false);
         this.debugTree.setCellRenderer(new DebuggerTreeRenderer());
         this.debugTree
             .getModel()
-            .addTreeModelListener(new DebuggerTreeModelListener(this.feedbackLabel, expandTreeHandler));
+            .addTreeModelListener(new DebuggerTreeModelListener(this.feedbackLabel));
 
         // action listeners
 
@@ -115,20 +108,59 @@ public class DebuggerWindow {
             saveHandler.handle(treeModel);
         });
         this.diffButton.addActionListener(e -> new DiffNodesView(project, scaledDiffButton).showAndGet());
-        this.expandButton.addActionListener(e -> expandTreeHandler.handle(treeModel));
-        this.collapseButton.addActionListener(e -> collapseTreeHandler.handle(treeModel));
         this.viewSavedNodesButton.addActionListener(e -> new SettingsNodesView(project,saveHandler, deleteHandler, treeModel).showAndGet());
     }
 
     class TreePopup extends JPopupMenu {
+        private int row;
+
         public TreePopup(JTree tree) {
-            JMenuItem delete = new JMenuItem("Delete");
-            JMenuItem add = new JMenuItem("Add");
-            delete.addActionListener(ae -> System.out.println("Delete child"));
-            add.addActionListener(ae -> System.out.println("Add child"));
-            add(delete);
+            JMenuItem expand = new JMenuItem("Expand");
+            JMenuItem collapse = new JMenuItem("Collapse");
+            JMenuItem expandAll = new JMenuItem("Expand All");
+            JMenuItem collapseAll = new JMenuItem("Collapse All");
+            expand.addActionListener(ae -> expandCollapse(tree, tree.getPathForRow(row),true));
+            collapse.addActionListener(ae -> expandCollapse(tree, tree.getPathForRow(row), false));
+            expandAll.addActionListener(ae -> {
+                for(int i = 0; i < tree.getRowCount(); i++){
+                    tree.expandRow(i);
+                }
+            });
+            collapseAll.addActionListener(ae -> {
+                for(int i = tree.getRowCount() - 1; i >= 0; i--){
+                    tree.collapseRow(i);
+                }
+            });
+
+            add(expand);
+            add(collapse);
             add(new JSeparator());
-            add(add);
+            add(expandAll);
+            add(collapseAll);
+        }
+
+        public void setRow(int row) {
+            this.row = row;
+        }
+
+        private void expandCollapse(JTree tree, TreePath path, boolean expand) {
+            TreeNode node = (TreeNode) path.getLastPathComponent();
+
+            if (node.getChildCount() >= 0) {
+                Enumeration enumeration = node.children();
+                while (enumeration.hasMoreElements()) {
+                    TreeNode n = (TreeNode) enumeration.nextElement();
+                    TreePath p = path.pathByAddingChild(n);
+
+                    expandCollapse(tree, p, expand);
+                }
+            }
+
+            if (expand) {
+                tree.expandPath(path);
+            } else {
+                tree.collapsePath(path);
+            }
         }
     }
 }

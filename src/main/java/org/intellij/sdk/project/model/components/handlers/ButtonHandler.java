@@ -31,12 +31,6 @@ public class ButtonHandler {
             case CLEAR:
                 button.setIcon(SdkIcons.CLEAR_ICON);
                 break;
-            case EXPAND:
-                button.setIcon(SdkIcons.EXPAND_ICON);
-                break;
-            case COLLAPSE:
-                button.setIcon(SdkIcons.COLLAPSE_ICON);
-                break;
             case VIEW_NODES:
                 button.setIcon(SdkIcons.VIEW_NODES_ICON);
                 break;

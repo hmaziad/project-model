@@ -18,7 +18,6 @@ import lombok.AllArgsConstructor;
 public class DebuggerTreeModelListener implements TreeModelListener {
     private static final ButtonEnablingService buttonEnablingService = ServiceManager.getService(ButtonEnablingService.class);
     private final JLabel feedbackLabel;
-    private final ToolHandler expandTreeHandler;
 
     @Override
     public void treeNodesChanged(TreeModelEvent e) {
@@ -44,7 +43,6 @@ public class DebuggerTreeModelListener implements TreeModelListener {
         } else {
             buttonEnablingService.setClearButtonEnabled(true);
             this.feedbackLabel.setText(DEBUGGER_SNAP_TAKEN);
-            expandTreeHandler.handle(treeModel);
         }
     }
 }

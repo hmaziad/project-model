@@ -105,42 +105,6 @@
               <opaque value="true"/>
             </properties>
           </component>
-          <component id="ace36" class="javax.swing.JButton" binding="expandButton">
-            <constraints/>
-            <properties>
-              <borderPainted value="false"/>
-              <contentAreaFilled value="false"/>
-              <foreground color="-12828863"/>
-              <icon value="icons/expand/expandall_dark.png"/>
-              <maximumSize width="30" height="30"/>
-              <minimumSize width="30" height="30"/>
-              <preferredSize width="30" height="30"/>
-              <text value=""/>
-              <toolTipText value="Expand Nodes"/>
-            </properties>
-          </component>
-          <component id="a37e3" class="javax.swing.JButton" binding="collapseButton">
-            <constraints/>
-            <properties>
-              <borderPainted value="false"/>
-              <contentAreaFilled value="false"/>
-              <foreground color="-12828863"/>
-              <icon value="icons/collapse/collapseall_dark.png"/>
-              <maximumSize width="30" height="30"/>
-              <minimumSize width="30" height="30"/>
-              <preferredSize width="30" height="30"/>
-              <text value=""/>
-              <toolTipText value="Collapse Nodes"/>
-            </properties>
-          </component>
-          <component id="30dd" class="javax.swing.JToolBar$Separator" binding="toolbarSeparatorViewNodes">
-            <constraints/>
-            <properties>
-              <background color="-16777216"/>
-              <foreground color="-16777216"/>
-              <opaque value="true"/>
-            </properties>
-          </component>
           <component id="6400a" class="javax.swing.JButton" binding="viewSavedNodesButton">
             <constraints/>
             <properties>
