@@ -17,19 +17,21 @@ import org.intellij.sdk.project.model.components.handlers.ToolHandler;
 import org.intellij.sdk.project.model.components.views.DiffNodesView;
 import org.intellij.sdk.project.model.components.views.SettingsNodesView;
 import org.intellij.sdk.project.model.listeners.DebuggerTreeModelListener;
+import org.intellij.sdk.project.model.services.ButtonEnablingService;
 import org.intellij.sdk.project.model.services.PersistencyService;
-import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
+@Getter
 public class DebuggerWindow {
     private static final PersistencyService persistencyService = ServiceManager.getService(PersistencyService.class);
+    private static final ButtonEnablingService buttonEnablingService = ServiceManager.getService(ButtonEnablingService.class);
 
-    @Getter
     private JPanel debuggerWindowContent;
     private JButton snapButton;
     private JButton diffButton;
@@ -47,7 +49,8 @@ public class DebuggerWindow {
     private JButton viewSavedNodesButton;
     private JToolBar.Separator toolbarSeparatorViewNodes;
 
-    public DebuggerWindow(@NotNull Project project) {
+    public DebuggerWindow() {
+        Project project = ProjectManager.getInstance().getOpenProjects()[0];
         JButton scaledDiffButton = new JButton();
         this.feedbackLabel.setBorder(new EmptyBorder(0, 10, 0, 0));
         DefaultTreeModel treeModel = (DefaultTreeModel) this.debugTree.getModel();
@@ -56,7 +59,7 @@ public class DebuggerWindow {
         ButtonHandler buttonHandler = new ButtonHandler();
         // toolbar
         buttonHandler.handleToolbar(this.toolbar);
-
+        this.snapButton.setEnabled(false);
         // icon buttons in toolbar
         buttonHandler.handleButton(this.snapButton, ButtonType.SNAP);
         buttonHandler.handleButton(this.diffButton, ButtonType.DIFF);
@@ -89,6 +92,7 @@ public class DebuggerWindow {
             .addTreeModelListener(new DebuggerTreeModelListener(this.feedbackLabel, buttonHandler.getAllButtons(), expandTreeHandler));
 
         // action listeners
+        buttonEnablingService.setJButton(this.snapButton);
         this.clearButton.addActionListener(e -> clearHandler.handle(treeModel));
         this.snapButton.addActionListener(e -> {
             snapHandler.handle(treeModel);
@@ -99,5 +103,4 @@ public class DebuggerWindow {
         this.collapseButton.addActionListener(e -> collapseTreeHandler.handle(treeModel));
         this.viewSavedNodesButton.addActionListener(e -> new SettingsNodesView(project,saveHandler, deleteHandler, treeModel).showAndGet());
     }
-
 }

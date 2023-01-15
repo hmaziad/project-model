@@ -17,7 +17,7 @@ public class SnapService implements ToolWindowFactory {
 
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         LOG.info("Starting Tool Window");
-        DebuggerWindow myToolWindow = new DebuggerWindow(project);
+        DebuggerWindow myToolWindow = new DebuggerWindow();
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(myToolWindow.getDebuggerWindowContent(), "Debugger Tab", false);
         toolWindow.getContentManager().addContent(content);
