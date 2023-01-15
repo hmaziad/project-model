@@ -24,7 +24,6 @@ import org.intellij.sdk.project.model.services.ButtonEnablingService;
 import org.intellij.sdk.project.model.services.PersistencyService;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
@@ -52,8 +51,12 @@ public class DebuggerWindow {
     private JButton viewSavedNodesButton;
     private JToolBar.Separator toolbarSeparatorViewNodes;
 
-    public DebuggerWindow() {
-        Project project = ProjectManager.getInstance().getOpenProjects()[0];
+    public DebuggerWindow(Project project) {
+        this.snapButton.setEnabled(false);
+        this.clearButton.setEnabled(false);
+        buttonEnablingService.setSnapButton(this.snapButton);
+        buttonEnablingService.setClearButton(this.clearButton);
+
         JButton scaledDiffButton = new JButton();
         this.feedbackLabel.setBorder(new EmptyBorder(0, 10, 0, 0));
         DefaultTreeModel treeModel = (DefaultTreeModel) this.debugTree.getModel();
@@ -73,7 +76,6 @@ public class DebuggerWindow {
         ButtonHandler buttonHandler = new ButtonHandler();
         // toolbar
         buttonHandler.handleToolbar(this.toolbar);
-//        this.snapButton.setEnabled();
         // icon buttons in toolbar
         buttonHandler.handleButton(this.snapButton, ButtonType.SNAP);
         buttonHandler.handleButton(this.diffButton, ButtonType.DIFF);
@@ -103,10 +105,10 @@ public class DebuggerWindow {
         this.debugTree.setCellRenderer(new DebuggerTreeRenderer());
         this.debugTree
             .getModel()
-            .addTreeModelListener(new DebuggerTreeModelListener(this.feedbackLabel, buttonHandler.getAllButtons(), expandTreeHandler));
+            .addTreeModelListener(new DebuggerTreeModelListener(this.feedbackLabel, expandTreeHandler));
 
         // action listeners
-//        buttonEnablingService.setJButton(this.snapButton);
+
         this.clearButton.addActionListener(e -> clearHandler.handle(treeModel));
         this.snapButton.addActionListener(e -> {
             snapHandler.handle(treeModel);

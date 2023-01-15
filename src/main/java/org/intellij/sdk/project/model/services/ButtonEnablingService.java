@@ -8,13 +8,14 @@ import lombok.Setter;
 @Setter
 @Getter
 public class ButtonEnablingService {
-    private JButton jButton;
+    private JButton snapButton;
+    private JButton clearButton;
 
-    public void disableButton() {
-//        this.jButton.setEnabled(false);
+    public void setSnapButtonEnabled(boolean isEnabled) {
+        this.snapButton.setEnabled(isEnabled);
     }
 
-    public void enableButton() {
-//        this.jButton.setEnabled(true);
+    public void setClearButtonEnabled(boolean isEnabled) {
+        this.clearButton.setEnabled(isEnabled);
     }
 }

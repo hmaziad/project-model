@@ -9,12 +9,13 @@ public class SessionStartedListener implements DebuggerManagerListener {
     private static final ButtonEnablingService buttonEnablingService = ServiceManager.getService(ButtonEnablingService.class);
 
     @Override
-    public void sessionCreated(DebuggerSession session) {
-        buttonEnablingService.enableButton();
+    public void sessionAttached(DebuggerSession session) {
+        buttonEnablingService.setSnapButtonEnabled(true);
     }
 
     @Override
-    public void sessionRemoved(DebuggerSession session) {
-        buttonEnablingService.disableButton();
+    public void sessionDetached(DebuggerSession session) {
+        buttonEnablingService.setSnapButtonEnabled(false);
     }
+
 }

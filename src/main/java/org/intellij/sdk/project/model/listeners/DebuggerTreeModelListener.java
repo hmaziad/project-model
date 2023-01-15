@@ -1,29 +1,24 @@
 package org.intellij.sdk.project.model.listeners;
 
-import static org.intellij.sdk.project.model.components.ButtonType.CLEAR;
-import static org.intellij.sdk.project.model.components.ButtonType.SNAP;
 import static org.intellij.sdk.project.model.constants.TextConstants.DEBUGGER_SNAP_TAKEN;
-import static org.intellij.sdk.project.model.constants.TextConstants.TAKE_DEBUGGER_SNAP;
 
-import java.util.EnumMap;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import javax.swing.*;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeModel;
-import org.intellij.sdk.project.model.components.ButtonType;
 import org.intellij.sdk.project.model.components.handlers.ToolHandler;
+import org.intellij.sdk.project.model.services.ButtonEnablingService;
+import com.intellij.openapi.components.ServiceManager;
 
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class DebuggerTreeModelListener implements TreeModelListener {
+    private static final ButtonEnablingService buttonEnablingService = ServiceManager.getService(ButtonEnablingService.class);
     private final JLabel feedbackLabel;
-    private Map<ButtonType, JButton> allButtons;
-    private ToolHandler expandTreeHandler;
+    private final ToolHandler expandTreeHandler;
 
     @Override
     public void treeNodesChanged(TreeModelEvent e) {
@@ -44,19 +39,11 @@ public class DebuggerTreeModelListener implements TreeModelListener {
     public void treeStructureChanged(TreeModelEvent e) {
         DefaultTreeModel treeModel = (DefaultTreeModel) e.getSource();
         boolean isRootNull = Objects.isNull(treeModel.getRoot());
-        this.allButtons = new EnumMap<>(ButtonType.class); // todo, removed when session listener is implemented
         if (isRootNull) {
-            this.feedbackLabel.setText(TAKE_DEBUGGER_SNAP);
-            this.allButtons.values().forEach(button -> button.setEnabled(false));
+            buttonEnablingService.setClearButtonEnabled(false);
         } else {
+            buttonEnablingService.setClearButtonEnabled(true);
             this.feedbackLabel.setText(DEBUGGER_SNAP_TAKEN);
-            Set<ButtonType> enabledOnNewNode = Set.of(SNAP, CLEAR);
-            this.allButtons
-                .entrySet()
-                .stream()
-                .filter(entry -> enabledOnNewNode.contains(entry.getKey()))
-                .map(Map.Entry::getValue)
-                .forEach(button -> button.setEnabled(true));
             expandTreeHandler.handle(treeModel);
         }
     }
