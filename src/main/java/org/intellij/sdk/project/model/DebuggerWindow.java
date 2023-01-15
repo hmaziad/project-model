@@ -2,6 +2,9 @@
 
 package org.intellij.sdk.project.model;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultTreeModel;
@@ -55,11 +58,22 @@ public class DebuggerWindow {
         this.feedbackLabel.setBorder(new EmptyBorder(0, 10, 0, 0));
         DefaultTreeModel treeModel = (DefaultTreeModel) this.debugTree.getModel();
         treeModel.setRoot(null);
-
+        final TreePopup treePopup = new TreePopup(this.debugTree);
+        debugTree.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    int row = debugTree.getRowForLocation(e.getX(), e.getY());
+                    debugTree.setSelectionRow(row);
+                    if (row >= 0) {
+                        treePopup.show(e.getComponent(), e.getX(), e.getY());
+                    }
+                }
+            }
+        });
         ButtonHandler buttonHandler = new ButtonHandler();
         // toolbar
         buttonHandler.handleToolbar(this.toolbar);
-        this.snapButton.setEnabled(false);
+//        this.snapButton.setEnabled();
         // icon buttons in toolbar
         buttonHandler.handleButton(this.snapButton, ButtonType.SNAP);
         buttonHandler.handleButton(this.diffButton, ButtonType.DIFF);
@@ -92,7 +106,7 @@ public class DebuggerWindow {
             .addTreeModelListener(new DebuggerTreeModelListener(this.feedbackLabel, buttonHandler.getAllButtons(), expandTreeHandler));
 
         // action listeners
-        buttonEnablingService.setJButton(this.snapButton);
+//        buttonEnablingService.setJButton(this.snapButton);
         this.clearButton.addActionListener(e -> clearHandler.handle(treeModel));
         this.snapButton.addActionListener(e -> {
             snapHandler.handle(treeModel);
@@ -102,5 +116,17 @@ public class DebuggerWindow {
         this.expandButton.addActionListener(e -> expandTreeHandler.handle(treeModel));
         this.collapseButton.addActionListener(e -> collapseTreeHandler.handle(treeModel));
         this.viewSavedNodesButton.addActionListener(e -> new SettingsNodesView(project,saveHandler, deleteHandler, treeModel).showAndGet());
+    }
+
+    class TreePopup extends JPopupMenu {
+        public TreePopup(JTree tree) {
+            JMenuItem delete = new JMenuItem("Delete");
+            JMenuItem add = new JMenuItem("Add");
+            delete.addActionListener(ae -> System.out.println("Delete child"));
+            add.addActionListener(ae -> System.out.println("Add child"));
+            add(delete);
+            add(new JSeparator());
+            add(add);
+        }
     }
 }

@@ -31,7 +31,9 @@ public class SnapHandler implements ToolHandler {
         boolean isLoaded = loadDebuggerSession(xDebuggerManager);
         if (isLoaded) {
             XStackFrameNode xRootNode = getTreeModel(xDebuggerManager);
-            this.consumer.accept(new DebugNode(xRootNode));
+            DebugNode rootNode = new DebugNode(xRootNode);
+
+            this.consumer.accept(rootNode);
         }
     }
 

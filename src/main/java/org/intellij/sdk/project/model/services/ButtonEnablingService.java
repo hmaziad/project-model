@@ -11,10 +11,10 @@ public class ButtonEnablingService {
     private JButton jButton;
 
     public void disableButton() {
-        this.jButton.setEnabled(false);
+//        this.jButton.setEnabled(false);
     }
 
     public void enableButton() {
-        this.jButton.setEnabled(true);
+//        this.jButton.setEnabled(true);
     }
 }
