@@ -11,28 +11,27 @@ import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.DebuggerTreeRenderer;
 import org.intellij.sdk.project.model.components.DropdownObserver;
 import org.intellij.sdk.project.model.components.handlers.DiffRefHandler;
+import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.intellij.sdk.project.model.components.handlers.SnapHandler;
-import org.intellij.sdk.project.model.services.PersistencyService;
 import org.intellij.sdk.project.model.xnodes.DebugNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.treeStructure.Tree;
 
-public class DiffNodesView extends DialogWrapper {
-    private static final PersistencyService persistencyService = ServiceManager.getService(PersistencyService.class);
-    private Project project;
-    private JButton scaledDiffButton;
+import icons.SdkIcons;
+
+public class DiffNodesView extends DialogWrapper implements ReachServices {
+    private final Project project;
     private DebugNode currentSession;
 
-    public DiffNodesView(@NotNull Project project, JButton scaledDiffButton) {
+
+    public DiffNodesView(@NotNull Project project) {
         super(true); // use current window as parent
         this.project = project;
-        this.scaledDiffButton = scaledDiffButton;
         setTitle("Diff Saved Nodes");
         init();
     }
@@ -40,9 +39,9 @@ public class DiffNodesView extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() { //todo handle no saved nodes or current debuggin session
-        Map<String, DebugNode> nodes = persistencyService.getNodes();
-        SnapHandler snapHandler = new SnapHandler(this.project, new JLabel(), session -> this.currentSession = session);
-        snapHandler.handle(null);
+        Map<String, DebugNode> nodes = PERSISTENCY_SERVICE.getNodes();
+        SnapHandler snapHandler = new SnapHandler();
+        this.currentSession = snapHandler.getCurrentSession(this.project).get();
 
         JComboBox<String> leftSnapsDropdown = new ComboBox<>();
         DropdownObserver leftDropdownObserver = new DropdownObserver(leftSnapsDropdown);
@@ -68,16 +67,17 @@ public class DiffNodesView extends DialogWrapper {
         gbc.gridx = 1;
         gbc.weightx = 0;
         gbc.fill = GridBagConstraints.NONE;
-
-        dialogPanel.add(this.scaledDiffButton, gbc);
+        JButton scaledDiffButton = new JButton();
+        scaledDiffButton.setIcon(SdkIcons.DIFF_SCALED);
+        dialogPanel.add(scaledDiffButton, gbc);
 
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridx = 2;
         gbc.weightx = 1;
         dialogPanel.add(getNodesPanel(rightDropdownObserver), gbc);
 
-        this.scaledDiffButton.setBorder(new EmptyBorder(10,20,10,20));
-        this.scaledDiffButton.addActionListener(e -> {
+        scaledDiffButton.setBorder(new EmptyBorder(10,20,10,20));
+        scaledDiffButton.addActionListener(e -> {
             DiffRefHandler diffRefHandler = new DiffRefHandler(this.project, leftDropdownObserver, rightDropdownObserver, this.currentSession);
             diffRefHandler.handle(null);
         });
@@ -103,7 +103,7 @@ public class DiffNodesView extends DialogWrapper {
         if (selectedItem.equals(CURRENT_DEBUGGER_SESSION)) {
             debugNode = this.currentSession;
         } else {
-            debugNode = persistencyService.getNodes().get(selectedItem);
+            debugNode = PERSISTENCY_SERVICE.getNodes().get(selectedItem);
         }
         JTree debugTree = new Tree();
         debugTree.setRootVisible(false);

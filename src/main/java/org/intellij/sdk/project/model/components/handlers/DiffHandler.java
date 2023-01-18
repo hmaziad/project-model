@@ -1,7 +1,5 @@
 package org.intellij.sdk.project.model.components.handlers;
 
-import javax.swing.*;
-import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.services.ParserService;
 import org.intellij.sdk.project.model.xnodes.DebugNode;
 import org.jetbrains.annotations.NotNull;
@@ -13,31 +11,18 @@ import com.intellij.diff.contents.DocumentContentImpl;
 import com.intellij.openapi.editor.impl.DocumentImpl;
 import com.intellij.openapi.project.Project;
 
-import lombok.AllArgsConstructor;
+public class DiffHandler implements ReachServices {
 
-@AllArgsConstructor
-public class DiffHandler implements ToolHandler {
-    private final JLabel feedbackLabel;
-    private final Project project;
-
-    @Override
-    public void handle(DefaultTreeModel treeModel) {
-        DebugNode originalNode = (DebugNode) treeModel.getRoot();
-        ToolHandler snapHandler = new SnapHandler(this.project, this.feedbackLabel, revisedNode -> computeDiff(originalNode, revisedNode));
-        snapHandler.handle(treeModel);
-    }
-
-    private void computeDiff(DebugNode originalNode, DebugNode revisedNode) {
-        String savedSnapString = ParserService.convertNodeToString(originalNode);
-        String debuggingSessionString = ParserService.convertNodeToString(revisedNode);
-        DiffContent content1 = new DocumentContentImpl(this.project, new DocumentImpl(debuggingSessionString), null);
-        DiffContent content2 = new DocumentContentImpl(this.project, new DocumentImpl(savedSnapString), null);
+    private void computeDiff(String title1, DebugNode originalNode, String title2, DebugNode revisedNode, Project project) {
+        String session1 = ParserService.convertNodeToString(originalNode);
+        String session2 = ParserService.convertNodeToString(revisedNode);
+        DiffContent content1 = new DocumentContentImpl(project, new DocumentImpl(session1), null);
+        DiffContent content2 = new DocumentContentImpl(project, new DocumentImpl(session2), null);
         @NotNull MutableDiffRequestChain chain = new MutableDiffRequestChain(content1, content2);
-        chain.setTitle1("Debugger Session");
-        chain.setTitle2("Snapshot Session");
-        chain.setWindowTitle("Comparing Debugger and Snapshot session");
-        DiffManager.getInstance().showDiff(this.project, chain, DiffDialogHints.DEFAULT);
-        this.feedbackLabel.setText("Successfully computed diff");
+        chain.setTitle1(title1);
+        chain.setTitle2(title2);
+        chain.setWindowTitle("Debugger Session");
+        DiffManager.getInstance().showDiff(project, chain, DiffDialogHints.DEFAULT);
     }
 }
 
