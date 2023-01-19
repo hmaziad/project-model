@@ -1,8 +1,8 @@
-package org.intellij.sdk.project.model.services;
+package org.intellij.sdk.project.model.util;
 
 import java.util.HashMap;
 
-import org.intellij.sdk.project.model.xnodes.DebugNode;
+import org.intellij.sdk.project.model.tree.components.DebugNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.google.gson.Gson;

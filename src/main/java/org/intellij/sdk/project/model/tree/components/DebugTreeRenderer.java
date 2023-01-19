@@ -1,4 +1,4 @@
-package org.intellij.sdk.project.model;
+package org.intellij.sdk.project.model.tree.components;
 
 
 import static com.intellij.ui.SimpleTextAttributes.STYLE_PLAIN;
@@ -8,14 +8,13 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.swing.*;
-import org.intellij.sdk.project.model.xnodes.DebugNode;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleColoredText;
 import com.intellij.ui.SimpleTextAttributes;
 
-public class DebuggerTreeRenderer extends ColoredTreeCellRenderer {
+public class DebugTreeRenderer extends ColoredTreeCellRenderer {
     @Override
     public void customizeCellRenderer(@NotNull JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
         if (!(value instanceof DebugNode)) {
@@ -32,7 +31,7 @@ public class DebuggerTreeRenderer extends ColoredTreeCellRenderer {
         }
         simpleColoredText.appendToComponent(this);
         if (Objects.nonNull(node.getIconPath())) {
-            setIcon(IconLoader.getIcon(node.getIconPath(), DebuggerTreeRenderer.class));
+            setIcon(IconLoader.getIcon(node.getIconPath(), DebugTreeRenderer.class));
         }
     }
 }

@@ -7,9 +7,10 @@ import java.util.Enumeration;
 import javax.swing.*;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import org.intellij.sdk.project.model.components.DebuggerToolbar;
+import org.intellij.sdk.project.model.components.toolbar.DebuggerToolbar;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.intellij.sdk.project.model.listeners.DebuggerTreeModelListener;
+import org.intellij.sdk.project.model.tree.components.DebugTreeRenderer;
 import com.intellij.openapi.project.Project;
 
 import lombok.Getter;
@@ -17,17 +18,17 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @Getter
-public class DebuggerWindow implements ReachServices {
+public class DebugWindow implements ReachServices {
 
     private final JPanel debuggerWindowContent;
 
-    public DebuggerWindow(Project project) {
+    public DebugWindow(Project project) {
         this.debuggerWindowContent = new DebuggerToolbar(true);
         JTree debugTree = COMPONENT_SERVICE.getDebugTree();
 
         debugTree.setRootVisible(false);
         debugTree.getModel().addTreeModelListener(new DebuggerTreeModelListener());
-        debugTree.setCellRenderer(new DebuggerTreeRenderer());
+        debugTree.setCellRenderer(new DebugTreeRenderer());
         this.debuggerWindowContent.add(debugTree);
         //        this.snapButton.setEnabled(false);
         //        this.clearButton.setEnabled(false);

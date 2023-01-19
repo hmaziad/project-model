@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.swing.*;
-import org.intellij.sdk.project.model.xnodes.DebugNode;
+import org.intellij.sdk.project.model.tree.components.DebugNode;
 import com.intellij.openapi.project.Project;
 
 import lombok.RequiredArgsConstructor;

@@ -3,7 +3,8 @@ package org.intellij.sdk.project.model.services;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.intellij.sdk.project.model.xnodes.DebugNode;
+import org.intellij.sdk.project.model.util.DebugNodeConverter;
+import org.intellij.sdk.project.model.tree.components.DebugNode;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;

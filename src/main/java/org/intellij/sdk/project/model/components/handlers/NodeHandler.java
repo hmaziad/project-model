@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.intellij.sdk.project.model.constants.MessageDialogues;
-import org.intellij.sdk.project.model.xnodes.DebugNode;
+import org.intellij.sdk.project.model.tree.components.DebugNode;
 import com.intellij.openapi.project.Project;
 
 public class NodeHandler implements ReachServices {

@@ -7,10 +7,10 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultTreeModel;
-import org.intellij.sdk.project.model.DebuggerTreeRenderer;
+import org.intellij.sdk.project.model.tree.components.DebugTreeRenderer;
 import org.intellij.sdk.project.model.components.handlers.DiffHandler;
 import org.intellij.sdk.project.model.components.handlers.DropdownHandler;
-import org.intellij.sdk.project.model.xnodes.DebugNode;
+import org.intellij.sdk.project.model.tree.components.DebugNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.project.Project;
@@ -90,7 +90,7 @@ public class DiffNodesView extends DialogWrapper {
         DebugNode selectedNode = this.dropdownHandler.getSelectedNode(nodesDropdown);
         JTree debugTree = new Tree(); // this tree should come predefined, we will work it now
         debugTree.setRootVisible(false);
-        debugTree.setCellRenderer(new DebuggerTreeRenderer());
+        debugTree.setCellRenderer(new DebugTreeRenderer());
         DefaultTreeModel localTreeModel = (DefaultTreeModel) debugTree.getModel();
         localTreeModel.setRoot(selectedNode);
         JPanel panel = new JPanel(new BorderLayout());

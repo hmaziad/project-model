@@ -2,7 +2,7 @@ package org.intellij.sdk.project.model.services;
 
 import java.util.List;
 
-import org.intellij.sdk.project.model.xnodes.DebugNode;
+import org.intellij.sdk.project.model.tree.components.DebugNode;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

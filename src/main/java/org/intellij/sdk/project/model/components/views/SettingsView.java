@@ -7,11 +7,11 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.tree.DefaultTreeModel;
-import org.intellij.sdk.project.model.DebuggerTreeRenderer;
+import org.intellij.sdk.project.model.tree.components.DebugTreeRenderer;
 import org.intellij.sdk.project.model.components.handlers.NodeHandler;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.intellij.sdk.project.model.constants.MessageDialogues;
-import org.intellij.sdk.project.model.xnodes.DebugNode;
+import org.intellij.sdk.project.model.tree.components.DebugNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.project.Project;
@@ -171,7 +171,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
 
         JTree debugTree = new Tree();
         debugTree.setRootVisible(false);
-        debugTree.setCellRenderer(new DebuggerTreeRenderer());
+        debugTree.setCellRenderer(new DebugTreeRenderer());
         DefaultTreeModel localTreeModel = (DefaultTreeModel) debugTree.getModel();
         localTreeModel.setRoot(debugNode);
 

@@ -7,7 +7,7 @@ import java.util.Optional;
 import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.intellij.sdk.project.model.components.handlers.SnapHandler;
-import org.intellij.sdk.project.model.xnodes.DebugNode;
+import org.intellij.sdk.project.model.tree.components.DebugNode;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.roots.ui.configuration.actions.IconWithTextAction;

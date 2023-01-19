@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javax.swing.*;
-import org.intellij.sdk.project.model.xnodes.DebugNode;
+import org.intellij.sdk.project.model.tree.components.DebugNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBViewport;
 import com.intellij.xdebugger.XDebuggerManager;

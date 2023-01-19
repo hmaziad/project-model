@@ -3,7 +3,7 @@ package org.intellij.sdk.project.model.components.handlers;
 import static org.intellij.sdk.project.model.constants.TextConstants.COMPARING_SESSIONS;
 
 import org.intellij.sdk.project.model.services.ParserService;
-import org.intellij.sdk.project.model.xnodes.DebugNode;
+import org.intellij.sdk.project.model.tree.components.DebugNode;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.diff.DiffDialogHints;
 import com.intellij.diff.DiffManager;

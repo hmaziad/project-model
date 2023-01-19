@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.apache.logging.log4j.util.Strings;
-import org.intellij.sdk.project.model.xnodes.DebugNode;
+import org.intellij.sdk.project.model.tree.components.DebugNode;
 import org.junit.Test;
 
 public class ParserServiceTest {

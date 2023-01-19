@@ -1,4 +1,4 @@
-package org.intellij.sdk.project.model.components;
+package org.intellij.sdk.project.model.components.toolbar;
 
 import javax.swing.*;
 import org.intellij.sdk.project.model.components.buttons.ClearButton;
