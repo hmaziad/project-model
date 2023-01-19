@@ -1,5 +1,7 @@
 package org.intellij.sdk.project.model.components.buttons;
 
+import static org.intellij.sdk.project.model.constants.TextConstants.OPEN_SETTINGS_WINDOW;
+
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.intellij.sdk.project.model.components.views.SettingsView;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +15,7 @@ import lombok.Getter;
 public class SettingsButton extends IconWithTextAction implements ReachServices {
 
     public SettingsButton() {
-        super(null, "Open Settings Window", SdkIcons.VIEW_NODES_ICON);
+        super(null, OPEN_SETTINGS_WINDOW, SdkIcons.VIEW_NODES_ICON);
     }
 
     @Override

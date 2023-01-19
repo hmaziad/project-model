@@ -1,5 +1,7 @@
 package org.intellij.sdk.project.model.components.buttons;
 
+import static org.intellij.sdk.project.model.constants.TextConstants.OPEN_DIFF_WINDOW;
+
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.intellij.sdk.project.model.components.views.DiffNodesView;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +15,7 @@ import lombok.Getter;
 public class DiffButton extends IconWithTextAction implements ReachServices {
 
     public DiffButton() {
-        super(null, "Open Diff Window", SdkIcons.DIFF_ICON);
+        super(null, OPEN_DIFF_WINDOW, SdkIcons.DIFF_ICON);
     }
 
     @Override

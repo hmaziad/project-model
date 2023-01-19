@@ -1,5 +1,7 @@
 package org.intellij.sdk.project.model.components.views;
 
+import static org.intellij.sdk.project.model.constants.TextConstants.DIFF_NODES;
+
 import java.awt.*;
 
 import javax.swing.*;
@@ -29,7 +31,7 @@ public class DiffNodesView extends DialogWrapper {
         super(true); // use current window as parent
         this.project = project;
         this.dropdownHandler = new DropdownHandler(project);
-        setTitle("Diff Saved Nodes");
+        setTitle(DIFF_NODES);
         init();
         initButton();
     }

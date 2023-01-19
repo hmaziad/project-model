@@ -29,7 +29,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
     public SettingsView(@NotNull Project project) {
         super(true); // use current window as parent
         this.project = project;
-        setTitle("Manage Saved Nodes");
+        setTitle("Manage Saved Sessions");
         init();
     }
 

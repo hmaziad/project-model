@@ -19,14 +19,12 @@ import lombok.extern.log4j.Log4j2;
 @Getter
 public class DebuggerWindow implements ReachServices {
 
-    private JPanel debuggerWindowContent;
+    private final JPanel debuggerWindowContent;
 
-    // https://intellij-support.jetbrains.com/hc/en-us/community/posts/360006504879-Add-an-action-buttons-to-my-custom-tool-window
-    // https://intellij-support.jetbrains.com/hc/en-us/community/posts/360009445759-How-to-create-button-with-icon
     public DebuggerWindow(Project project) {
         this.debuggerWindowContent = new DebuggerToolbar(true);
-
         JTree debugTree = COMPONENT_SERVICE.getDebugTree();
+
         debugTree.setRootVisible(false);
         debugTree.getModel().addTreeModelListener(new DebuggerTreeModelListener());
         debugTree.setCellRenderer(new DebuggerTreeRenderer());

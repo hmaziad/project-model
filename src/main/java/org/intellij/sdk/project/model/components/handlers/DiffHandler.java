@@ -1,5 +1,7 @@
 package org.intellij.sdk.project.model.components.handlers;
 
+import static org.intellij.sdk.project.model.constants.TextConstants.COMPARING_SESSIONS;
+
 import org.intellij.sdk.project.model.services.ParserService;
 import org.intellij.sdk.project.model.xnodes.DebugNode;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +23,7 @@ public class DiffHandler {
         @NotNull MutableDiffRequestChain chain = new MutableDiffRequestChain(content1, content2);
         chain.setTitle1(leftNodeName);
         chain.setTitle2(rightNodeName);
-        chain.setWindowTitle("Comparing Sessions");
+        chain.setWindowTitle(COMPARING_SESSIONS);
         DiffManager.getInstance().showDiff(project, chain, DiffDialogHints.DEFAULT);
     }
 

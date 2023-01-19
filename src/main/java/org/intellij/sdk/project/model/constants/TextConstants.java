@@ -5,20 +5,17 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TextConstants {
-    public static final String TAKE_DEBUGGER_SNAP = "Try taking a snap shot of current debugging session";
-    public static final String DEBUGGER_SNAP_TAKEN = "Debugger session snap shot successfully taken";
-    public static final String START_DEBUGGER_ERROR_MESSAGE = "Please start debugger to use this feature";
-    public static final String CLEARED_SNAP_MESSAGE = "Successfully cleared taken snap shot";
-    public static final String DELETE_SNAP_MESSAGE = "Successfully deleted saved snap shot";
-    public static final String SAVED_SNAP_MESSAGE = "Successfully saved snap shot below";
-    public static final String WINDOW_IS_ALREADY_CLEAR = "Window is already clear";
-    public static final String NO_SAVED_NODES = "There are no saved sessions";
     public static final String DELETE_SAVED_NODE = "Are you sure you want to delete the saved session \"%s\"?";
     public static final String DELETE_SAVED_NODES = "Are you sure you want to delete all sessions?";
-    public static final String SELECTED_LABEL_IS_NULL = "Selected label is null";
-    public static final String SELECTED_NODE_IS_NULL = "Selected session is null";
-    public static final String RETRIEVED_NODE_FROM_STORAGE = "Successfully retrieved \"%s\" from storage";
     public static final String CURRENT_SESSION = "Current Session";
-
-
+    public static final String CLEAR_SESSION_BELOW = "Clear Session Below";
+    public static final String SUCCESSFULLY_CLEARED_SESSION = "Successfully cleared session";
+    public static final String OPEN_DIFF_WINDOW = "Open Diff Window";
+    public static final String OPEN_SETTINGS_WINDOW = "Open Settings Window";
+    public static final String SAVE_DEBUGGER_SESSION = "Save Debugger Session";
+    public static final String COMPARING_SESSIONS = "Comparing Sessions";
+    public static final String DELETE_SESSION = "Delete Session";
+    public static final String NODE_DATE_FORMAT = "yyyy-MM-dd_hh:mm:ss.SSS";
+    public static final String GENERATED_SESSION_NAME = "session-%s";
+    public static final String DIFF_NODES = "Diff Sessions";
 }

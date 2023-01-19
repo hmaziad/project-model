@@ -2,6 +2,9 @@ package org.intellij.sdk.project.model.components.handlers;
 
 import static org.intellij.sdk.project.model.constants.TextConstants.DELETE_SAVED_NODE;
 import static org.intellij.sdk.project.model.constants.TextConstants.DELETE_SAVED_NODES;
+import static org.intellij.sdk.project.model.constants.TextConstants.DELETE_SESSION;
+import static org.intellij.sdk.project.model.constants.TextConstants.GENERATED_SESSION_NAME;
+import static org.intellij.sdk.project.model.constants.TextConstants.NODE_DATE_FORMAT;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,22 +19,23 @@ import org.intellij.sdk.project.model.xnodes.DebugNode;
 import com.intellij.openapi.project.Project;
 
 public class NodeHandler implements ReachServices {
+
     public void save(DebugNode debugNode) {
-        String dateTimeNow = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_hh:mm:ss.SSS"));
-        String nodeName = String.format("node-%s", dateTimeNow);
+        String dateTimeNow = LocalDateTime.now().format(DateTimeFormatter.ofPattern(NODE_DATE_FORMAT));
+        String nodeName = String.format(GENERATED_SESSION_NAME, dateTimeNow);
         PERSISTENCY_SERVICE.getNodes().put(nodeName, debugNode);
     }
 
     public void delete(String nodeName, Project project) {
         String message = String.format(DELETE_SAVED_NODE, nodeName);
-        boolean isSure = MessageDialogues.getYesNoMessageDialogue(message, "Delete Session", project);
+        boolean isSure = MessageDialogues.getYesNoMessageDialogue(message, DELETE_SESSION, project);
         if (isSure) {
             PERSISTENCY_SERVICE.getNodes().remove(nodeName);
         }
     }
 
     public void deleteAll(Project project) {
-        boolean isSure = MessageDialogues.getYesNoMessageDialogue(DELETE_SAVED_NODES, "Delete Session", project);
+        boolean isSure = MessageDialogues.getYesNoMessageDialogue(DELETE_SAVED_NODES, DELETE_SESSION, project);
         if (isSure) {
             PERSISTENCY_SERVICE.getNodes().clear();
         }

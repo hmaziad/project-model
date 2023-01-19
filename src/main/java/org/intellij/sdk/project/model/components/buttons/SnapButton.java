@@ -1,5 +1,7 @@
 package org.intellij.sdk.project.model.components.buttons;
 
+import static org.intellij.sdk.project.model.constants.TextConstants.SAVE_DEBUGGER_SESSION;
+
 import java.util.Optional;
 
 import javax.swing.tree.DefaultTreeModel;
@@ -19,7 +21,7 @@ public class SnapButton extends IconWithTextAction implements ReachServices {
     private final SnapHandler snapHandler = new SnapHandler();
 
     public SnapButton() {
-        super(null, "Save Debugger Session", SdkIcons.SNAP_ICON);
+        super(null, SAVE_DEBUGGER_SESSION, SdkIcons.SNAP_ICON);
     }
 
     @Override
