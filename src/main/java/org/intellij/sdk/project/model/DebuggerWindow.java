@@ -7,7 +7,7 @@ import java.util.Enumeration;
 import javax.swing.*;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import org.intellij.sdk.project.model.components.SettingsPanel;
+import org.intellij.sdk.project.model.components.DebuggerToolbar;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.intellij.sdk.project.model.listeners.DebuggerTreeModelListener;
 import com.intellij.openapi.project.Project;
@@ -24,7 +24,7 @@ public class DebuggerWindow implements ReachServices {
     // https://intellij-support.jetbrains.com/hc/en-us/community/posts/360006504879-Add-an-action-buttons-to-my-custom-tool-window
     // https://intellij-support.jetbrains.com/hc/en-us/community/posts/360009445759-How-to-create-button-with-icon
     public DebuggerWindow(Project project) {
-        this.debuggerWindowContent = new SettingsPanel(true);
+        this.debuggerWindowContent = new DebuggerToolbar(true);
 
         JTree debugTree = COMPONENT_SERVICE.getDebugTree();
         debugTree.setRootVisible(false);

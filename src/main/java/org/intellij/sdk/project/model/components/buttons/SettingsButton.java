@@ -1,7 +1,7 @@
 package org.intellij.sdk.project.model.components.buttons;
 
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
-import org.intellij.sdk.project.model.components.views.DiffNodesView;
+import org.intellij.sdk.project.model.components.views.SettingsView;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.roots.ui.configuration.actions.IconWithTextAction;
@@ -10,19 +10,18 @@ import icons.SdkIcons;
 import lombok.Getter;
 
 @Getter
-public class DiffButton extends IconWithTextAction implements ReachServices {
+public class SettingsButton extends IconWithTextAction implements ReachServices {
 
-    public DiffButton() {
-        super(null, "Open Diff Window", SdkIcons.DIFF_ICON);
+    public SettingsButton() {
+        super(null, "Open Settings Window", SdkIcons.VIEW_NODES_ICON);
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        new DiffNodesView(e.getProject()).showAndGet();
+        new SettingsView(e.getProject()).showAndGet();
     }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(!PERSISTENCY_SERVICE.getNodes().isEmpty());
     }
 }

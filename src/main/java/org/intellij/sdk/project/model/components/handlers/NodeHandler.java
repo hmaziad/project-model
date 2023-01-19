@@ -17,7 +17,7 @@ import com.intellij.openapi.project.Project;
 
 public class NodeHandler implements ReachServices {
     public void save(DebugNode debugNode) {
-        String dateTimeNow = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-hh-mm-SSS"));
+        String dateTimeNow = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_hh:mm:ss.SSS"));
         String nodeName = String.format("node-%s", dateTimeNow);
         PERSISTENCY_SERVICE.getNodes().put(nodeName, debugNode);
     }
