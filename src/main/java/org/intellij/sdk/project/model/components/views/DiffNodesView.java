@@ -1,18 +1,13 @@
 package org.intellij.sdk.project.model.components.views;
 
-import static org.intellij.sdk.project.model.components.DropdownObserver.CURRENT_DEBUGGER_SESSION;
-
 import java.awt.*;
-import java.util.Map;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.DebuggerTreeRenderer;
-import org.intellij.sdk.project.model.components.DropdownObserver;
-import org.intellij.sdk.project.model.components.handlers.DiffRefHandler;
-import org.intellij.sdk.project.model.components.handlers.ReachServices;
-import org.intellij.sdk.project.model.components.handlers.SnapHandler;
+import org.intellij.sdk.project.model.components.handlers.DiffHandler;
+import org.intellij.sdk.project.model.components.handlers.DropdownHandler;
 import org.intellij.sdk.project.model.xnodes.DebugNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,35 +19,34 @@ import com.intellij.ui.treeStructure.Tree;
 
 import icons.SdkIcons;
 
-public class DiffNodesView extends DialogWrapper implements ReachServices {
+public class DiffNodesView extends DialogWrapper {
     private final Project project;
-    private DebugNode currentSession;
-
+    private final DropdownHandler dropdownHandler;
+    private final DiffHandler diffHandler = new DiffHandler();
+    private final JButton diffButton = new JButton();
 
     public DiffNodesView(@NotNull Project project) {
         super(true); // use current window as parent
         this.project = project;
+        this.dropdownHandler = new DropdownHandler(project);
         setTitle("Diff Saved Nodes");
         init();
+        initButton();
     }
 
     @Nullable
     @Override
-    protected JComponent createCenterPanel() { //todo handle no saved nodes or current debuggin session
-        Map<String, DebugNode> nodes = PERSISTENCY_SERVICE.getNodes();
-        SnapHandler snapHandler = new SnapHandler();
-        this.currentSession = snapHandler.getCurrentSession(this.project).get();
+    protected JComponent createCenterPanel() {
+        JComboBox<String> leftDropdown = new ComboBox<>();
+        JComboBox<String> rightDropdown = new ComboBox<>();
+        this.dropdownHandler.addNodesToDropdown(leftDropdown);
+        this.dropdownHandler.addNodesToDropdown(rightDropdown);
+        addDiffBtnListener(leftDropdown, rightDropdown);
+        return createDiffPanel(leftDropdown, rightDropdown);
+    }
 
-        JComboBox<String> leftSnapsDropdown = new ComboBox<>();
-        DropdownObserver leftDropdownObserver = new DropdownObserver(leftSnapsDropdown);
-        leftDropdownObserver.addCurrentSession(this.currentSession);
-        leftSnapsDropdown.setSelectedIndex(0);
-
-        JComboBox<String> rightSnapsDropdown = new ComboBox<>();
-        DropdownObserver rightDropdownObserver = new DropdownObserver(rightSnapsDropdown);
-        rightDropdownObserver.addCurrentSession(this.currentSession);
-        rightSnapsDropdown.setSelectedIndex(nodes.size() > 1 ? 1 : 0);
-
+    @NotNull
+    private JPanel createDiffPanel(JComboBox<String> leftDropdown, JComboBox<String> rightDropdown) {
         setSize(1300, 1100);
         JPanel dialogPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -62,57 +56,60 @@ public class DiffNodesView extends DialogWrapper implements ReachServices {
         gbc.gridy = 0;
         gbc.weightx = 1;
         gbc.weighty = 1;
-        dialogPanel.add(getNodesPanel(leftDropdownObserver), gbc);
+        dialogPanel.add(createNodesPanel(leftDropdown), gbc);
 
         gbc.gridx = 1;
         gbc.weightx = 0;
         gbc.fill = GridBagConstraints.NONE;
-        JButton scaledDiffButton = new JButton();
-        scaledDiffButton.setIcon(SdkIcons.DIFF_SCALED);
-        dialogPanel.add(scaledDiffButton, gbc);
+
+        dialogPanel.add(this.diffButton, gbc);
 
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridx = 2;
         gbc.weightx = 1;
-        dialogPanel.add(getNodesPanel(rightDropdownObserver), gbc);
-
-        scaledDiffButton.setBorder(new EmptyBorder(10,20,10,20));
-        scaledDiffButton.addActionListener(e -> {
-            DiffRefHandler diffRefHandler = new DiffRefHandler(this.project, leftDropdownObserver, rightDropdownObserver, this.currentSession);
-            diffRefHandler.handle(null);
-        });
+        dialogPanel.add(createNodesPanel(rightDropdown), gbc);
         return dialogPanel;
     }
 
-    private JPanel getNodesPanel(DropdownObserver dropdownObserver) {
+    private JPanel createNodesPanel(JComboBox<String> nodesDropdown) {
         JPanel mainPanel = new JPanel(new BorderLayout());
         JScrollPane scrollPane = new JBScrollPane();
         scrollPane.setPreferredSize(new Dimension(0, 100));
         scrollPane.setViewportView(new JTextArea());
-        JComboBox<String> jComboBox = dropdownObserver.getJComboBox();
-        showSelectedNodeContent(dropdownObserver, scrollPane);
-        jComboBox.addActionListener(e -> showSelectedNodeContent(dropdownObserver, scrollPane));
-        mainPanel.add(jComboBox, BorderLayout.NORTH);
+        mainPanel.add(nodesDropdown, BorderLayout.NORTH);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
+
+        showSelectedNodeContent(nodesDropdown, scrollPane);
+        nodesDropdown.addActionListener(e -> showSelectedNodeContent(nodesDropdown, scrollPane));
         return mainPanel;
     }
 
-    private void showSelectedNodeContent(DropdownObserver dropdownObserver, JScrollPane scrollPane) {
-        String selectedItem = dropdownObserver.getCurrentItem();
-        DebugNode debugNode;
-        if (selectedItem.equals(CURRENT_DEBUGGER_SESSION)) {
-            debugNode = this.currentSession;
-        } else {
-            debugNode = PERSISTENCY_SERVICE.getNodes().get(selectedItem);
-        }
-        JTree debugTree = new Tree();
+    private void showSelectedNodeContent(JComboBox<String> nodesDropdown, JScrollPane scrollPane) {
+        DebugNode selectedNode = this.dropdownHandler.getSelectedNode(nodesDropdown);
+        JTree debugTree = new Tree(); // this tree should come predefined, we will work it now
         debugTree.setRootVisible(false);
         debugTree.setCellRenderer(new DebuggerTreeRenderer());
         DefaultTreeModel localTreeModel = (DefaultTreeModel) debugTree.getModel();
-        localTreeModel.setRoot(debugNode);
+        localTreeModel.setRoot(selectedNode);
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(debugTree);
         scrollPane.setViewportView(panel);
+    }
+
+    private void initButton() {
+        this.diffButton.setIcon(SdkIcons.DIFF_SCALED);
+        this.diffButton.getModel().addChangeListener(e -> diffButton.setContentAreaFilled(diffButton.getModel().isRollover()));
+        this.diffButton.setBorder(new EmptyBorder(10, 20, 10, 20));
+    }
+
+    private void addDiffBtnListener(JComboBox<String> leftDropdown, JComboBox<String> rightDropdown) {
+        this.diffButton.addActionListener(e -> {
+            DebugNode leftNode = this.dropdownHandler.getSelectedNode(leftDropdown);
+            String leftNodeName = this.dropdownHandler.getSelectedNodeName(leftDropdown);
+            DebugNode rightNode = this.dropdownHandler.getSelectedNode(rightDropdown);
+            String rightNodeName = this.dropdownHandler.getSelectedNodeName(rightDropdown);
+            this.diffHandler.diffNodes(leftNode, leftNodeName, rightNode, rightNodeName, this.project);
+        });
     }
 
 }

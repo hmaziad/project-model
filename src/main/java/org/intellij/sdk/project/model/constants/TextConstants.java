@@ -12,11 +12,13 @@ public class TextConstants {
     public static final String DELETE_SNAP_MESSAGE = "Successfully deleted saved snap shot";
     public static final String SAVED_SNAP_MESSAGE = "Successfully saved snap shot below";
     public static final String WINDOW_IS_ALREADY_CLEAR = "Window is already clear";
-    public static final String NO_SAVED_NODES = "There are no saved nodes";
-    public static final String DELETE_THE_SAVED_NODE_Q = "Are you sure you want to delete the saved node \"%s\"?";
+    public static final String NO_SAVED_NODES = "There are no saved sessions";
+    public static final String DELETE_SAVED_NODE = "Are you sure you want to delete the saved session \"%s\"?";
+    public static final String DELETE_SAVED_NODES = "Are you sure you want to delete all sessions?";
     public static final String SELECTED_LABEL_IS_NULL = "Selected label is null";
-    public static final String SELECTED_NODE_IS_NULL = "Selected node is null";
+    public static final String SELECTED_NODE_IS_NULL = "Selected session is null";
     public static final String RETRIEVED_NODE_FROM_STORAGE = "Successfully retrieved \"%s\" from storage";
+    public static final String CURRENT_SESSION = "Current Session";
 
 
 }

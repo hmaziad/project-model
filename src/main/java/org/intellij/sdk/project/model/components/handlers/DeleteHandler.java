@@ -1,7 +1,7 @@
 package org.intellij.sdk.project.model.components.handlers;
 
 import static org.intellij.sdk.project.model.constants.TextConstants.DELETE_SNAP_MESSAGE;
-import static org.intellij.sdk.project.model.constants.TextConstants.DELETE_THE_SAVED_NODE_Q;
+import static org.intellij.sdk.project.model.constants.TextConstants.DELETE_SAVED_NODE;
 import static org.intellij.sdk.project.model.constants.TextConstants.NO_SAVED_NODES;
 
 import java.util.Objects;
@@ -18,7 +18,7 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @AllArgsConstructor
-public class DeleteHandler implements ToolHandler {
+public class DeleteHandler {
     private final JLabel feedbackLabel;
     private final Project project;
     private static final PersistencyService persistencyService = ServiceManager.getService(PersistencyService.class);
@@ -37,7 +37,7 @@ public class DeleteHandler implements ToolHandler {
             this.feedbackLabel.setText(NO_SAVED_NODES);
             return;
         }
-        String message = String.format(DELETE_THE_SAVED_NODE_Q, nodeKeyName);
+        String message = String.format(DELETE_SAVED_NODE, nodeKeyName);
         boolean isSure = withOutDialogue || MessageDialogues.getYesNoMessageDialogue(message, "Delete Snap", this.project);
         if (isSure) {
             persistencyService.getNodes().remove(nodeKeyName);

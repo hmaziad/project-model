@@ -1,8 +1,10 @@
-package org.intellij.sdk.project.model.components.handlers;
+package org.intellij.sdk.project.model.components.buttons;
 
 import java.util.Optional;
 
 import javax.swing.tree.DefaultTreeModel;
+import org.intellij.sdk.project.model.components.handlers.ReachServices;
+import org.intellij.sdk.project.model.components.handlers.SnapHandler;
 import org.intellij.sdk.project.model.xnodes.DebugNode;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.actionSystem.AnActionEvent;

@@ -13,7 +13,7 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @AllArgsConstructor
-public class ClearHandler implements ToolHandler {
+public class ClearHandler {
     private final JLabel feedbackLabel;
 
     public void handle(DefaultTreeModel treeModel) {

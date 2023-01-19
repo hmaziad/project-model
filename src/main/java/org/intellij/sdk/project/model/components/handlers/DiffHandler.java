@@ -11,18 +11,19 @@ import com.intellij.diff.contents.DocumentContentImpl;
 import com.intellij.openapi.editor.impl.DocumentImpl;
 import com.intellij.openapi.project.Project;
 
-public class DiffHandler implements ReachServices {
+public class DiffHandler {
 
-    private void computeDiff(String title1, DebugNode originalNode, String title2, DebugNode revisedNode, Project project) {
-        String session1 = ParserService.convertNodeToString(originalNode);
-        String session2 = ParserService.convertNodeToString(revisedNode);
-        DiffContent content1 = new DocumentContentImpl(project, new DocumentImpl(session1), null);
-        DiffContent content2 = new DocumentContentImpl(project, new DocumentImpl(session2), null);
+    public void diffNodes(DebugNode leftNode, String leftNodeName, DebugNode rightNode, String rightNodeName, Project project) {
+        String leftNodeString = ParserService.convertNodeToString(leftNode);
+        String rightNodeString = ParserService.convertNodeToString(rightNode);
+        DiffContent content1 = new DocumentContentImpl(project, new DocumentImpl(leftNodeString), null);
+        DiffContent content2 = new DocumentContentImpl(project, new DocumentImpl(rightNodeString), null);
         @NotNull MutableDiffRequestChain chain = new MutableDiffRequestChain(content1, content2);
-        chain.setTitle1(title1);
-        chain.setTitle2(title2);
-        chain.setWindowTitle("Debugger Session");
+        chain.setTitle1(leftNodeName);
+        chain.setTitle2(rightNodeName);
+        chain.setWindowTitle("Comparing Sessions");
         DiffManager.getInstance().showDiff(project, chain, DiffDialogHints.DEFAULT);
     }
+
 }
 

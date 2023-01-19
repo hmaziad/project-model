@@ -1,4 +1,4 @@
-package org.intellij.sdk.project.model.components.handlers;
+package org.intellij.sdk.project.model.components.buttons;
 
 import javax.swing.*;
 import org.jetbrains.annotations.NotNull;

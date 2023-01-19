@@ -20,7 +20,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @AllArgsConstructor
 @Value
-public class SaveHandler implements ToolHandler {
+public class SaveHandler  {
     static PersistencyService persistencyService = ServiceManager.getService(PersistencyService.class);
     JLabel feedbackLabel;
 

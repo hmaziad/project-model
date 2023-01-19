@@ -24,7 +24,7 @@ public class DebuggerWindow implements ReachServices {
     // https://intellij-support.jetbrains.com/hc/en-us/community/posts/360006504879-Add-an-action-buttons-to-my-custom-tool-window
     // https://intellij-support.jetbrains.com/hc/en-us/community/posts/360009445759-How-to-create-button-with-icon
     public DebuggerWindow(Project project) {
-        this.debuggerWindowContent = new SettingsPanel(false);
+        this.debuggerWindowContent = new SettingsPanel(true);
 
         JTree debugTree = COMPONENT_SERVICE.getDebugTree();
         debugTree.setRootVisible(false);

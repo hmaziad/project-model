@@ -1,10 +1,10 @@
 package org.intellij.sdk.project.model.components;
 
 import javax.swing.*;
-import org.intellij.sdk.project.model.components.handlers.ClearButton;
-import org.intellij.sdk.project.model.components.handlers.DiffButton;
-import org.intellij.sdk.project.model.components.handlers.SnapButton;
-import org.intellij.sdk.project.model.components.handlers.ToolbarButton;
+import org.intellij.sdk.project.model.components.buttons.ClearButton;
+import org.intellij.sdk.project.model.components.buttons.DiffButton;
+import org.intellij.sdk.project.model.components.buttons.SnapButton;
+import org.intellij.sdk.project.model.components.buttons.ToolbarButton;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
@@ -16,7 +16,7 @@ import icons.SdkIcons;
 public class SettingsPanel extends SimpleToolWindowPanel {
 
     public SettingsPanel(boolean vertical) {
-        super(vertical);
+        super(vertical, true);
 
         final ActionManager actionManager = ActionManager.getInstance();
         DefaultActionGroup actionGroup = new DefaultActionGroup("ACTION_GROUP", false);

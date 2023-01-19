@@ -18,6 +18,9 @@ import com.intellij.ui.SimpleTextAttributes;
 public class DebuggerTreeRenderer extends ColoredTreeCellRenderer {
     @Override
     public void customizeCellRenderer(@NotNull JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        if (!(value instanceof DebugNode)) {
+            return;
+        }
         DebugNode node = (DebugNode) value;
         final SimpleColoredText simpleColoredText = new SimpleColoredText();
         List<String> texts = node.getTexts();

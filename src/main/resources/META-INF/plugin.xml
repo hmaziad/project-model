@@ -33,7 +33,7 @@
     <vendor url="https://plugins.jetbrains.com">IntelliJ Platform SDK</vendor>
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Armadillo" secondary="true" icon="AllIcons.General.Modified" anchor="bottom"
-                    factoryClass="org.intellij.sdk.project.model.services.SnapService"/>
+                    factoryClass="org.intellij.sdk.project.model.services.DebuggerWindowProvider"/>
         <applicationService serviceImplementation="org.intellij.sdk.project.model.services.PersistencyService" serviceInterface="org.intellij.sdk.project.model.services.PersistencyService"/>
         <applicationService
                 serviceInterface="org.intellij.sdk.project.model.services.ComponentService"

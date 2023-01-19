@@ -1,36 +1,44 @@
 package org.intellij.sdk.project.model.components.handlers;
 
-import static org.intellij.sdk.project.model.constants.TextConstants.RETRIEVED_NODE_FROM_STORAGE;
-import static org.intellij.sdk.project.model.constants.TextConstants.SELECTED_LABEL_IS_NULL;
-import static org.intellij.sdk.project.model.constants.TextConstants.SELECTED_NODE_IS_NULL;
+import static org.intellij.sdk.project.model.constants.TextConstants.CURRENT_SESSION;
 
-import java.util.Objects;
+import java.util.List;
+import java.util.Optional;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultTreeModel;
-import org.intellij.sdk.project.model.services.PersistencyService;
 import org.intellij.sdk.project.model.xnodes.DebugNode;
-import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.project.Project;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
-@AllArgsConstructor
-public class DropdownHandler implements ToolHandler {
-    private static final PersistencyService persistencyService = ServiceManager.getService(PersistencyService.class);
-    private final JLabel feedbackLabel;
+@RequiredArgsConstructor
+public class DropdownHandler {
+    private final NodeHandler nodeHandler = new NodeHandler();
+    private final SnapHandler snapHandler = new SnapHandler();
+    private int index = 0;
+    private final Project project;
 
-    @Override
-    public void handle(DefaultTreeModel treeModel) {
-        String selectedItemLabel = null; // to do later
-        if (Objects.isNull(selectedItemLabel)) {
-            this.feedbackLabel.setText(SELECTED_LABEL_IS_NULL);
+    public void addNodesToDropdown(JComboBox<String> nodesDropdown) {
+        List<String> allNodeNames = this.nodeHandler.getAllNodeNames();
+        Optional<DebugNode> currentSession = this.snapHandler.getCurrentSession(this.project);
+        currentSession.ifPresent(node -> nodesDropdown.addItem(CURRENT_SESSION));
+        allNodeNames.forEach(nodesDropdown::addItem);
+        if (nodesDropdown.getItemCount() > 0) {
+            int remaining = nodesDropdown.getItemCount() - index;
+            nodesDropdown.setSelectedIndex(Math.min(this.index++, remaining));
         }
-        DebugNode selectedNode = persistencyService.getNodes().get(selectedItemLabel);
-        if (Objects.isNull(selectedNode)) {
-            this.feedbackLabel.setText(SELECTED_NODE_IS_NULL);
-        }
-        treeModel.setRoot(selectedNode);
-        this.feedbackLabel.setText(String.format(RETRIEVED_NODE_FROM_STORAGE, selectedItemLabel));
+    }
 
+    public DebugNode getSelectedNode(JComboBox<String> nodesDropdown) {
+        String selectedItem = (String) nodesDropdown.getSelectedItem();
+        if (CURRENT_SESSION.equals(selectedItem)) {
+            return this.snapHandler.getCurrentSession(this.project).orElseThrow(() -> new IllegalStateException("Why you messing?"));
+        } else {
+            return this.nodeHandler.getNodeByName(selectedItem);
+        }
+    }
+
+    public String getSelectedNodeName(JComboBox<String> nodesDropdown) {
+        return (String) nodesDropdown.getSelectedItem();
     }
 }
