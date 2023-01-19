@@ -1,4 +1,4 @@
-package org.intellij.sdk.project.model.listeners;
+package org.intellij.sdk.project.model.tree.components;
 
 import java.util.Objects;
 
@@ -9,8 +9,8 @@ import org.intellij.sdk.project.model.components.handlers.ReachServices;
 
 import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
 public class DebuggerTreeModelListener implements TreeModelListener, ReachServices {
+
     @Override
     public void treeNodesChanged(TreeModelEvent e) {
         //nothing to change

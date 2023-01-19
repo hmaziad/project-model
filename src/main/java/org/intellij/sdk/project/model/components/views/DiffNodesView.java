@@ -6,18 +6,16 @@ import java.awt.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.tree.DefaultTreeModel;
-import org.intellij.sdk.project.model.tree.components.DebugTreeRenderer;
 import org.intellij.sdk.project.model.components.handlers.DiffHandler;
 import org.intellij.sdk.project.model.components.handlers.DropdownHandler;
 import org.intellij.sdk.project.model.tree.components.DebugNode;
+import org.intellij.sdk.project.model.tree.components.DebugTreeManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.treeStructure.Tree;
 
 import icons.SdkIcons;
 
@@ -26,6 +24,7 @@ public class DiffNodesView extends DialogWrapper {
     private final DropdownHandler dropdownHandler;
     private final DiffHandler diffHandler = new DiffHandler();
     private final JButton diffButton = new JButton();
+    private final DebugTreeManager debugTreeManager = new DebugTreeManager();
 
     public DiffNodesView(@NotNull Project project) {
         super(true); // use current window as parent
@@ -88,13 +87,9 @@ public class DiffNodesView extends DialogWrapper {
 
     private void showSelectedNodeContent(JComboBox<String> nodesDropdown, JScrollPane scrollPane) {
         DebugNode selectedNode = this.dropdownHandler.getSelectedNode(nodesDropdown);
-        JTree debugTree = new Tree(); // this tree should come predefined, we will work it now
-        debugTree.setRootVisible(false);
-        debugTree.setCellRenderer(new DebugTreeRenderer());
-        DefaultTreeModel localTreeModel = (DefaultTreeModel) debugTree.getModel();
-        localTreeModel.setRoot(selectedNode);
+        this.debugTreeManager.setRoot(selectedNode);
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(debugTree);
+        panel.add(this.debugTreeManager.getDebugTree());
         scrollPane.setViewportView(panel);
     }
 

@@ -4,7 +4,6 @@ import static org.intellij.sdk.project.model.constants.TextConstants.SAVE_DEBUGG
 
 import java.util.Optional;
 
-import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.intellij.sdk.project.model.components.handlers.SnapHandler;
 import org.intellij.sdk.project.model.tree.components.DebugNode;
@@ -30,7 +29,7 @@ public class SnapButton extends IconWithTextAction implements ReachServices {
         if (debugNode.isEmpty()) {
             COMPONENT_SERVICE.getFeedbackMessage().setText("Weird, we cannot get a debug session. Try another way.");
         } else {
-            ((DefaultTreeModel) COMPONENT_SERVICE.getDebugTree().getModel()).setRoot(debugNode.get());
+            COMPONENT_SERVICE.getDebugTreeManager().setRoot(debugNode.get());
         }
     }
 

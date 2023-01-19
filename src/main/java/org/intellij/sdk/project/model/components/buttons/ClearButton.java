@@ -3,7 +3,6 @@ package org.intellij.sdk.project.model.components.buttons;
 import static org.intellij.sdk.project.model.constants.TextConstants.CLEAR_SESSION_BELOW;
 import static org.intellij.sdk.project.model.constants.TextConstants.SUCCESSFULLY_CLEARED_SESSION;
 
-import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -19,7 +18,7 @@ public class ClearButton extends IconWithTextAction implements ReachServices {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        ((DefaultTreeModel) COMPONENT_SERVICE.getDebugTree().getModel()).setRoot(null);
+        COMPONENT_SERVICE.getDebugTreeManager().setRoot(null);
         COMPONENT_SERVICE.getFeedbackMessage().setText(SUCCESSFULLY_CLEARED_SESSION);
     }
 

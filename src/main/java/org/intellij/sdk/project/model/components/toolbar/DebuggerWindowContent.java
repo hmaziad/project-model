@@ -11,9 +11,9 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.roots.ui.configuration.actions.IconWithTextAction;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 
-public class DebuggerToolbar extends SimpleToolWindowPanel {
+public class DebuggerWindowContent extends SimpleToolWindowPanel {
 
-    public DebuggerToolbar(boolean vertical) {
+    public DebuggerWindowContent(boolean vertical) {
         super(vertical, false);
 
         final ActionManager actionManager = ActionManager.getInstance();

@@ -6,25 +6,24 @@ import java.util.Objects;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.tree.DefaultTreeModel;
-import org.intellij.sdk.project.model.tree.components.DebugTreeRenderer;
 import org.intellij.sdk.project.model.components.handlers.NodeHandler;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.intellij.sdk.project.model.constants.MessageDialogues;
 import org.intellij.sdk.project.model.tree.components.DebugNode;
+import org.intellij.sdk.project.model.tree.components.DebugTreeManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
 
 public class SettingsView extends DialogWrapper implements ReachServices {
     private final Project project;
     private final NodeHandler nodeHandler = new NodeHandler();
     private JScrollPane scrollableNodesPanel;
+    private final DebugTreeManager debugTreeManager = new DebugTreeManager();
 
     public SettingsView(@NotNull Project project) {
         super(true); // use current window as parent
@@ -96,7 +95,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
     private void loadNode(JBList<String> keysList) {
         String selectedKey = keysList.getSelectedValue();
         DebugNode debugNode = this.nodeHandler.getNodeByName(selectedKey);
-        ((DefaultTreeModel) COMPONENT_SERVICE.getDebugTree().getModel()).setRoot(debugNode);
+        COMPONENT_SERVICE.getDebugTreeManager().setRoot(debugNode);
     }
 
     private void deleteAll(JBList<String> keysList) {
@@ -142,7 +141,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         JScrollPane scrollableKeysPanel = new JBScrollPane();
         scrollableKeysPanel.setMinimumSize(new Dimension(350, 1100));
         TitledBorder titledBorder = BorderFactory.createTitledBorder("Saved Sessions");
-        titledBorder.setBorder(new LineBorder(Color.darkGray.darker()));
+        titledBorder.setBorder(new LineBorder(Color.gray.darker()));
         scrollableKeysPanel.setBorder(titledBorder);
 
         keysList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -159,7 +158,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
     private JScrollPane getScrollableNodesPanel() {
         JScrollPane jScrollPane = new JBScrollPane();
         TitledBorder titledBorder = BorderFactory.createTitledBorder("Session Content");
-        titledBorder.setBorder(new LineBorder(Color.darkGray.darker()));
+        titledBorder.setBorder(new LineBorder(Color.gray.darker()));
         jScrollPane.setBorder(titledBorder);
         jScrollPane.setPreferredSize(new Dimension(0, 1100));
         return jScrollPane;
@@ -168,15 +167,9 @@ public class SettingsView extends DialogWrapper implements ReachServices {
     private void showSelectedNodeContent(JBList<String> keysList) {
         String selectedValue = keysList.getSelectedValue();
         DebugNode debugNode = this.nodeHandler.getNodeByName(selectedValue);
-
-        JTree debugTree = new Tree();
-        debugTree.setRootVisible(false);
-        debugTree.setCellRenderer(new DebugTreeRenderer());
-        DefaultTreeModel localTreeModel = (DefaultTreeModel) debugTree.getModel();
-        localTreeModel.setRoot(debugNode);
-
+        this.debugTreeManager.setRoot(debugNode);
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(debugTree);
+        panel.add(this.debugTreeManager.getDebugTree());
         this.scrollableNodesPanel.setViewportView(panel);
     }
 
