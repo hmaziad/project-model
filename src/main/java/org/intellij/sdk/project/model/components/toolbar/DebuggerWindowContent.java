@@ -10,9 +10,10 @@ import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.roots.ui.configuration.actions.IconWithTextAction;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
+import com.intellij.util.ui.JBUI;
 
 public class DebuggerWindowContent extends SimpleToolWindowPanel {
-
+// JBUI.CurrentTheme.Link.Foreground.ENABLED
     public DebuggerWindowContent(boolean vertical) {
         super(vertical, false);
 
@@ -33,6 +34,7 @@ public class DebuggerWindowContent extends SimpleToolWindowPanel {
         actionGroup.add(clearButton);
         ActionToolbar actionToolbar = actionManager.createActionToolbar("ACTION_TOOLBAR", actionGroup, true);
         actionToolbar.setOrientation(SwingConstants.HORIZONTAL);
+        actionToolbar.getComponent().setBorder(JBUI.Borders.customLineBottom(JBUI.CurrentTheme.ToolWindow.borderColor()));
         this.setToolbar(actionToolbar.getComponent());
     }
 
