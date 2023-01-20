@@ -24,7 +24,7 @@ public class DiffNodesView extends DialogWrapper {
     private final DropdownHandler dropdownHandler;
     private final DiffHandler diffHandler = new DiffHandler();
     private final JButton diffButton = new JButton();
-    private final DebugTreeManager debugTreeManager = new DebugTreeManager();
+
 
     public DiffNodesView(@NotNull Project project) {
         super(true); // use current window as parent
@@ -51,13 +51,15 @@ public class DiffNodesView extends DialogWrapper {
         setSize(1300, 1100);
         JPanel dialogPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
+        DebugTreeManager leftDebugTreeManager = new DebugTreeManager();
+        DebugTreeManager rightDebugTreeManager = new DebugTreeManager();
 
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 1;
         gbc.weighty = 1;
-        dialogPanel.add(createNodesPanel(leftDropdown), gbc);
+        dialogPanel.add(createNodesPanel(leftDropdown, leftDebugTreeManager), gbc);
 
         gbc.gridx = 1;
         gbc.weightx = 0;
@@ -68,11 +70,11 @@ public class DiffNodesView extends DialogWrapper {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridx = 2;
         gbc.weightx = 1;
-        dialogPanel.add(createNodesPanel(rightDropdown), gbc);
+        dialogPanel.add(createNodesPanel(rightDropdown, rightDebugTreeManager), gbc);
         return dialogPanel;
     }
 
-    private JPanel createNodesPanel(JComboBox<String> nodesDropdown) {
+    private JPanel createNodesPanel(JComboBox<String> nodesDropdown, DebugTreeManager debugTreeManager) {
         JPanel mainPanel = new JPanel(new BorderLayout());
         JScrollPane scrollPane = new JBScrollPane();
         scrollPane.setPreferredSize(new Dimension(0, 100));
@@ -80,16 +82,16 @@ public class DiffNodesView extends DialogWrapper {
         mainPanel.add(nodesDropdown, BorderLayout.NORTH);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
-        showSelectedNodeContent(nodesDropdown, scrollPane);
-        nodesDropdown.addActionListener(e -> showSelectedNodeContent(nodesDropdown, scrollPane));
+        showSelectedNodeContent(nodesDropdown, scrollPane, debugTreeManager);
+        nodesDropdown.addActionListener(e -> showSelectedNodeContent(nodesDropdown, scrollPane, debugTreeManager));
         return mainPanel;
     }
 
-    private void showSelectedNodeContent(JComboBox<String> nodesDropdown, JScrollPane scrollPane) {
+    private void showSelectedNodeContent(JComboBox<String> nodesDropdown, JScrollPane scrollPane, DebugTreeManager debugTreeManager) {
         DebugNode selectedNode = this.dropdownHandler.getSelectedNode(nodesDropdown);
-        this.debugTreeManager.setRoot(selectedNode);
+        debugTreeManager.setRoot(selectedNode);
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(this.debugTreeManager.getDebugTree());
+        panel.add(debugTreeManager.getDebugTree());
         scrollPane.setViewportView(panel);
     }
 
