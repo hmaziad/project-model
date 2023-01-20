@@ -5,6 +5,7 @@ package org.intellij.sdk.project.model;
 import javax.swing.*;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.intellij.sdk.project.model.components.toolbar.DebuggerWindowContent;
+import org.intellij.sdk.project.model.tree.components.DebugTreeManager;
 
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
@@ -17,7 +18,9 @@ public class DebugWindow implements ReachServices {
 
     public DebugWindow() {
         this.debuggerWindowContent = new DebuggerWindowContent(true);
-        JTree debugTree = COMPONENT_SERVICE.getDebugTreeManager().getDebugTree();
+        DebugTreeManager debugTreeManager = COMPONENT_SERVICE.getDebugTreeManager();
+        debugTreeManager.addClearButtonListener();
+        JTree debugTree = debugTreeManager.getDebugTree();
         this.debuggerWindowContent.add(debugTree);
     }
 }

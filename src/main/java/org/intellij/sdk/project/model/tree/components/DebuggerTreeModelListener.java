@@ -7,8 +7,6 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
 
-import lombok.AllArgsConstructor;
-
 public class DebuggerTreeModelListener implements TreeModelListener, ReachServices {
 
     @Override

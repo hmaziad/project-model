@@ -20,9 +20,12 @@ public class DebugTreeManager {
     public DebugTreeManager() {
         this.debugTree.setRootVisible(false);
         this.debugTree.setCellRenderer(new DebugTreeRenderer());
-        this.debugTree.getModel().addTreeModelListener(new DebuggerTreeModelListener());
         final TreePopup treePopup = new TreePopup(this.debugTree);
         this.debugTree.addMouseListener(getMouseAdapter(treePopup));
+    }
+
+    public void addClearButtonListener() {
+        this.debugTree.getModel().addTreeModelListener(new DebuggerTreeModelListener());
     }
 
     public void setRoot(DebugNode debugNode) {
