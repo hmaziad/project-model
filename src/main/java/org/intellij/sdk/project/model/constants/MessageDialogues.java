@@ -11,6 +11,10 @@ public class MessageDialogues {
         return Messages.showOkCancelDialog(project, message, title, "Yes", "No", null, null) == Messages.OK;
     }
 
+    public static void showInfoMessageDialogue(String message, String title) {
+        Messages.showInfoMessage(message, title);
+    }
+
     // todo remove
     public static void getErrorMessageDialogue(String message, Project project) {
         Messages.showMessageDialog(project,message, "Error", Messages.getErrorIcon());

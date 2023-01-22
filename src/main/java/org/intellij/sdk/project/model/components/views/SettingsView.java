@@ -84,12 +84,29 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         JButton deleteAllButton = new JButton("Delete All");
         deleteAllButton.addActionListener(e -> deleteAll(keysList));
         panel.add(deleteAllButton);
-
+        // export button
+        JButton exportButton = new JButton("Export");
+        exportButton.addActionListener(e -> export(keysList));
+        panel.add(exportButton);
         refreshView(keysList);
-
+        // import button
+        JButton importButton = new JButton("Import");
+        importButton.addActionListener(e -> _import(keysList));
+        panel.add(importButton);
+        refreshView(keysList);
         enableButtons(keysList.getItemsCount() != 0, deleteButton, renameButton, loadButton, deleteAllButton);
         keysList.addListSelectionListener(e -> enableButtons(keysList.getItemsCount() != 0, deleteButton, renameButton, loadButton, deleteAllButton));
         return panel;
+    }
+
+    private void _import(JBList<String> keysList) {
+        this.nodeHandler.doImport(this.project);
+        refreshView(keysList);
+    }
+
+    private void export(JBList<String> keysList) {
+        String selectedKey = keysList.getSelectedValue();
+        this.nodeHandler.export(selectedKey, this.project);
     }
 
     private void loadNode(JBList<String> keysList) {

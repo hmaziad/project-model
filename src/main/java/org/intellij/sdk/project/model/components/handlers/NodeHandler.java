@@ -6,19 +6,35 @@ import static org.intellij.sdk.project.model.constants.TextConstants.DELETE_SESS
 import static org.intellij.sdk.project.model.constants.TextConstants.GENERATED_SESSION_NAME;
 import static org.intellij.sdk.project.model.constants.TextConstants.NODE_DATE_FORMAT;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.intellij.sdk.project.model.constants.MessageDialogues;
 import org.intellij.sdk.project.model.tree.components.DebugNode;
+import org.intellij.sdk.project.model.util.DebugNodeConverter;
+import com.intellij.json.JsonFileType;
+import com.intellij.openapi.fileChooser.FileChooser;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 
 public class NodeHandler implements ReachServices {
+    private final DebugNodeConverter nodeConverter = new DebugNodeConverter();
 
     public void save(DebugNode debugNode) {
         String dateTimeNow = LocalDateTime.now().format(DateTimeFormatter.ofPattern(NODE_DATE_FORMAT));
@@ -60,7 +76,7 @@ public class NodeHandler implements ReachServices {
             .collect(Collectors.toList());
     }
 
-    public Map<String,DebugNode> getAllNodesPerNames() {
+    public Map<String, DebugNode> getAllNodesPerNames() {
         return PERSISTENCY_SERVICE.getNodes();
     }
 
@@ -71,4 +87,59 @@ public class NodeHandler implements ReachServices {
         nodes.put(to, fromNode);
     }
 
+    /**
+     * Feedback node saved, and say path
+     * tell of node already exists
+     * Show error in case of error
+     */
+
+
+    public void export(String selectedKey, Project project) {
+        String path = project.getBasePath();
+        DebugNode debugNode = getNodeByName(selectedKey);
+        HashMap<String, DebugNode> namePerNode = new HashMap<>();
+        namePerNode.put("root", debugNode);
+        String nodeAsJson = this.nodeConverter.toString(namePerNode);
+        String fileName = selectedKey.replace(":", "-") + ".json";
+        Path pathWithDir = createDirectoryIfNotExists(path);
+        try {
+            String fullPath = String.format("%s/%s", pathWithDir.toUri().getPath(), fileName);
+            File nodeAsFile = new File(fullPath);
+            if (nodeAsFile.createNewFile()) {
+                MessageDialogues.showInfoMessageDialogue("File created under path:\n" + fullPath,"Success");
+            } else {
+                String errorMessage =
+                    String.format("File with name \"%s\" already exists under directory:%n%s%nPlease rename session or move the existing file.", fileName, pathWithDir);
+                MessageDialogues.getErrorMessageDialogue(errorMessage, project);
+            }
+            FileWriter myWriter = new FileWriter(nodeAsFile);
+            myWriter.write(Objects.requireNonNull(nodeAsJson, "Session contains no data"));
+            myWriter.close();
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not export session", e);
+        }
+    }
+
+    private Path createDirectoryIfNotExists(String path) {
+        String dirName = "/armadillo";
+        try {
+            return Files.createDirectories(Paths.get(path + dirName));
+        } catch (IOException e) {
+            throw new IllegalStateException(String.format("Could not create %s dir", dirName), e);
+        }
+    }
+
+    public void doImport(Project project) {
+        FileChooserDescriptor jsonOnly = FileChooserDescriptorFactory.createSingleFileDescriptor(JsonFileType.INSTANCE);
+        VirtualFile chosenFile = FileChooser.chooseFile(jsonOnly, project, null);
+        String fileName = Objects.requireNonNull(chosenFile.getNameWithoutExtension(),"File is not valid");
+        Map<String, DebugNode> nodes = PERSISTENCY_SERVICE.getNodes();
+        if (nodes.containsKey(fileName)) {
+            MessageDialogues.getErrorMessageDialogue(String.format("A session with name \"%s\" already exists", fileName), project);
+        }
+        String content = String.valueOf(FileDocumentManager.getInstance().getDocument(chosenFile).getCharsSequence());
+        HashMap<String, DebugNode> nodeFromJson = this.nodeConverter.fromString(content);
+        String errorMessage = chosenFile.getName() + " file is empty";
+        nodes.put(fileName, Objects.requireNonNull(nodeFromJson, errorMessage).entrySet().iterator().next().getValue());
+    }
 }
