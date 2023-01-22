@@ -106,7 +106,7 @@ public class NodeHandler implements ReachServices {
             String fullPath = String.format("%s/%s", pathWithDir.toUri().getPath(), fileName);
             File nodeAsFile = new File(fullPath);
             if (nodeAsFile.createNewFile()) {
-                MessageDialogues.showInfoMessageDialogue("File created under path:\n" + fullPath,"Success");
+                MessageDialogues.showInfoMessageDialogue("File created under path:\n" + fullPath, "Success");
             } else {
                 String errorMessage =
                     String.format("File with name \"%s\" already exists under directory:%n%s%nPlease rename session or move the existing file.", fileName, pathWithDir);
@@ -132,14 +132,17 @@ public class NodeHandler implements ReachServices {
     public void doImport(Project project) {
         FileChooserDescriptor jsonOnly = FileChooserDescriptorFactory.createSingleFileDescriptor(JsonFileType.INSTANCE);
         VirtualFile chosenFile = FileChooser.chooseFile(jsonOnly, project, null);
-        String fileName = Objects.requireNonNull(chosenFile.getNameWithoutExtension(),"File is not valid");
-        Map<String, DebugNode> nodes = PERSISTENCY_SERVICE.getNodes();
-        if (nodes.containsKey(fileName)) {
-            MessageDialogues.getErrorMessageDialogue(String.format("A session with name \"%s\" already exists", fileName), project);
+        if (Objects.nonNull(chosenFile)) {
+            String errorMessage = chosenFile.getName() + " file is empty";
+            String fileName = Objects.requireNonNull(chosenFile.getNameWithoutExtension(), "File is not valid");
+            Map<String, DebugNode> nodes = PERSISTENCY_SERVICE.getNodes();
+            if (nodes.containsKey(fileName)) {
+                MessageDialogues.getErrorMessageDialogue(String.format("A session with name \"%s\" already exists", fileName), project);
+            }
+            CharSequence charsSequence = Objects.requireNonNull(FileDocumentManager.getInstance().getDocument(chosenFile), errorMessage).getCharsSequence();
+            String content = String.valueOf(charsSequence);
+            HashMap<String, DebugNode> nodeFromJson = this.nodeConverter.fromString(content);
+            nodes.put(fileName, Objects.requireNonNull(nodeFromJson, errorMessage).entrySet().iterator().next().getValue());
         }
-        String content = String.valueOf(FileDocumentManager.getInstance().getDocument(chosenFile).getCharsSequence());
-        HashMap<String, DebugNode> nodeFromJson = this.nodeConverter.fromString(content);
-        String errorMessage = chosenFile.getName() + " file is empty";
-        nodes.put(fileName, Objects.requireNonNull(nodeFromJson, errorMessage).entrySet().iterator().next().getValue());
     }
 }
