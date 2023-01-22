@@ -138,11 +138,12 @@ public class NodeHandler implements ReachServices {
             Map<String, DebugNode> nodes = PERSISTENCY_SERVICE.getNodes();
             if (nodes.containsKey(fileName)) {
                 MessageDialogues.getErrorMessageDialogue(String.format("A session with name \"%s\" already exists", fileName), project);
+            } else {
+                CharSequence charsSequence = Objects.requireNonNull(FileDocumentManager.getInstance().getDocument(chosenFile), errorMessage).getCharsSequence();
+                String content = String.valueOf(charsSequence);
+                HashMap<String, DebugNode> nodeFromJson = this.nodeConverter.fromString(content);
+                nodes.put(fileName, Objects.requireNonNull(nodeFromJson, errorMessage).entrySet().iterator().next().getValue());
             }
-            CharSequence charsSequence = Objects.requireNonNull(FileDocumentManager.getInstance().getDocument(chosenFile), errorMessage).getCharsSequence();
-            String content = String.valueOf(charsSequence);
-            HashMap<String, DebugNode> nodeFromJson = this.nodeConverter.fromString(content);
-            nodes.put(fileName, Objects.requireNonNull(nodeFromJson, errorMessage).entrySet().iterator().next().getValue());
         }
     }
 }
