@@ -95,8 +95,8 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         importButton.addActionListener(e -> _import(keysList));
         panel.add(importButton);
         refreshView(keysList);
-        enableButtons(keysList.getItemsCount() != 0,exportButton, deleteButton, renameButton, loadButton, deleteAllButton);
-        keysList.addListSelectionListener(e -> enableButtons(keysList.getItemsCount() != 0, deleteButton, renameButton, loadButton, deleteAllButton));
+        enableButtons(keysList.getItemsCount() != 0, exportButton, deleteButton, renameButton, loadButton, deleteAllButton);
+        keysList.addListSelectionListener(e -> enableButtons(keysList.getItemsCount() != 0, exportButton, deleteButton, renameButton, loadButton, deleteAllButton));
         return panel;
     }
 
