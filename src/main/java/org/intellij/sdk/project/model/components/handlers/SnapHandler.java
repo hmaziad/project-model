@@ -16,7 +16,6 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public class SnapHandler {
-    private final NodeHandler nodeHandler = new NodeHandler();
 
     public Optional<DebugNode> getCurrentSession(Project project) {
         XDebuggerManager xDebuggerManager = XDebuggerManager.getInstance(project);
@@ -25,7 +24,6 @@ public class SnapHandler {
             XDebuggerTreeNode xRootNode = getDebugSessionTree(xDebuggerManager);
             LOG.debug("Debugger session retrieved: {}", xRootNode);
             DebugNode resultNode = new DebugNode(xRootNode);
-            this.nodeHandler.save(resultNode); // put alone
             return Optional.of(resultNode);
         }
         return Optional.empty();

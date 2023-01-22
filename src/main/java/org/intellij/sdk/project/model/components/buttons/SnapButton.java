@@ -4,6 +4,7 @@ import static org.intellij.sdk.project.model.constants.TextConstants.SAVE_DEBUGG
 
 import java.util.Optional;
 
+import org.intellij.sdk.project.model.components.handlers.NodeHandler;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.intellij.sdk.project.model.components.handlers.SnapHandler;
 import org.intellij.sdk.project.model.tree.components.DebugNode;
@@ -18,6 +19,7 @@ import lombok.Getter;
 public class SnapButton extends IconWithTextAction implements ReachServices {
 
     private final SnapHandler snapHandler = new SnapHandler();
+    private final NodeHandler nodeHandler = new NodeHandler();
 
     public SnapButton() {
         super(null, SAVE_DEBUGGER_SESSION, SdkIcons.SNAP_ICON);
@@ -25,11 +27,13 @@ public class SnapButton extends IconWithTextAction implements ReachServices {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        Optional<DebugNode> debugNode = this.snapHandler.getCurrentSession(e.getProject());
-        if (debugNode.isEmpty()) {
+        Optional<DebugNode> optionalDebugNode = this.snapHandler.getCurrentSession(e.getProject());
+        if (optionalDebugNode.isEmpty()) {
             COMPONENT_SERVICE.getFeedbackMessage().setText("Weird, we cannot get a debug session. Try another way.");
         } else {
-            COMPONENT_SERVICE.getDebugTreeManager().setRoot(debugNode.get());
+            DebugNode debugNode = optionalDebugNode.get();
+            nodeHandler.save(debugNode);
+            COMPONENT_SERVICE.getDebugTreeManager().setRoot(debugNode);
         }
     }
 
