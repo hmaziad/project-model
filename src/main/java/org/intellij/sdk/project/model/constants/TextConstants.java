@@ -18,4 +18,10 @@ public class TextConstants {
     public static final String NODE_DATE_FORMAT = "yyyy-MM-dd_hh:mm:ss.SSS";
     public static final String GENERATED_SESSION_NAME = "session-%s";
     public static final String DIFF_NODES = "Diff Sessions";
+    public static final String REMOVE_SESSION_FROM_STORAGE = "Remove session from storage";
+    public static final String RENAME_SESSION = "Rename session";
+    public static final String LOAD_SESSION_INTO_TOOLBAR = "Load session into toolbar window";
+    public static final String REMOVE_ALL_SESSIONS = "Remove all sessions from storage";
+    public static final String EXPORT_SESSION_JSON = "Export session into json file";
+    public static final String IMPORT_FROM_FILE = "Import and save session from json file";
 }

@@ -1,5 +1,12 @@
 package org.intellij.sdk.project.model.components.views;
 
+import static org.intellij.sdk.project.model.constants.TextConstants.EXPORT_SESSION_JSON;
+import static org.intellij.sdk.project.model.constants.TextConstants.IMPORT_FROM_FILE;
+import static org.intellij.sdk.project.model.constants.TextConstants.LOAD_SESSION_INTO_TOOLBAR;
+import static org.intellij.sdk.project.model.constants.TextConstants.REMOVE_ALL_SESSIONS;
+import static org.intellij.sdk.project.model.constants.TextConstants.REMOVE_SESSION_FROM_STORAGE;
+import static org.intellij.sdk.project.model.constants.TextConstants.RENAME_SESSION;
+
 import java.awt.*;
 import java.util.Arrays;
 import java.util.Objects;
@@ -71,27 +78,33 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         panel.setLayout(boxLayout);
         // delete button
         JButton deleteButton = new JButton("Delete");
+        deleteButton.setToolTipText(REMOVE_SESSION_FROM_STORAGE);
         deleteButton.addActionListener(e -> deleteNode(keysList));
         panel.add(deleteButton);
         // rename button
         JButton renameButton = new JButton("Rename");
+        renameButton.setToolTipText(RENAME_SESSION);
         renameButton.addActionListener(e -> renameNodeName(keysList));
         panel.add(renameButton);
         // load button
-        JButton loadButton = new JButton("Show");
+        JButton loadButton = new JButton("Load");
+        loadButton.setToolTipText(LOAD_SESSION_INTO_TOOLBAR);
         loadButton.addActionListener(e -> loadNode(keysList));
         panel.add(loadButton);
         // delete all button
         JButton deleteAllButton = new JButton("Delete All");
+        deleteAllButton.setToolTipText(REMOVE_ALL_SESSIONS);
         deleteAllButton.addActionListener(e -> deleteAll(keysList));
         panel.add(deleteAllButton);
         // export button
         JButton exportButton = new JButton("Export");
+        exportButton.setToolTipText(EXPORT_SESSION_JSON);
         exportButton.addActionListener(e -> export(keysList));
         panel.add(exportButton);
         refreshView(keysList);
         // import button
         JButton importButton = new JButton("Import");
+        importButton.setToolTipText(IMPORT_FROM_FILE);
         importButton.addActionListener(e -> _import(keysList));
         panel.add(importButton);
         refreshView(keysList);
