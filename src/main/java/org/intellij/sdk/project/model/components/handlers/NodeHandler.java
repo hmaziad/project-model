@@ -103,7 +103,7 @@ public class NodeHandler implements ReachServices {
         String fileName = selectedKey.replace(":", "-") + ".json";
         Path pathWithDir = createDirectoryIfNotExists(path);
         try {
-            String fullPath = String.format("%s/%s", pathWithDir.toUri().getPath(), fileName);
+            String fullPath = String.format("%s%s", pathWithDir.toUri().getPath(), fileName);
             File nodeAsFile = new File(fullPath);
             if (nodeAsFile.createNewFile()) {
                 MessageDialogues.showInfoMessageDialogue("File created under path:\n" + fullPath, "Success");

@@ -1,6 +1,7 @@
 package org.intellij.sdk.project.model.components.views;
 
 import java.awt.*;
+import java.util.Arrays;
 import java.util.Objects;
 
 import javax.swing.*;
@@ -94,7 +95,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         importButton.addActionListener(e -> _import(keysList));
         panel.add(importButton);
         refreshView(keysList);
-        enableButtons(keysList.getItemsCount() != 0, deleteButton, renameButton, loadButton, deleteAllButton);
+        enableButtons(keysList.getItemsCount() != 0,exportButton, deleteButton, renameButton, loadButton, deleteAllButton);
         keysList.addListSelectionListener(e -> enableButtons(keysList.getItemsCount() != 0, deleteButton, renameButton, loadButton, deleteAllButton));
         return panel;
     }
@@ -120,11 +121,8 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         refreshView(keysList);
     }
 
-    private void enableButtons(boolean enable, JButton deleteButton, JButton renameButton, JButton loadButton, JButton deleteAllButton) {
-        deleteButton.setEnabled(enable);
-        renameButton.setEnabled(enable);
-        loadButton.setEnabled(enable);
-        deleteAllButton.setEnabled(enable);
+    private void enableButtons(boolean enable,JButton ...jButtons) {
+        Arrays.stream(jButtons).forEach(jButton -> jButton.setEnabled(enable));
     }
 
     private void renameNodeName(JBList<String> keysList) {
