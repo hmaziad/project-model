@@ -15,7 +15,7 @@ import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.LayeredIcon;
 import com.intellij.ui.SimpleColoredText;
 import com.intellij.ui.SimpleTextAttributes;
-import com.intellij.xdebugger.impl.ui.tree.nodes.XValueContainerNode;
+import com.intellij.xdebugger.impl.ui.tree.nodes.XDebuggerTreeNode;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,7 +45,7 @@ public class DebugNode extends DefaultMutableTreeNode {
     }
 
     // exclude Mark
-    public DebugNode(XValueContainerNode<?> xNode) {
+    public DebugNode(XDebuggerTreeNode xNode) {
         this.iconPath = getIconPath(xNode.getIcon()).orElse(null);
         SimpleColoredText simpleColoredText = xNode.getText();
         ArrayList<String> texts = simpleColoredText.getTexts();
@@ -66,7 +66,7 @@ public class DebugNode extends DefaultMutableTreeNode {
 //            LOG.error("Could not get icon path: {}", e.toString());
         }
 
-        List<? extends XValueContainerNode<?>> children = xNode.getLoadedChildren();
+        List<? extends XDebuggerTreeNode> children = xNode.getLoadedChildren();
         children.forEach(child -> {
             DebugNode debugNode = new DebugNode(child);
             add(debugNode);
