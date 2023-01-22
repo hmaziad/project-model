@@ -33,7 +33,15 @@
     <vendor url="https://plugins.jetbrains.com">IntelliJ Platform SDK</vendor>
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Armadillo" secondary="true" icon="AllIcons.General.Modified" anchor="bottom"
-                    factoryClass="org.intellij.sdk.project.model.SnapService"/>
-        <applicationService serviceImplementation="org.intellij.sdk.project.model.PersistencyService" serviceInterface="org.intellij.sdk.project.model.PersistencyService"/>
+                    factoryClass="org.intellij.sdk.project.model.DebugWindowProvider"/>
+        <applicationService serviceImplementation="org.intellij.sdk.project.model.services.PersistencyService" serviceInterface="org.intellij.sdk.project.model.services.PersistencyService"/>
+        <applicationService
+                serviceInterface="org.intellij.sdk.project.model.services.ComponentService"
+                serviceImplementation="org.intellij.sdk.project.model.services.ComponentService"/>
     </extensions>
+    <projectListeners>
+        <listener
+                class="org.intellij.sdk.project.model.listeners.SessionStartedListener"
+                topic="com.intellij.debugger.impl.DebuggerManagerListener"/>
+    </projectListeners>
 </idea-plugin>
