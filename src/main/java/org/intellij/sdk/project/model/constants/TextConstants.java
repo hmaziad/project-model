@@ -16,7 +16,7 @@ public class TextConstants {
     public static final String COMPARING_SESSIONS = "Comparing Sessions";
     public static final String DELETE_SESSION = "Delete Session";
     public static final String NODE_DATE_FORMAT = "yyyy-MM-dd_hh:mm:ss.SSS";
-    public static final String GENERATED_SESSION_NAME = "session-%s";
+    public static final String GENERATED_SESSION_NAME = "%s_%s";
     public static final String DIFF_NODES = "Diff Sessions";
     public static final String REMOVE_SESSION_FROM_STORAGE = "Remove session from storage";
     public static final String RENAME_SESSION = "Rename session";

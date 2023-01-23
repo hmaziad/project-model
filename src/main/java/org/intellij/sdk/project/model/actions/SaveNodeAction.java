@@ -12,7 +12,7 @@ public class SaveNodeAction extends XDebuggerTreeActionBase implements ReachServ
     protected void perform(XValueNodeImpl node, @NotNull String nodeName, AnActionEvent e) {
         DebugNode root = new DebugNode();
         root.add(new DebugNode(node));
-        COMPONENT_SERVICE.getNodeHandler().save(root);
+        COMPONENT_SERVICE.getNodeHandler().save(root, e.getProject());
         COMPONENT_SERVICE.getDebugTreeManager().setRoot(root);
     }
 }

@@ -32,14 +32,24 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.xdebugger.XDebuggerManager;
+import com.intellij.xdebugger.XSourcePosition;
 
 public class NodeHandler implements ReachServices {
     private final DebugNodeConverter nodeConverter = new DebugNodeConverter();
 
-    public void save(DebugNode debugNode) {
-        String dateTimeNow = LocalDateTime.now().format(DateTimeFormatter.ofPattern(NODE_DATE_FORMAT));
-        String nodeName = String.format(GENERATED_SESSION_NAME, dateTimeNow);
-        save(nodeName,debugNode);
+    public void save(DebugNode debugNode, Project project) {
+        LocalDateTime timestamp = LocalDateTime.now();
+        debugNode.setTimestamp(timestamp);
+        String generatedName = getGenerateName(project, timestamp);
+        save(generatedName, debugNode);
+    }
+
+    private String getGenerateName(Project project, LocalDateTime timestamp) {
+        String formattedTimestamp = timestamp.format(DateTimeFormatter.ofPattern(NODE_DATE_FORMAT));
+        XSourcePosition xSourcePosition = XDebuggerManager.getInstance(project).getCurrentSession().getCurrentPosition();
+        String classPart = xSourcePosition.getFile().getNameWithoutExtension();
+        return String.format(GENERATED_SESSION_NAME, classPart, formattedTimestamp);
     }
 
     private void save(String nodeName, DebugNode debugNode) {
@@ -75,11 +85,15 @@ public class NodeHandler implements ReachServices {
     }
 
     public List<String> getAllNodeNames() {
+        Comparator<Map.Entry<String, DebugNode>> debugComparator = Comparator.comparing(e1 -> e1.getValue().getTimestamp());
         return PERSISTENCY_SERVICE //
             .getNodes() //
-            .keySet() //
+            .entrySet() //
             .stream() //
-            .sorted(Comparator.reverseOrder()) //
+            .filter(e -> Objects.nonNull(e.getValue().getTimestamp()))
+            .sorted(Comparator.nullsLast(debugComparator))//
+            .filter(Objects::nonNull) //
+            .map(Map.Entry::getKey) //
             .collect(Collectors.toList());
     }
 
