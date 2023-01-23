@@ -15,6 +15,7 @@ public class SdkIcons {
     public static final Icon SNAP_ICON = IconLoader.getIcon("/icons/snap/snapshotGutter_dark.svg", SdkIcons.class);
     public static final Icon DIFF_ICON = IconLoader.getIcon("/icons/diff/diff_dark.svg", SdkIcons.class);
     public static final Icon DELETE_ICON = AllIcons.Actions.GC;
+    public static final Icon CLEAR_ICON = AllIcons.Debugger.Db_invalid_breakpoint;
     public static final Icon VIEW_NODES_ICON = IconLoader.getIcon("/icons/view_saved_nodes/manageDataSources_dark.svg", SdkIcons.class);
     public static final Icon DIFF_SCALED = IconLoader.getIcon("/icons/diff/diff_dark_scaled.svg", SdkIcons.class);
 

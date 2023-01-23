@@ -1,6 +1,7 @@
 package org.intellij.sdk.project.model.components.toolbar;
 
 import javax.swing.*;
+import org.intellij.sdk.project.model.components.buttons.ClearButton;
 import org.intellij.sdk.project.model.components.buttons.DeleteButton;
 import org.intellij.sdk.project.model.components.buttons.DiffButton;
 import org.intellij.sdk.project.model.components.buttons.SettingsButton;
@@ -21,17 +22,20 @@ public class DebuggerWindowContent extends SimpleToolWindowPanel {
         DefaultActionGroup actionGroup = new DefaultActionGroup("ACTION_GROUP", false);
 
         IconWithTextAction snapButton = new SnapButton();
-        IconWithTextAction clearButton = new DeleteButton();
+        IconWithTextAction deleteButton = new DeleteButton();
+        IconWithTextAction clearButton = new ClearButton();
         IconWithTextAction diffButton = new DiffButton();
         IconWithTextAction settingsButton = new SettingsButton();
 
         actionGroup.add(snapButton);
+        actionGroup.add(clearButton);
         actionGroup.addSeparator();
         actionGroup.add(diffButton);
         actionGroup.addSeparator();
         actionGroup.add(settingsButton);
         actionGroup.addSeparator();
-        actionGroup.add(clearButton);
+        actionGroup.add(deleteButton);
+
         ActionToolbar actionToolbar = actionManager.createActionToolbar("ACTION_TOOLBAR", actionGroup, true);
         actionToolbar.setOrientation(SwingConstants.HORIZONTAL);
         actionToolbar.getComponent().setBorder(JBUI.Borders.customLineBottom(JBUI.CurrentTheme.ToolWindow.borderColor()));
