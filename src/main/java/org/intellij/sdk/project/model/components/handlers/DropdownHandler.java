@@ -17,12 +17,14 @@ public class DropdownHandler implements ReachServices {
     private int index = 0;
     private final Project project;
 
-    public void addNodesToDropdown(JComboBox<String> nodesDropdown) {
+    public void addNodesToDropdown(JComboBox<String> nodesDropdown, Optional<Integer> optionalLastIndex) {
         List<String> allNodeNames = COMPONENT_SERVICE.getNodeHandler().getAllNodeNames();
         Optional<DebugNode> currentSession = this.snapHandler.getCurrentSession(this.project);
         currentSession.ifPresent(node -> nodesDropdown.addItem(CURRENT_SESSION));
         allNodeNames.forEach(nodesDropdown::addItem);
-        if (nodesDropdown.getItemCount() > 0) {
+        if (optionalLastIndex.isPresent() && optionalLastIndex.get() < nodesDropdown.getItemCount()) {
+            nodesDropdown.setSelectedIndex(optionalLastIndex.get());
+        } else if (nodesDropdown.getItemCount() > 0) {
             int remaining = nodesDropdown.getItemCount() - index;
             nodesDropdown.setSelectedIndex(Math.min(this.index++, remaining));
         }

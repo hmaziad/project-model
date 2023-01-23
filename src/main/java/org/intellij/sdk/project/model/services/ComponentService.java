@@ -1,5 +1,6 @@
 package org.intellij.sdk.project.model.services;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.*;
@@ -16,6 +17,10 @@ public class ComponentService {
     private final DebugTreeManager debugTreeManager = new DebugTreeManager();
     private final JLabel feedbackMessage = new JLabel("Let's get started...");
     private final NodeHandler nodeHandler = new NodeHandler();
+    @Setter
+    private Optional<Integer> lastSelectedLeft = Optional.empty();
+    @Setter
+    private Optional<Integer> lastSelectedRight = Optional.empty();
     @Setter
     private String nodeNameInWindow = null;
 }

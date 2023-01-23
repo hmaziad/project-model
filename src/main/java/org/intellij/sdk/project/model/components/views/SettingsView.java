@@ -130,6 +130,8 @@ public class SettingsView extends DialogWrapper implements ReachServices {
 
     private void deleteAll(JBList<String> keysList) {
         COMPONENT_SERVICE.getNodeHandler().deleteAll(this.project);
+        COMPONENT_SERVICE.getDebugTreeManager().setRoot(null);
+        COMPONENT_SERVICE.setNodeNameInWindow(null);
         refreshView(keysList);
     }
 
