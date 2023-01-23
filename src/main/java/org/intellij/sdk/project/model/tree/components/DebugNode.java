@@ -20,10 +20,11 @@ import com.intellij.xdebugger.impl.ui.tree.nodes.XDebuggerTreeNode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 
 @Getter
 @NoArgsConstructor(force = true)
-//@Log4j2
+@Log4j2
 public class DebugNode extends DefaultMutableTreeNode {
 
     @Expose
@@ -63,7 +64,7 @@ public class DebugNode extends DefaultMutableTreeNode {
                 this.iconPath = icon.getOriginalPath(); // e.g. nodes/parameter.svg
             }
         } catch (Exception e) {
-//            LOG.error("Could not get icon path: {}", e.toString());
+            LOG.error("Could not get icon path: {}", e.toString());
         }
 
         List<? extends XDebuggerTreeNode> children = xNode.getLoadedChildren();
@@ -99,7 +100,7 @@ public class DebugNode extends DefaultMutableTreeNode {
                 return Optional.of(imageIcon.getOriginalPath()); // e.g. nodes/parameter.svg
             }
         }
-//        LOG.error("Could not get Icon path for icon class {}", icon);
+        LOG.error("Could not get Icon path for icon class {}", icon);
         return Optional.empty();
     }
 
