@@ -1,7 +1,7 @@
 package org.intellij.sdk.project.model.components.toolbar;
 
 import javax.swing.*;
-import org.intellij.sdk.project.model.components.buttons.ClearButton;
+import org.intellij.sdk.project.model.components.buttons.DeleteButton;
 import org.intellij.sdk.project.model.components.buttons.DiffButton;
 import org.intellij.sdk.project.model.components.buttons.SettingsButton;
 import org.intellij.sdk.project.model.components.buttons.SnapButton;
@@ -21,7 +21,7 @@ public class DebuggerWindowContent extends SimpleToolWindowPanel {
         DefaultActionGroup actionGroup = new DefaultActionGroup("ACTION_GROUP", false);
 
         IconWithTextAction snapButton = new SnapButton();
-        IconWithTextAction clearButton = new ClearButton();
+        IconWithTextAction clearButton = new DeleteButton();
         IconWithTextAction diffButton = new DiffButton();
         IconWithTextAction settingsButton = new SettingsButton();
 

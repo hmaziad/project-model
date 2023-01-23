@@ -14,7 +14,6 @@ import java.util.Objects;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
-import org.intellij.sdk.project.model.components.handlers.NodeHandler;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.intellij.sdk.project.model.constants.MessageDialogues;
 import org.intellij.sdk.project.model.tree.components.DebugNode;
@@ -29,7 +28,6 @@ import com.intellij.util.ui.JBUI;
 
 public class SettingsView extends DialogWrapper implements ReachServices {
     private final Project project;
-    private final NodeHandler nodeHandler = new NodeHandler();
     private JScrollPane scrollableNodesPanel;
     private final DebugTreeManager debugTreeManager = new DebugTreeManager();
 
@@ -46,7 +44,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         setSize(1300, 1100);
         JPanel dialogPanel = new JPanel(new GridBagLayout());
 
-        String[] keyStrings = this.nodeHandler.getAllNodeNames().toArray(String[]::new);
+        String[] keyStrings = COMPONENT_SERVICE.getNodeHandler().getAllNodeNames().toArray(String[]::new);
         JBList<String> keysList = new JBList<>(keyStrings);
 
         JScrollPane scrollableKeysPanel = getScrollableKeysPanel(keysList);
@@ -114,23 +112,24 @@ public class SettingsView extends DialogWrapper implements ReachServices {
     }
 
     private void _import(JBList<String> keysList) {
-        this.nodeHandler.doImport(this.project);
+        COMPONENT_SERVICE.getNodeHandler().doImport(this.project);
         refreshView(keysList);
     }
 
     private void export(JBList<String> keysList) {
         String selectedKey = keysList.getSelectedValue();
-        this.nodeHandler.export(selectedKey, this.project);
+        COMPONENT_SERVICE.getNodeHandler().export(selectedKey, this.project);
     }
 
     private void loadNode(JBList<String> keysList) {
         String selectedKey = keysList.getSelectedValue();
-        DebugNode debugNode = this.nodeHandler.getNodeByName(selectedKey);
+        DebugNode debugNode = COMPONENT_SERVICE.getNodeHandler().getNodeByName(selectedKey);
+        COMPONENT_SERVICE.setNodeNameInWindow(selectedKey);
         COMPONENT_SERVICE.getDebugTreeManager().setRoot(debugNode);
     }
 
     private void deleteAll(JBList<String> keysList) {
-        this.nodeHandler.deleteAll(this.project);
+        COMPONENT_SERVICE.getNodeHandler().deleteAll(this.project);
         refreshView(keysList);
     }
 
@@ -141,23 +140,23 @@ public class SettingsView extends DialogWrapper implements ReachServices {
     private void renameNodeName(JBList<String> keysList) {
         String selectedNodeName = keysList.getSelectedValue();
         String newNodeName = MessageDialogues.getRenameDialogue(this.project, selectedNodeName, false);
-        while (this.nodeHandler.getAllNodesPerNames().containsKey(newNodeName)) {
+        while (COMPONENT_SERVICE.getNodeHandler().getAllNodesPerNames().containsKey(newNodeName)) {
             newNodeName = MessageDialogues.getRenameDialogue(this.project, newNodeName, true);
         }
         if (Objects.nonNull(newNodeName)) {
-            this.nodeHandler.renameNode(selectedNodeName, newNodeName);
+            COMPONENT_SERVICE.getNodeHandler().renameNode(selectedNodeName, newNodeName);
             refreshView(keysList);
         }
     }
 
     private void deleteNode(JBList<String> keysList) {
-        this.nodeHandler.delete(keysList.getSelectedValue(), this.project);
+        COMPONENT_SERVICE.getNodeHandler().delete(keysList.getSelectedValue(), this.project);
         refreshView(keysList);
     }
 
     private void refreshView(JBList<String> keysList) {
         DefaultListModel<String> model = new DefaultListModel<>();
-        model.addAll(this.nodeHandler.getAllNodeNames());
+        model.addAll(COMPONENT_SERVICE.getNodeHandler().getAllNodeNames());
         keysList.setModel(model);
         int currentIndex = Math.min(keysList.getItemsCount(), 0);
         keysList.setSelectedIndex(currentIndex);
@@ -194,7 +193,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
 
     private void showSelectedNodeContent(JBList<String> keysList) {
         String selectedValue = keysList.getSelectedValue();
-        DebugNode debugNode = this.nodeHandler.getNodeByName(selectedValue);
+        DebugNode debugNode = COMPONENT_SERVICE.getNodeHandler().getNodeByName(selectedValue);
         this.debugTreeManager.setRoot(debugNode);
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(this.debugTreeManager.getDebugTree());

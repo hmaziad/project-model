@@ -12,14 +12,13 @@ import com.intellij.openapi.project.Project;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class DropdownHandler {
-    private final NodeHandler nodeHandler = new NodeHandler();
+public class DropdownHandler implements ReachServices {
     private final SnapHandler snapHandler = new SnapHandler();
     private int index = 0;
     private final Project project;
 
     public void addNodesToDropdown(JComboBox<String> nodesDropdown) {
-        List<String> allNodeNames = this.nodeHandler.getAllNodeNames();
+        List<String> allNodeNames = COMPONENT_SERVICE.getNodeHandler().getAllNodeNames();
         Optional<DebugNode> currentSession = this.snapHandler.getCurrentSession(this.project);
         currentSession.ifPresent(node -> nodesDropdown.addItem(CURRENT_SESSION));
         allNodeNames.forEach(nodesDropdown::addItem);
@@ -34,7 +33,7 @@ public class DropdownHandler {
         if (CURRENT_SESSION.equals(selectedItem)) {
             return this.snapHandler.getCurrentSession(this.project).orElseThrow(() -> new IllegalStateException("Why you messing?"));
         } else {
-            return this.nodeHandler.getNodeByName(selectedItem);
+            return COMPONENT_SERVICE.getNodeHandler().getNodeByName(selectedItem);
         }
     }
 

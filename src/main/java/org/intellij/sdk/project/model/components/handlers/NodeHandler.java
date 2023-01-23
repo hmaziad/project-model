@@ -39,6 +39,11 @@ public class NodeHandler implements ReachServices {
     public void save(DebugNode debugNode) {
         String dateTimeNow = LocalDateTime.now().format(DateTimeFormatter.ofPattern(NODE_DATE_FORMAT));
         String nodeName = String.format(GENERATED_SESSION_NAME, dateTimeNow);
+        save(nodeName,debugNode);
+    }
+
+    private void save(String nodeName, DebugNode debugNode) {
+        COMPONENT_SERVICE.setNodeNameInWindow(nodeName);
         PERSISTENCY_SERVICE.getNodes().put(nodeName, debugNode);
     }
 
@@ -47,6 +52,8 @@ public class NodeHandler implements ReachServices {
         boolean isSure = MessageDialogues.getYesNoMessageDialogue(message, DELETE_SESSION, project);
         if (isSure) {
             PERSISTENCY_SERVICE.getNodes().remove(nodeName);
+            COMPONENT_SERVICE.getDebugTreeManager().setRoot(null);
+            COMPONENT_SERVICE.setNodeNameInWindow(null);
         }
     }
 
@@ -142,7 +149,8 @@ public class NodeHandler implements ReachServices {
                 CharSequence charsSequence = Objects.requireNonNull(FileDocumentManager.getInstance().getDocument(chosenFile), errorMessage).getCharsSequence();
                 String content = String.valueOf(charsSequence);
                 HashMap<String, DebugNode> nodeFromJson = this.nodeConverter.fromString(content);
-                nodes.put(fileName, Objects.requireNonNull(nodeFromJson, errorMessage).entrySet().iterator().next().getValue());
+                DebugNode debugNode = Objects.requireNonNull(nodeFromJson, errorMessage).entrySet().iterator().next().getValue();
+                save(fileName, debugNode);
             }
         }
     }
