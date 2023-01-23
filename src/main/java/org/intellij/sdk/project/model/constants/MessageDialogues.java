@@ -1,5 +1,8 @@
 package org.intellij.sdk.project.model.constants;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.InputValidator;
@@ -17,7 +20,7 @@ public class MessageDialogues {
 
     // todo remove
     public static void getErrorMessageDialogue(String message, Project project) {
-        Messages.showMessageDialog(project,message, "Error", Messages.getErrorIcon());
+        Messages.showMessageDialog(project, message, "Error", Messages.getErrorIcon());
     }
 
     public static @Nullable @NlsSafe String getRenameDialogue(Project project, String newNodeName, boolean showComment) {
@@ -27,9 +30,12 @@ public class MessageDialogues {
     }
 
     private static class CustomInputValidator implements InputValidator {
+        private static final Pattern pattern = Pattern.compile("[~!@#$%^&*()+{}\\[\\]:;,<>/?]");
+
         @Override
         public boolean checkInput(@NlsSafe String inputString) {
-            return !inputString.contains(" ");
+            final Matcher matcher = pattern.matcher(inputString);
+            return !matcher.find();
         }
 
         @Override

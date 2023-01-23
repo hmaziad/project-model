@@ -144,6 +144,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
             newNodeName = MessageDialogues.getRenameDialogue(this.project, newNodeName, true);
         }
         if (Objects.nonNull(newNodeName)) {
+            newNodeName = newNodeName.replace(' ', '_');
             COMPONENT_SERVICE.getNodeHandler().renameNode(selectedNodeName, newNodeName);
             refreshView(keysList);
         }
