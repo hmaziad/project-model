@@ -41,7 +41,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        setSize(1300, 1100);
+        setSize(1100, 800);
         JPanel dialogPanel = new JPanel(new GridBagLayout());
 
         String[] keyStrings = COMPONENT_SERVICE.getNodeHandler().getAllNodeNames().toArray(String[]::new);
@@ -56,11 +56,11 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         gbc.weighty = 1;
 
         gbc.gridx = 0;
-        gbc.weightx = 0;
+        gbc.weightx = 1;
         dialogPanel.add(scrollableKeysPanel, gbc);
 
         gbc.gridx = 1;
-        gbc.weightx = 1;
+        gbc.weightx = 5;
         dialogPanel.add(scrollableNodesPanel, gbc);
 
         gbc.gridx = 2;
@@ -169,7 +169,8 @@ public class SettingsView extends DialogWrapper implements ReachServices {
     @NotNull
     private JScrollPane getScrollableKeysPanel(JBList<String> keysList) {
         JScrollPane scrollableKeysPanel = new JBScrollPane();
-        scrollableKeysPanel.setMinimumSize(new Dimension(350, 1100));
+        scrollableKeysPanel.setPreferredSize(new Dimension(200, 800));
+        scrollableKeysPanel.setMinimumSize(new Dimension(200, 800));
         TitledBorder titledBorder = BorderFactory.createTitledBorder("Saved Sessions");
         titledBorder.setBorder(new LineBorder(Color.gray.darker()));
         scrollableKeysPanel.setBorder(titledBorder);
@@ -190,7 +191,8 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         TitledBorder titledBorder = BorderFactory.createTitledBorder("Session Content");
         titledBorder.setBorder(new LineBorder(Color.gray.darker()));
         jScrollPane.setBorder(titledBorder);
-        jScrollPane.setPreferredSize(new Dimension(0, 1100));
+        jScrollPane.setPreferredSize(new Dimension(450, 800));
+        jScrollPane.setMinimumSize(new Dimension(450, 800));
         return jScrollPane;
     }
 
