@@ -10,7 +10,7 @@ import javax.swing.border.EmptyBorder;
 import org.intellij.sdk.project.model.components.handlers.DiffHandler;
 import org.intellij.sdk.project.model.components.handlers.DropdownHandler;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
-import org.intellij.sdk.project.model.tree.components.DebugNode;
+import org.intellij.sdk.project.model.tree.components.DebugNodeContainer;
 import org.intellij.sdk.project.model.tree.components.DebugTreeManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -94,8 +94,8 @@ public class DiffNodesView extends DialogWrapper implements ReachServices {
     }
 
     private void showSelectedNodeContent(JComboBox<String> nodesDropdown, JScrollPane scrollPane, DebugTreeManager debugTreeManager) {
-        DebugNode selectedNode = this.dropdownHandler.getSelectedNode(nodesDropdown);
-        debugTreeManager.setRoot(selectedNode);
+        DebugNodeContainer selectedContainer = this.dropdownHandler.getSelectedContainer(nodesDropdown);
+        debugTreeManager.setRoot(selectedContainer.getNode());
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(debugTreeManager.getDebugTree());
         scrollPane.setViewportView(panel);
@@ -109,11 +109,11 @@ public class DiffNodesView extends DialogWrapper implements ReachServices {
 
     private void addDiffBtnListener(JComboBox<String> leftDropdown, JComboBox<String> rightDropdown) {
         this.diffButton.addActionListener(e -> {
-            DebugNode leftNode = this.dropdownHandler.getSelectedNode(leftDropdown);
+            DebugNodeContainer leftNodeContainer = this.dropdownHandler.getSelectedContainer(leftDropdown);
             String leftNodeName = this.dropdownHandler.getSelectedNodeName(leftDropdown);
-            DebugNode rightNode = this.dropdownHandler.getSelectedNode(rightDropdown);
+            DebugNodeContainer rightNodeContainer = this.dropdownHandler.getSelectedContainer(rightDropdown);
             String rightNodeName = this.dropdownHandler.getSelectedNodeName(rightDropdown);
-            this.diffHandler.diffNodes(leftNode, leftNodeName, rightNode, rightNodeName, this.project);
+            this.diffHandler.diffNodes(leftNodeContainer, leftNodeName, rightNodeContainer, rightNodeName, this.project);
         });
     }
 

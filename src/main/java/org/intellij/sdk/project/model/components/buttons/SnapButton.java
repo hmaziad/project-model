@@ -5,7 +5,6 @@ import static org.intellij.sdk.project.model.constants.TextConstants.SAVE_DEBUGG
 import java.util.Optional;
 
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
-import org.intellij.sdk.project.model.components.handlers.SnapHandler;
 import org.intellij.sdk.project.model.tree.components.DebugNode;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -17,15 +16,13 @@ import lombok.Getter;
 @Getter
 public class SnapButton extends IconWithTextAction implements ReachServices {
 
-    private final SnapHandler snapHandler = new SnapHandler();
-
     public SnapButton() {
         super(null, SAVE_DEBUGGER_SESSION, SdkIcons.SNAP_ICON);
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        Optional<DebugNode> optionalDebugNode = this.snapHandler.getCurrentSession(e.getProject());
+        Optional<DebugNode> optionalDebugNode = COMPONENT_SERVICE.getSnapHandler().getCurrentSession(e.getProject());
         if (optionalDebugNode.isEmpty()) {
             COMPONENT_SERVICE.getFeedbackMessage().setText("Weird, we cannot get a debug session. Try another way.");
         } else {

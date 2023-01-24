@@ -10,13 +10,14 @@ import static org.intellij.sdk.project.model.constants.TextConstants.RENAME_SESS
 import java.awt.*;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.intellij.sdk.project.model.constants.MessageDialogues;
-import org.intellij.sdk.project.model.tree.components.DebugNode;
+import org.intellij.sdk.project.model.tree.components.DebugNodeContainer;
 import org.intellij.sdk.project.model.tree.components.DebugTreeManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -99,7 +100,6 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         exportButton.setToolTipText(EXPORT_SESSION_JSON);
         exportButton.addActionListener(e -> export(keysList));
         panel.add(exportButton);
-        refreshView(keysList);
         // import button
         JButton importButton = new JButton("Import");
         importButton.setToolTipText(IMPORT_FROM_FILE);
@@ -123,9 +123,9 @@ public class SettingsView extends DialogWrapper implements ReachServices {
 
     private void loadNode(JBList<String> keysList) {
         String selectedKey = keysList.getSelectedValue();
-        DebugNode debugNode = COMPONENT_SERVICE.getNodeHandler().getNodeByName(selectedKey);
+        DebugNodeContainer nodeContainer = COMPONENT_SERVICE.getNodeHandler().getNodeContainerByName(selectedKey).orElseThrow();
         COMPONENT_SERVICE.setNodeNameInWindow(selectedKey);
-        COMPONENT_SERVICE.getDebugTreeManager().setRoot(debugNode);
+        COMPONENT_SERVICE.getDebugTreeManager().setRoot(nodeContainer.getNode());
     }
 
     private void deleteAll(JBList<String> keysList) {
@@ -142,7 +142,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
     private void renameNodeName(JBList<String> keysList) {
         String selectedNodeName = keysList.getSelectedValue();
         String newNodeName = MessageDialogues.getRenameDialogue(this.project, selectedNodeName, false);
-        while (COMPONENT_SERVICE.getNodeHandler().getAllNodesPerNames().containsKey(newNodeName)) {
+        while (COMPONENT_SERVICE.getNodeHandler().getAllContainersPerNames().containsKey(newNodeName)) {
             newNodeName = MessageDialogues.getRenameDialogue(this.project, newNodeName, true);
         }
         if (Objects.nonNull(newNodeName)) {
@@ -196,10 +196,11 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         return jScrollPane;
     }
 
+
     private void showSelectedNodeContent(JBList<String> keysList) {
         String selectedValue = keysList.getSelectedValue();
-        DebugNode debugNode = COMPONENT_SERVICE.getNodeHandler().getNodeByName(selectedValue);
-        this.debugTreeManager.setRoot(debugNode);
+        Optional<DebugNodeContainer> optionalContainer = COMPONENT_SERVICE.getNodeHandler().getNodeContainerByName(selectedValue);
+        this.debugTreeManager.setRoot(optionalContainer.isPresent() ? optionalContainer.get().getNode() : null);
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(this.debugTreeManager.getDebugTree());
         this.scrollableNodesPanel.setViewportView(panel);

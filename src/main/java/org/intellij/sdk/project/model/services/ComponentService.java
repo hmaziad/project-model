@@ -5,7 +5,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.*;
 import org.intellij.sdk.project.model.components.handlers.NodeHandler;
+import org.intellij.sdk.project.model.components.handlers.SnapHandler;
 import org.intellij.sdk.project.model.tree.components.DebugTreeManager;
+import org.intellij.sdk.project.model.util.DebugContainerConverter;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +19,9 @@ public class ComponentService {
     private final DebugTreeManager debugTreeManager = new DebugTreeManager();
     private final JLabel feedbackMessage = new JLabel("Let's get started...");
     private final NodeHandler nodeHandler = new NodeHandler();
+    private final SnapHandler snapHandler = new SnapHandler();
+    private final DebugContainerConverter nodeConverter = new DebugContainerConverter();
+
     @Setter
     private Optional<Integer> lastSelectedLeft = Optional.empty();
     @Setter

@@ -1,7 +1,6 @@
 package org.intellij.sdk.project.model.tree.components;
 
 import java.awt.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -32,10 +31,6 @@ public class DebugNode extends DefaultMutableTreeNode {
     private List<String> texts = new ArrayList<>();
     @Expose
     private List<Integer> colors = new ArrayList<>();
-
-    @Setter
-    private LocalDateTime timestamp;
-
     @Expose
     private String iconPath;
 

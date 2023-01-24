@@ -25,6 +25,6 @@ public class DiffButton extends IconWithTextAction implements ReachServices {
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(!PERSISTENCY_SERVICE.getNodes().isEmpty());
+        e.getPresentation().setEnabled(!PERSISTENCY_SERVICE.getContainers().isEmpty());
     }
 }

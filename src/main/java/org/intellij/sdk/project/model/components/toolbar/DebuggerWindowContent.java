@@ -14,7 +14,6 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.util.ui.JBUI;
 
 public class DebuggerWindowContent extends SimpleToolWindowPanel {
-// JBUI.CurrentTheme.Link.Foreground.ENABLED
     public DebuggerWindowContent(boolean vertical) {
         super(vertical, false);
 

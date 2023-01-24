@@ -14,17 +14,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.intellij.sdk.project.model.constants.MessageDialogues;
 import org.intellij.sdk.project.model.tree.components.DebugNode;
-import org.intellij.sdk.project.model.util.DebugNodeConverter;
+import org.intellij.sdk.project.model.tree.components.DebugNodeContainer;
 import com.intellij.json.JsonFileType;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
@@ -36,13 +36,17 @@ import com.intellij.xdebugger.XDebuggerManager;
 import com.intellij.xdebugger.XSourcePosition;
 
 public class NodeHandler implements ReachServices {
-    private final DebugNodeConverter nodeConverter = new DebugNodeConverter();
 
     public void save(DebugNode debugNode, Project project) {
         LocalDateTime timestamp = LocalDateTime.now();
-        debugNode.setTimestamp(timestamp);
         String generatedName = getGenerateName(project, timestamp);
-        save(generatedName, debugNode);
+        DebugNodeContainer nodeContainer = new DebugNodeContainer(timestamp, debugNode);
+        save(generatedName, nodeContainer);
+    }
+
+    private void save(String generatedName, DebugNodeContainer nodeContainer) {
+        COMPONENT_SERVICE.setNodeNameInWindow(generatedName);
+        PERSISTENCY_SERVICE.getContainers().put(generatedName, nodeContainer);
     }
 
     private String getGenerateName(Project project, LocalDateTime timestamp) {
@@ -52,16 +56,11 @@ public class NodeHandler implements ReachServices {
         return String.format(GENERATED_SESSION_NAME, classPart, formattedTimestamp);
     }
 
-    private void save(String nodeName, DebugNode debugNode) {
-        COMPONENT_SERVICE.setNodeNameInWindow(nodeName);
-        PERSISTENCY_SERVICE.getNodes().put(nodeName, debugNode);
-    }
-
     public void delete(String nodeName, Project project) {
         String message = String.format(DELETE_SAVED_NODE, nodeName);
         boolean isSure = MessageDialogues.getYesNoMessageDialogue(message, DELETE_SESSION, project);
         if (isSure) {
-            PERSISTENCY_SERVICE.getNodes().remove(nodeName);
+            PERSISTENCY_SERVICE.getContainers().remove(nodeName);
             COMPONENT_SERVICE.getDebugTreeManager().setRoot(null);
             COMPONENT_SERVICE.setNodeNameInWindow(null);
         }
@@ -70,57 +69,45 @@ public class NodeHandler implements ReachServices {
     public void deleteAll(Project project) {
         boolean isSure = MessageDialogues.getYesNoMessageDialogue(DELETE_SAVED_NODES, DELETE_SESSION, project);
         if (isSure) {
-            PERSISTENCY_SERVICE.getNodes().clear();
+            PERSISTENCY_SERVICE.getContainers().clear();
         }
     }
 
-    public DebugNode getNodeByName(String nodeName) {
-        return PERSISTENCY_SERVICE.getNodes().get(nodeName);
-    }
-
-    public List<DebugNode> getAllNodes() {
-        return new ArrayList<>(PERSISTENCY_SERVICE //
-            .getNodes() //
-            .values());
+    public Optional<DebugNodeContainer> getNodeContainerByName(String nodeName) {
+        return Optional.ofNullable(PERSISTENCY_SERVICE.getContainers().get(nodeName));
     }
 
     public List<String> getAllNodeNames() {
-        Comparator<Map.Entry<String, DebugNode>> debugComparator = Comparator.comparing(e1 -> e1.getValue().getTimestamp());
+        Comparator<Map.Entry<String, DebugNodeContainer>> debugComparator = Comparator.comparing(e1 -> {
+            LocalDateTime timestamp = e1.getValue().getTimestamp();
+            return timestamp == null ? LocalDateTime.now() : timestamp;
+        });
         return PERSISTENCY_SERVICE //
-            .getNodes() //
+            .getContainers() //
             .entrySet() //
             .stream() //
-            .filter(e -> Objects.nonNull(e.getValue().getTimestamp()))
-            .sorted(Comparator.nullsLast(debugComparator))//
-            .filter(Objects::nonNull) //
+            .sorted(debugComparator)//
             .map(Map.Entry::getKey) //
             .collect(Collectors.toList());
     }
 
-    public Map<String, DebugNode> getAllNodesPerNames() {
-        return PERSISTENCY_SERVICE.getNodes();
+    public Map<String, DebugNodeContainer> getAllContainersPerNames() {
+        return PERSISTENCY_SERVICE.getContainers();
     }
 
     public void renameNode(String from, String to) {
-        Map<String, DebugNode> nodes = PERSISTENCY_SERVICE.getNodes();
-        DebugNode fromNode = nodes.get(from);
-        nodes.remove(from);
-        nodes.put(to, fromNode);
+        Map<String, DebugNodeContainer> containers = PERSISTENCY_SERVICE.getContainers();
+        DebugNodeContainer fromContainer = containers.get(from);
+        containers.remove(from);
+        containers.put(to, fromContainer);
     }
-
-    /**
-     * Feedback node saved, and say path
-     * tell of node already exists
-     * Show error in case of error
-     */
-
 
     public void export(String selectedKey, Project project) {
         String path = project.getBasePath();
-        DebugNode debugNode = getNodeByName(selectedKey);
-        HashMap<String, DebugNode> namePerNode = new HashMap<>();
-        namePerNode.put("root", debugNode);
-        String nodeAsJson = this.nodeConverter.toString(namePerNode);
+        DebugNodeContainer nodeContainer = getNodeContainerByName(selectedKey).orElseThrow();
+        HashMap<String, DebugNodeContainer> namePerNode = new HashMap<>();
+        namePerNode.put("root", nodeContainer);
+        String nodeAsJson = COMPONENT_SERVICE.getNodeConverter().toString(namePerNode);
         String fileName = selectedKey.replace(":", "-") + ".json";
         Path pathWithDir = createDirectoryIfNotExists(path);
         try {
@@ -155,17 +142,27 @@ public class NodeHandler implements ReachServices {
         VirtualFile chosenFile = FileChooser.chooseFile(jsonOnly, project, null);
         if (Objects.nonNull(chosenFile)) {
             String errorMessage = chosenFile.getName() + " file is empty";
+            Map<String, DebugNodeContainer> nodes = PERSISTENCY_SERVICE.getContainers();
             String fileName = Objects.requireNonNull(chosenFile.getNameWithoutExtension(), "File is not valid");
-            Map<String, DebugNode> nodes = PERSISTENCY_SERVICE.getNodes();
             if (nodes.containsKey(fileName)) {
                 MessageDialogues.getErrorMessageDialogue(String.format("A session with name \"%s\" already exists", fileName), project);
-            } else {
-                CharSequence charsSequence = Objects.requireNonNull(FileDocumentManager.getInstance().getDocument(chosenFile), errorMessage).getCharsSequence();
-                String content = String.valueOf(charsSequence);
-                HashMap<String, DebugNode> nodeFromJson = this.nodeConverter.fromString(content);
-                DebugNode debugNode = Objects.requireNonNull(nodeFromJson, errorMessage).entrySet().iterator().next().getValue();
-                save(fileName, debugNode);
+            }else {
+            CharSequence charsSequence = Objects.requireNonNull(FileDocumentManager.getInstance().getDocument(chosenFile), errorMessage).getCharsSequence();
+            String content = String.valueOf(charsSequence);
+            HashMap<String, DebugNodeContainer> nodeFromJson = COMPONENT_SERVICE.getNodeConverter().fromString(content);
+            DebugNodeContainer nodeContainer = Objects.requireNonNull(nodeFromJson, errorMessage).entrySet().iterator().next().getValue();
+            save(fileName, nodeContainer);
             }
         }
     }
+
+    public DebugNodeContainer getCurrentSession(Project project) {
+        DebugNode debugNode = COMPONENT_SERVICE //
+            .getSnapHandler() //
+            .getCurrentSession(project) //
+            .orElseThrow(() -> new IllegalStateException("Why you messing?"));
+
+        return new DebugNodeContainer( null, debugNode);
+    }
+
 }
