@@ -24,7 +24,7 @@ public class DebugContainerConverter extends Converter<HashMap<String, DebugNode
         HashMap<String, DebugNodeContainer> correctedNodes = new HashMap<>();
         for (var entry : persistedNodes.entrySet()) {
             DebugNodeContainer entryValue = entry.getValue();
-            correctedNodes.put(entry.getKey(), new DebugNodeContainer(entryValue.getTimestamp(), new DebugNode(entryValue.getNode())));
+            correctedNodes.put(entry.getKey(), new DebugNodeContainer(entryValue.getTimestamp(), entryValue.getDescription(), new DebugNode(entryValue.getNode())));
         }
         return correctedNodes;
     }

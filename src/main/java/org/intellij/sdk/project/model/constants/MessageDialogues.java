@@ -24,10 +24,16 @@ public class MessageDialogues {
     }
 
     public static @Nullable @NlsSafe String getRenameDialogue(Project project, String newNodeName, boolean showComment) {
-        String dialogueDescription = String.format("Enter new name for node %s", newNodeName);
+        String dialogueDescription = String.format("Enter new name for session \"%s\"", newNodeName);
         String dialogueErrorMessage = showComment ? String.format("\"%s\" already exists", newNodeName) : null;
-        return Messages.showInputDialog(project, dialogueDescription, "Rename Node", null, null, new CustomInputValidator(), null, dialogueErrorMessage);
+        return Messages.showInputDialog(project, dialogueDescription, "Rename Session", null, newNodeName, new CustomInputValidator(), null, dialogueErrorMessage);
     }
+
+    public static @Nullable @NlsSafe String getEditDialogue(Project project, String nodeName, String currentDescription) {
+        String dialogueDescription = String.format("Enter description for session \"%s\"", nodeName);
+        return Messages.showInputDialog(project, dialogueDescription, "Session Description", null, currentDescription, null, null, null);
+    }
+
 
     private static class CustomInputValidator implements InputValidator {
         private static final Pattern pattern = Pattern.compile("[~!@#$%^&*()+{}\\[\\]:;,<>/?]");

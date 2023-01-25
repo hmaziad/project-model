@@ -1,6 +1,8 @@
 package org.intellij.sdk.project.model.components.views;
 
+import static org.intellij.sdk.project.model.constants.TextConstants.EDIT_SESSION;
 import static org.intellij.sdk.project.model.constants.TextConstants.EXPORT_SESSION_JSON;
+import static org.intellij.sdk.project.model.constants.TextConstants.HUMAN_DATE_FORMAT;
 import static org.intellij.sdk.project.model.constants.TextConstants.IMPORT_FROM_FILE;
 import static org.intellij.sdk.project.model.constants.TextConstants.LOAD_SESSION_INTO_TOOLBAR;
 import static org.intellij.sdk.project.model.constants.TextConstants.REMOVE_ALL_SESSIONS;
@@ -8,11 +10,13 @@ import static org.intellij.sdk.project.model.constants.TextConstants.REMOVE_SESS
 import static org.intellij.sdk.project.model.constants.TextConstants.RENAME_SESSION;
 
 import java.awt.*;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
@@ -51,9 +55,28 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         JScrollPane scrollableKeysPanel = getScrollableKeysPanel(keysList);
         this.scrollableNodesPanel = getScrollableNodesPanel();
 
+        JLabel timestampLabel = new JLabel();
+        JLabel descriptionLabel = new JLabel();
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH;
+
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 0.0;
+        gbc.gridwidth = 3;
+        gbc.gridx = 0;
         gbc.gridy = 0;
+
+        EmptyBorder emptyBorder1 = new EmptyBorder(0, 2, 4, 0);
+        timestampLabel.setBorder(emptyBorder1);
+        dialogPanel.add(timestampLabel, gbc);
+
+        gbc.gridy = 1;
+        EmptyBorder emptyBorder2 = new EmptyBorder(0, 2, 20, 0);
+        descriptionLabel.setBorder(emptyBorder2);
+        dialogPanel.add(descriptionLabel, gbc);
+
+        gbc.gridwidth = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridy = 2;
         gbc.weighty = 1;
 
         gbc.gridx = 0;
@@ -67,47 +90,81 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         gbc.gridx = 2;
         gbc.weightx = 0;
         dialogPanel.add(getButtonsPanel(keysList), gbc);
+
+        updateMetaData(keysList, timestampLabel, descriptionLabel);
+        keysList.addListSelectionListener(e -> updateMetaData(keysList, timestampLabel, descriptionLabel));
         return dialogPanel;
+    }
+
+    private void updateMetaData(JBList<String> keysList, JLabel timestampLabel, JLabel descriptionLabel) {
+        String selectedValue = keysList.getSelectedValue();
+        Optional<DebugNodeContainer> optionalContainer = COMPONENT_SERVICE.getNodeHandler().getNodeContainerByName(selectedValue);
+        if (optionalContainer.isPresent()) {
+            DebugNodeContainer container = optionalContainer.get();
+            if (Objects.nonNull(container.getTimestamp())) {
+                String formattedTimestamp = container.getTimestamp().format(DateTimeFormatter.ofPattern(HUMAN_DATE_FORMAT));
+                timestampLabel.setText("Created on: " + formattedTimestamp);
+            } else {
+                timestampLabel.setText("");
+            }
+            if (Objects.nonNull(container.getDescription())) {
+                descriptionLabel.setText("Description: " + container.getDescription());
+            } else {
+                descriptionLabel.setText("");
+            }
+        }
     }
 
     private JPanel getButtonsPanel(JBList<String> keysList) {
         JPanel panel = new JPanel();
         panel.setBorder(JBUI.Borders.empty(50, 5, 0, 5));
+//        Insets margin = new Insets(20, 0, 0, 0);
         BoxLayout boxLayout = new BoxLayout(panel, BoxLayout.Y_AXIS);
+        panel.add(Box.createRigidArea(new Dimension(0, 5)));
         panel.setLayout(boxLayout);
+        // rename button
+        JButton renameButton = new JButton("Rename");
+        renameButton.setToolTipText(RENAME_SESSION);
+        renameButton.addActionListener(e -> renameButton(keysList));
+        panel.add(renameButton);
+//        renameButton.setMargin(margin);
+        // edit button
+        JButton editButton = new JButton("Describe");
+        editButton.setToolTipText(EDIT_SESSION);
+        editButton.addActionListener(e -> editButton(keysList));
+        panel.add(editButton);
+
         // delete button
         JButton deleteButton = new JButton("Delete");
         deleteButton.setToolTipText(REMOVE_SESSION_FROM_STORAGE);
         deleteButton.addActionListener(e -> deleteNode(keysList));
         panel.add(deleteButton);
-        // rename button
-        JButton renameButton = new JButton("Rename");
-        renameButton.setToolTipText(RENAME_SESSION);
-        renameButton.addActionListener(e -> renameNodeName(keysList));
-        panel.add(renameButton);
         // load button
         JButton loadButton = new JButton("Load");
         loadButton.setToolTipText(LOAD_SESSION_INTO_TOOLBAR);
         loadButton.addActionListener(e -> loadNode(keysList));
         panel.add(loadButton);
-        // delete all button
-        JButton deleteAllButton = new JButton("Delete All");
-        deleteAllButton.setToolTipText(REMOVE_ALL_SESSIONS);
-        deleteAllButton.addActionListener(e -> deleteAll(keysList));
-        panel.add(deleteAllButton);
+
         // export button
         JButton exportButton = new JButton("Export");
         exportButton.setToolTipText(EXPORT_SESSION_JSON);
         exportButton.addActionListener(e -> export(keysList));
         panel.add(exportButton);
+//        exportButton.setMargin(margin);
         // import button
         JButton importButton = new JButton("Import");
         importButton.setToolTipText(IMPORT_FROM_FILE);
         importButton.addActionListener(e -> _import(keysList));
         panel.add(importButton);
+        // delete all button
+        JButton deleteAllButton = new JButton("Delete All");
+        deleteAllButton.setToolTipText(REMOVE_ALL_SESSIONS);
+        deleteAllButton.addActionListener(e -> deleteAll(keysList));
+        panel.add(deleteAllButton);
+//        deleteAllButton.setMargin(margin);
         refreshView(keysList);
-        enableButtons(keysList.getItemsCount() != 0, exportButton, deleteButton, renameButton, loadButton, deleteAllButton);
-        keysList.addListSelectionListener(e -> enableButtons(keysList.getItemsCount() != 0, exportButton, deleteButton, renameButton, loadButton, deleteAllButton));
+        enableButtons(keysList.getItemsCount() != 0, exportButton, deleteButton, editButton, loadButton, deleteAllButton, renameButton);
+        keysList.addListSelectionListener(e -> enableButtons(keysList.getItemsCount() != 0, exportButton, deleteButton, editButton, loadButton, deleteAllButton));
         return panel;
     }
 
@@ -139,7 +196,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         Arrays.stream(jButtons).forEach(jButton -> jButton.setEnabled(enable));
     }
 
-    private void renameNodeName(JBList<String> keysList) {
+    private void renameButton(JBList<String> keysList) {
         String selectedNodeName = keysList.getSelectedValue();
         String newNodeName = MessageDialogues.getRenameDialogue(this.project, selectedNodeName, false);
         while (COMPONENT_SERVICE.getNodeHandler().getAllContainersPerNames().containsKey(newNodeName)) {
@@ -148,6 +205,20 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         if (Objects.nonNull(newNodeName)) {
             newNodeName = newNodeName.replace(' ', '_');
             COMPONENT_SERVICE.getNodeHandler().renameNode(selectedNodeName, newNodeName);
+            refreshView(keysList);
+        }
+    }
+
+    private void editButton(JBList<String> keysList) {
+        String selectedNodeName = keysList.getSelectedValue();
+        Optional<DebugNodeContainer> container = COMPONENT_SERVICE.getNodeHandler().getNodeContainerByName(selectedNodeName);
+        String currentDescription = null;
+        if (container.isPresent()) {
+            currentDescription = container.get().getDescription();
+        }
+        String description = MessageDialogues.getEditDialogue(this.project, selectedNodeName, currentDescription);
+        if (Objects.nonNull(description)) {
+            container.ifPresent(debugNodeContainer -> debugNodeContainer.setDescription(description));
             refreshView(keysList);
         }
     }

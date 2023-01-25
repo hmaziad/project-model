@@ -40,7 +40,7 @@ public class NodeHandler implements ReachServices {
     public void save(DebugNode debugNode, Project project) {
         LocalDateTime timestamp = LocalDateTime.now();
         String generatedName = getGenerateName(project, timestamp);
-        DebugNodeContainer nodeContainer = new DebugNodeContainer(timestamp, debugNode);
+        DebugNodeContainer nodeContainer = new DebugNodeContainer(timestamp, null, debugNode);
         save(generatedName, nodeContainer);
     }
 
@@ -162,7 +162,7 @@ public class NodeHandler implements ReachServices {
             .getCurrentSession(project) //
             .orElseThrow(() -> new IllegalStateException("Why you messing?"));
 
-        return new DebugNodeContainer( null, debugNode);
+        return new DebugNodeContainer(null, null, debugNode);
     }
 
 }
