@@ -118,7 +118,6 @@ public class SettingsView extends DialogWrapper implements ReachServices {
     private JPanel getButtonsPanel(JBList<String> keysList) {
         JPanel panel = new JPanel();
         panel.setBorder(JBUI.Borders.empty(50, 5, 0, 5));
-//        Insets margin = new Insets(20, 0, 0, 0);
         BoxLayout boxLayout = new BoxLayout(panel, BoxLayout.Y_AXIS);
         panel.add(Box.createRigidArea(new Dimension(0, 5)));
         panel.setLayout(boxLayout);
@@ -127,7 +126,6 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         renameButton.setToolTipText(RENAME_SESSION);
         renameButton.addActionListener(e -> renameButton(keysList));
         panel.add(renameButton);
-//        renameButton.setMargin(margin);
         // edit button
         JButton editButton = new JButton("Describe");
         editButton.setToolTipText(EDIT_SESSION);
@@ -150,7 +148,6 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         exportButton.setToolTipText(EXPORT_SESSION_JSON);
         exportButton.addActionListener(e -> export(keysList));
         panel.add(exportButton);
-//        exportButton.setMargin(margin);
         // import button
         JButton importButton = new JButton("Import");
         importButton.setToolTipText(IMPORT_FROM_FILE);
@@ -161,7 +158,6 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         deleteAllButton.setToolTipText(REMOVE_ALL_SESSIONS);
         deleteAllButton.addActionListener(e -> deleteAll(keysList));
         panel.add(deleteAllButton);
-//        deleteAllButton.setMargin(margin);
         refreshView(keysList);
         enableButtons(keysList.getItemsCount() != 0, exportButton, deleteButton, editButton, loadButton, deleteAllButton, renameButton);
         keysList.addListSelectionListener(e -> enableButtons(keysList.getItemsCount() != 0, exportButton, deleteButton, editButton, loadButton, deleteAllButton));
