@@ -81,7 +81,7 @@ public class NodeHandler implements ReachServices {
         Comparator<Map.Entry<String, DebugNodeContainer>> debugComparator = Comparator.comparing(e1 -> {
             LocalDateTime timestamp = e1.getValue().getTimestamp();
             return timestamp == null ? LocalDateTime.now() : timestamp;
-        });
+        }, Comparator.reverseOrder());
         return PERSISTENCY_SERVICE //
             .getContainers() //
             .entrySet() //
