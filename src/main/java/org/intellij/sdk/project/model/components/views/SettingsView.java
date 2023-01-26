@@ -39,7 +39,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
     public SettingsView(@NotNull Project project) {
         super(true); // use current window as parent
         this.project = project;
-        setTitle("Manage Saved Sessions");
+        setTitle("Armadillo: Manage Saved Sessions");
         init();
     }
 
