@@ -56,7 +56,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         this.scrollableNodesPanel = getScrollableNodesPanel();
 
         JLabel timestampLabel = new JLabel();
-        JLabel descriptionLabel = new JLabel();
+        JLabel descriptionLabel = new JLabel("Description: ");
         GridBagConstraints gbc = new GridBagConstraints();
 
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -110,7 +110,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
             if (Objects.nonNull(container.getDescription())) {
                 descriptionLabel.setText("Description: " + container.getDescription());
             } else {
-                descriptionLabel.setText("");
+                descriptionLabel.setText("Description: ");
             }
         }
     }
@@ -158,7 +158,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         deleteAllButton.setToolTipText(REMOVE_ALL_SESSIONS);
         deleteAllButton.addActionListener(e -> deleteAll(keysList));
         panel.add(deleteAllButton);
-        refreshView(keysList);
+        refreshView(keysList, true);
         enableButtons(keysList.getItemsCount() != 0, exportButton, deleteButton, editButton, loadButton, deleteAllButton, renameButton);
         keysList.addListSelectionListener(e -> enableButtons(keysList.getItemsCount() != 0, exportButton, deleteButton, editButton, loadButton, deleteAllButton));
         return panel;
@@ -166,7 +166,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
 
     private void _import(JBList<String> keysList) {
         COMPONENT_SERVICE.getNodeHandler().doImport(this.project);
-        refreshView(keysList);
+        refreshView(keysList, true);
     }
 
     private void export(JBList<String> keysList) {
@@ -185,10 +185,10 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         COMPONENT_SERVICE.getNodeHandler().deleteAll(this.project);
         COMPONENT_SERVICE.getDebugTreeManager().setRoot(null);
         COMPONENT_SERVICE.setNodeNameInWindow(null);
-        refreshView(keysList);
+        refreshView(keysList, true);
     }
 
-    private void enableButtons(boolean enable,JButton ...jButtons) {
+    private void enableButtons(boolean enable, JButton... jButtons) {
         Arrays.stream(jButtons).forEach(jButton -> jButton.setEnabled(enable));
     }
 
@@ -201,7 +201,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         if (Objects.nonNull(newNodeName)) {
             newNodeName = newNodeName.replace(' ', '_');
             COMPONENT_SERVICE.getNodeHandler().renameNode(selectedNodeName, newNodeName);
-            refreshView(keysList);
+            refreshView(keysList, false);
         }
     }
 
@@ -215,20 +215,24 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         String description = MessageDialogues.getEditDialogue(this.project, selectedNodeName, currentDescription);
         if (Objects.nonNull(description)) {
             container.ifPresent(debugNodeContainer -> debugNodeContainer.setDescription(description));
-            refreshView(keysList);
+            refreshView(keysList, false);
         }
     }
 
     private void deleteNode(JBList<String> keysList) {
         COMPONENT_SERVICE.getNodeHandler().delete(keysList.getSelectedValue(), this.project);
-        refreshView(keysList);
+        refreshView(keysList, true);
     }
 
-    private void refreshView(JBList<String> keysList) {
+    private void refreshView(JBList<String> keysList, boolean resetIndex) {
+        int currentIndex = keysList.getSelectedIndex();
         DefaultListModel<String> model = new DefaultListModel<>();
         model.addAll(COMPONENT_SERVICE.getNodeHandler().getAllNodeNames());
         keysList.setModel(model);
-        int currentIndex = Math.min(keysList.getItemsCount(), 0);
+        if (resetIndex) {
+            currentIndex = Math.min(keysList.getItemsCount(), 0);
+            keysList.setSelectedIndex(currentIndex);
+        }
         keysList.setSelectedIndex(currentIndex);
         showSelectedNodeContent(keysList);
     }
