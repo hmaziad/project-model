@@ -34,7 +34,7 @@ import com.intellij.util.ui.JBUI;
 public class SettingsView extends DialogWrapper implements ReachServices {
     private final Project project;
     private JScrollPane scrollableNodesPanel;
-    private final DebugTreeManager debugTreeManager = new DebugTreeManager();
+    private final DebugTreeManager debugTreeManager = new DebugTreeManager(false);
 
     public SettingsView(@NotNull Project project) {
         super(true); // use current window as parent

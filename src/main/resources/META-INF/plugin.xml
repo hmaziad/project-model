@@ -45,7 +45,7 @@
                 topic="com.intellij.debugger.impl.DebuggerManagerListener"/>
     </projectListeners>
     <actions>
-        <action id="saveNodeAction" class="org.intellij.sdk.project.model.actions.SaveNodeAction" text="Save Node" description="Save debug session">
+        <action id="saveNodeAction" class="org.intellij.sdk.project.model.actions.SaveNodeAction" text="Save Session" description="Save debug session">
             <add-to-group group-id="XDebugger.ValueGroup" anchor="after" relative-to-action="XDebugger.CopyName"/>
         </action>
     </actions>

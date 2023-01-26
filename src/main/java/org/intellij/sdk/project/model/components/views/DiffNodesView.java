@@ -3,6 +3,7 @@ package org.intellij.sdk.project.model.components.views;
 import static org.intellij.sdk.project.model.constants.TextConstants.DIFF_NODES;
 
 import java.awt.*;
+import java.util.List;
 import java.util.Optional;
 
 import javax.swing.*;
@@ -26,7 +27,8 @@ public class DiffNodesView extends DialogWrapper implements ReachServices {
     private final DropdownHandler dropdownHandler;
     private final DiffHandler diffHandler = new DiffHandler();
     private final JButton diffButton = new JButton();
-
+    private DebugTreeManager leftDebugTreeManager;
+    private DebugTreeManager rightDebugTreeManager;
 
     public DiffNodesView(@NotNull Project project) {
         super(true); // use current window as parent
@@ -45,8 +47,14 @@ public class DiffNodesView extends DialogWrapper implements ReachServices {
         this.dropdownHandler.addNodesToDropdown(leftDropdown, COMPONENT_SERVICE.getLastSelectedLeft());
         this.dropdownHandler.addNodesToDropdown(rightDropdown, COMPONENT_SERVICE.getLastSelectedRight());
 
-        leftDropdown.addActionListener(e -> COMPONENT_SERVICE.setLastSelectedLeft(Optional.of(leftDropdown.getSelectedIndex())));
-        rightDropdown.addActionListener(e -> COMPONENT_SERVICE.setLastSelectedRight(Optional.of(rightDropdown.getSelectedIndex())));
+        leftDropdown.addActionListener(e -> {
+            this.leftDebugTreeManager.clearNodeColors();
+            COMPONENT_SERVICE.setLastSelectedLeft(Optional.of(leftDropdown.getSelectedIndex()));
+        });
+        rightDropdown.addActionListener(e -> {
+            this.rightDebugTreeManager.clearNodeColors();
+            COMPONENT_SERVICE.setLastSelectedRight(Optional.of(rightDropdown.getSelectedIndex()));
+        });
 
         addDiffBtnListener(leftDropdown, rightDropdown);
         return createDiffPanel(leftDropdown, rightDropdown);
@@ -54,11 +62,11 @@ public class DiffNodesView extends DialogWrapper implements ReachServices {
 
     @NotNull
     private JPanel createDiffPanel(JComboBox<String> leftDropdown, JComboBox<String> rightDropdown) {
-        setSize(1100, 800);
+        setSize(1300, 1100);
         JPanel dialogPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        DebugTreeManager leftDebugTreeManager = new DebugTreeManager();
-        DebugTreeManager rightDebugTreeManager = new DebugTreeManager();
+        this.leftDebugTreeManager = new DebugTreeManager(true);
+        this.rightDebugTreeManager = new DebugTreeManager(true);
 
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridx = 0;
@@ -113,7 +121,19 @@ public class DiffNodesView extends DialogWrapper implements ReachServices {
             String leftNodeName = this.dropdownHandler.getSelectedNodeName(leftDropdown);
             DebugNodeContainer rightNodeContainer = this.dropdownHandler.getSelectedContainer(rightDropdown);
             String rightNodeName = this.dropdownHandler.getSelectedNodeName(rightDropdown);
-            this.diffHandler.diffNodes(leftNodeContainer, leftNodeName, rightNodeContainer, rightNodeName, this.project);
+            List<List<List<Integer>>> changes = this.diffHandler.diffNodes(leftNodeContainer.getNode(), leftNodeName, rightNodeContainer.getNode(), rightNodeName, this.project);
+            List<List<Integer>> additions = changes.get(0);
+            List<List<Integer>> deletions = changes.get(1);
+            List<List<Integer>> modifications1 = changes.get(2);
+            List<List<Integer>> modifications2 = changes.get(3);
+
+            this.leftDebugTreeManager.addDiffDeletions(deletions);
+            this.leftDebugTreeManager.addDiffModifications(modifications1);
+
+            this.rightDebugTreeManager.addDiffInsertions(additions);
+            this.rightDebugTreeManager.addDiffModifications(modifications2);
+            this.leftDebugTreeManager.getDebugTree().repaint();
+            this.rightDebugTreeManager.getDebugTree().repaint();
         });
     }
 

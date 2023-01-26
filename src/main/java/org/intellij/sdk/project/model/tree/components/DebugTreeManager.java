@@ -1,8 +1,13 @@
 package org.intellij.sdk.project.model.tree.components;
 
+import static org.intellij.sdk.project.model.tree.components.DebugColor.BLUE;
+import static org.intellij.sdk.project.model.tree.components.DebugColor.GREEN;
+import static org.intellij.sdk.project.model.tree.components.DebugColor.RED;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
@@ -17,9 +22,9 @@ public class DebugTreeManager {
     @Getter
     private final JTree debugTree = new Tree();
 
-    public DebugTreeManager() {
+    public DebugTreeManager(boolean allowColors) {
         this.debugTree.setRootVisible(false);
-        this.debugTree.setCellRenderer(new DebugTreeRenderer());
+        this.debugTree.setCellRenderer(new DebugTreeRenderer(allowColors));
         final TreePopup treePopup = new TreePopup(this.debugTree);
         this.debugTree.addMouseListener(getMouseAdapter(treePopup));
     }
@@ -39,12 +44,6 @@ public class DebugTreeManager {
         }
     }
 
-    public void expand() {
-        for (int i = 0; i < this.debugTree.getRowCount(); i++) {
-            this.debugTree.expandRow(i);
-        }
-    }
-
     @NotNull
     private MouseAdapter getMouseAdapter(TreePopup treePopup) {
         return new MouseAdapter() {
@@ -59,6 +58,54 @@ public class DebugTreeManager {
                 }
             }
         };
+    }
+
+    public void addDiffInsertions(List<List<Integer>> additions) {
+        for (List<Integer> range : additions) {
+            int start = range.get(0);
+            int end = range.get(1);
+            for (int row = start; row < end; row++) {
+                TreePath path = this.debugTree.getPathForRow(row);
+                DebugNode debugNode = (DebugNode) path.getLastPathComponent();
+                debugNode.setColor(GREEN);
+            }
+        }
+    }
+
+    public void addDiffDeletions(List<List<Integer>> deletions) {
+        for (List<Integer> range : deletions) {
+            int start = range.get(0);
+            int end = range.get(1);
+            for (int row = start; row < end; row++) {
+                TreePath path = this.debugTree.getPathForRow(row);
+                DebugNode debugNode = (DebugNode) path.getLastPathComponent();
+                debugNode.setColor(RED);
+            }
+        }
+    }
+
+    public void addDiffModifications(List<List<Integer>> modifications) {
+        for (List<Integer> range : modifications) {
+            int start = range.get(0);
+            int end = range.get(1);
+            for (int row = start; row < end; row++) {
+                TreePath path = this.debugTree.getPathForRow(row);
+                DebugNode debugNode = (DebugNode) path.getLastPathComponent();
+                debugNode.setColor(BLUE);
+            }
+        }
+    }
+
+    public void clearNodeColors() {
+        DebugNode rootNode = (DebugNode) this.debugTree.getModel().getRoot();
+        clearNodeColors(rootNode);
+    }
+
+    private void clearNodeColors(DebugNode rootNode) {
+        rootNode.setColor(null);
+        for (DebugNode child : rootNode.getMyChildren()) {
+            clearNodeColors(child);
+        }
     }
 
     private class TreePopup extends JPopupMenu {

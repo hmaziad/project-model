@@ -16,7 +16,7 @@ import lombok.Setter;
 public class ComponentService {
     private final AtomicBoolean snapIsEnabled = new AtomicBoolean(false);
     private final AtomicBoolean clearIsEnabled = new AtomicBoolean(false);
-    private final DebugTreeManager debugTreeManager = new DebugTreeManager();
+    private final DebugTreeManager debugTreeManager = new DebugTreeManager(false);
     private final JLabel feedbackMessage = new JLabel("Let's get started...");
     private final NodeHandler nodeHandler = new NodeHandler();
     private final SnapHandler snapHandler = new SnapHandler();

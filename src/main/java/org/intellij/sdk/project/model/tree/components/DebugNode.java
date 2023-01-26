@@ -39,6 +39,9 @@ public class DebugNode extends DefaultMutableTreeNode {
     @Expose
     private List<DebugNode> myChildren = new ArrayList<>();
 
+    @Setter
+    private DebugColor color;
+
     @VisibleForTesting
     public DebugNode(String text) {
 
