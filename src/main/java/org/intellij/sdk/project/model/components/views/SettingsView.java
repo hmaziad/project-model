@@ -38,12 +38,18 @@ public class SettingsView extends DialogWrapper implements ReachServices {
     private final Project project;
     private JScrollPane scrollableNodesPanel;
     private final DebugTreeManager debugTreeManager = new DebugTreeManager(false);
+    private JBList<String> keysList;
 
     public SettingsView(@NotNull Project project) {
         super(true); // use current window as parent
         this.project = project;
         setTitle("Armadillo: Manage Saved Sessions");
         init();
+    }
+
+    @Override
+    public @Nullable JComponent getPreferredFocusedComponent() {
+        return this.keysList;
     }
 
     @Nullable
@@ -54,6 +60,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
 
         String[] keyStrings = COMPONENT_SERVICE.getNodeHandler().getAllNodeNames().toArray(String[]::new);
         JBList<String> keysList = new JBList<>(keyStrings);
+        this.keysList = keysList;
         KeyPopup keyPopup = new KeyPopup();
         keysList.addMouseListener(getMouseAdapter(keyPopup));
         new ListSpeedSearch<>(keysList);

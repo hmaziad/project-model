@@ -20,7 +20,8 @@ public class SettingsButton extends IconWithTextAction implements ReachServices 
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        new SettingsView(e.getProject()).showAndGet();
+        SettingsView settingsView = new SettingsView(e.getProject());
+        settingsView.showAndGet();
     }
 
     @Override
