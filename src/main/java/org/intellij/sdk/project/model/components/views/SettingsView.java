@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.ui.ListSpeedSearch;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
@@ -55,7 +56,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         JBList<String> keysList = new JBList<>(keyStrings);
         KeyPopup keyPopup = new KeyPopup();
         keysList.addMouseListener(getMouseAdapter(keyPopup));
-
+        new ListSpeedSearch<>(keysList);
         JScrollPane scrollableKeysPanel = getScrollableKeysPanel(keysList);
         this.scrollableNodesPanel = getScrollableNodesPanel();
 
