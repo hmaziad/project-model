@@ -14,6 +14,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.jetbrains.annotations.NotNull;
+import com.intellij.ui.TreeSpeedSearch;
 import com.intellij.ui.treeStructure.Tree;
 
 import lombok.Getter;
@@ -27,6 +28,7 @@ public class DebugTreeManager {
         this.debugTree.setCellRenderer(new DebugTreeRenderer(allowColors));
         final TreePopup treePopup = new TreePopup(this.debugTree);
         this.debugTree.addMouseListener(getMouseAdapter(treePopup));
+        new TreeSpeedSearch(this.debugTree);
     }
 
     public void addClearButtonListener() {

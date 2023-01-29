@@ -253,8 +253,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
 
         keysList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         keysList.addListSelectionListener(e -> {
-            //            showSelectedNodeContent(keysList);
-            System.out.println("Hello");
+            showSelectedNodeContent(keysList);
         });
 
         JPanel keysPanel = new JPanel(new BorderLayout());
