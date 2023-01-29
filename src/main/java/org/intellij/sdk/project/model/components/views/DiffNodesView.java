@@ -50,14 +50,18 @@ public class DiffNodesView extends DialogWrapper implements ReachServices {
         leftDropdown.addActionListener(e -> {
             this.leftDebugTreeManager.clearNodeColors();
             COMPONENT_SERVICE.setLastSelectedLeft(Optional.of(leftDropdown.getSelectedIndex()));
+            doDiff(leftDropdown, rightDropdown, false);
         });
         rightDropdown.addActionListener(e -> {
             this.rightDebugTreeManager.clearNodeColors();
             COMPONENT_SERVICE.setLastSelectedRight(Optional.of(rightDropdown.getSelectedIndex()));
+            doDiff(leftDropdown, rightDropdown, false);
         });
 
         addDiffBtnListener(leftDropdown, rightDropdown);
-        return createDiffPanel(leftDropdown, rightDropdown);
+        JPanel diffPanel = createDiffPanel(leftDropdown, rightDropdown);
+        doDiff(leftDropdown, rightDropdown, false);
+        return diffPanel;
     }
 
     @NotNull
@@ -117,24 +121,29 @@ public class DiffNodesView extends DialogWrapper implements ReachServices {
 
     private void addDiffBtnListener(JComboBox<String> leftDropdown, JComboBox<String> rightDropdown) {
         this.diffButton.addActionListener(e -> {
-            DebugNodeContainer leftNodeContainer = this.dropdownHandler.getSelectedContainer(leftDropdown);
-            String leftNodeName = this.dropdownHandler.getSelectedNodeName(leftDropdown);
-            DebugNodeContainer rightNodeContainer = this.dropdownHandler.getSelectedContainer(rightDropdown);
-            String rightNodeName = this.dropdownHandler.getSelectedNodeName(rightDropdown);
-            List<List<List<Integer>>> changes = this.diffHandler.diffNodes(leftNodeContainer.getNode(), leftNodeName, rightNodeContainer.getNode(), rightNodeName, this.project);
-            List<List<Integer>> additions = changes.get(0);
-            List<List<Integer>> deletions = changes.get(1);
-            List<List<Integer>> modifications1 = changes.get(2);
-            List<List<Integer>> modifications2 = changes.get(3);
-
-            this.leftDebugTreeManager.addDiffDeletions(deletions);
-            this.leftDebugTreeManager.addDiffModifications(modifications1);
-
-            this.rightDebugTreeManager.addDiffInsertions(additions);
-            this.rightDebugTreeManager.addDiffModifications(modifications2);
-            this.leftDebugTreeManager.getDebugTree().repaint();
-            this.rightDebugTreeManager.getDebugTree().repaint();
+            doDiff(leftDropdown, rightDropdown, true);
         });
+    }
+
+    private void doDiff(JComboBox<String> leftDropdown, JComboBox<String> rightDropdown, boolean showDiffIntellij) {
+        DebugNodeContainer leftNodeContainer = this.dropdownHandler.getSelectedContainer(leftDropdown);
+        String leftNodeName = this.dropdownHandler.getSelectedNodeName(leftDropdown);
+        DebugNodeContainer rightNodeContainer = this.dropdownHandler.getSelectedContainer(rightDropdown);
+        String rightNodeName = this.dropdownHandler.getSelectedNodeName(rightDropdown);
+        List<List<List<Integer>>> changes =
+            this.diffHandler.diffNodes(leftNodeContainer.getNode(), leftNodeName, rightNodeContainer.getNode(), rightNodeName, showDiffIntellij, this.project);
+        List<List<Integer>> additions = changes.get(0);
+        List<List<Integer>> deletions = changes.get(1);
+        List<List<Integer>> modifications1 = changes.get(2);
+        List<List<Integer>> modifications2 = changes.get(3);
+
+        this.leftDebugTreeManager.addDiffDeletions(deletions);
+        this.leftDebugTreeManager.addDiffModifications(modifications1);
+
+        this.rightDebugTreeManager.addDiffInsertions(additions);
+        this.rightDebugTreeManager.addDiffModifications(modifications2);
+        this.leftDebugTreeManager.getDebugTree().repaint();
+        this.rightDebugTreeManager.getDebugTree().repaint();
     }
 
 }

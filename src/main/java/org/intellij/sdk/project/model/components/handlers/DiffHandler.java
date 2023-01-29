@@ -22,7 +22,7 @@ import com.intellij.openapi.project.Project;
 
 public class DiffHandler {
 
-    public List<List<List<Integer>>> diffNodes(DebugNode leftNode, String leftNodeName, DebugNode rightNode, String rightNodeName, Project project) {
+    public List<List<List<Integer>>> diffNodes(DebugNode leftNode, String leftNodeName, DebugNode rightNode, String rightNodeName, boolean showDiffIntellij, Project project) {
         String leftNodeString = ParserService.convertNodeToString(leftNode);
         String rightNodeString = ParserService.convertNodeToString(rightNode);
         DiffContent content1 = new DocumentContentImpl(project, new DocumentImpl(leftNodeString), null);
@@ -31,7 +31,10 @@ public class DiffHandler {
         chain.setTitle1(leftNodeName);
         chain.setTitle2(rightNodeName);
         chain.setWindowTitle(COMPARING_SESSIONS);
-        DiffManager.getInstance().showDiff(project, chain, DiffDialogHints.DEFAULT);
+
+        if (showDiffIntellij) {
+            DiffManager.getInstance().showDiff(project, chain, DiffDialogHints.DEFAULT);
+        }
 
         List<LineFragment> changes = ComparisonManagerImpl.getInstanceImpl().compareLines(leftNodeString, rightNodeString, ComparisonPolicy.DEFAULT, new ProgressIndicatorBase());
 
