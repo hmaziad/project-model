@@ -31,7 +31,7 @@ public class MessageDialogues {
 
     public static @Nullable @NlsSafe String getEditDialogue(Project project, String nodeName, String currentDescription) {
         String dialogueDescription = String.format("Enter description for session \"%s\"", nodeName);
-        return Messages.showInputDialog(project, dialogueDescription, "Armadillo: Session Description", null, currentDescription, null, null, null);
+        return Messages.showInputDialog(project, dialogueDescription, "Armadillo: Add Description", null, currentDescription, null, null, null);
     }
 
 

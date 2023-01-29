@@ -5,8 +5,8 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TextConstants {
-    public static final String DELETE_SAVED_NODE = "Armadillo: Are you sure you want to delete the saved session \"%s\"?";
-    public static final String DELETE_SAVED_NODES = "Armadillo: Are you sure you want to delete all sessions?";
+    public static final String DELETE_SAVED_NODE = "Are you sure you want to delete the saved session \"%s\"?";
+    public static final String DELETE_SAVED_NODES = "Are you sure you want to delete all sessions?";
     public static final String CURRENT_SESSION = "Current Session";
     public static final String DELETE_SESSION_BELOW = "Delete session from storage";
     public static final String CLEAR_SESSION_BELOW = "Clear session";
