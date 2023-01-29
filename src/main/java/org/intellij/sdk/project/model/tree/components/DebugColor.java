@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 public enum DebugColor {
-    RED(ColorUtil.fromHex("#780C0C")), GREEN(ColorUtil.fromHex("#384C38")), BLUE(ColorUtil.fromHex("#003C84"));
+    RED(ColorUtil.fromHex("#663a3a")), GREEN(ColorUtil.fromHex("#384C38")), BLUE(ColorUtil.fromHex("#3a4757"));
 
     private final Color realColor;
 
