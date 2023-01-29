@@ -113,7 +113,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
                 timestampLabel.setText("");
             }
             if (Objects.nonNull(container.getDescription())) {
-                descriptionLabel.setText("Description: " + container.getDescription());
+                descriptionLabel.setText("<html>Description: " + container.getDescription() + "</html>");
             } else {
                 descriptionLabel.setText("Description: ");
             }
