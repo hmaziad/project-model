@@ -9,6 +9,7 @@ import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 
+import icons.SdkIcons;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
@@ -18,7 +19,9 @@ public class DebugWindowProvider implements ToolWindowFactory {
         LOG.info("Starting Tool Window");
         DebugWindow myToolWindow = new DebugWindow();
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        Content content = contentFactory.createContent(myToolWindow.getDebuggerWindowContent(), "Session", false);
+        Content content = contentFactory.createContent(myToolWindow.getDebuggerWindowContent(), "  Session", false);
+        content.setIcon(SdkIcons.SNAP_ICON);
+        content.putUserData(ToolWindow.SHOW_CONTENT_ICON, Boolean.TRUE);
         toolWindow.getContentManager().addContent(content);
     }
 
