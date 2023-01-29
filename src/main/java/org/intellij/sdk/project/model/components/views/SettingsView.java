@@ -10,6 +10,8 @@ import static org.intellij.sdk.project.model.constants.TextConstants.REMOVE_SESS
 import static org.intellij.sdk.project.model.constants.TextConstants.RENAME_SESSION;
 
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Objects;
@@ -51,6 +53,8 @@ public class SettingsView extends DialogWrapper implements ReachServices {
 
         String[] keyStrings = COMPONENT_SERVICE.getNodeHandler().getAllNodeNames().toArray(String[]::new);
         JBList<String> keysList = new JBList<>(keyStrings);
+        KeyPopup keyPopup = new KeyPopup();
+        keysList.addMouseListener(getMouseAdapter(keyPopup));
 
         JScrollPane scrollableKeysPanel = getScrollableKeysPanel(keysList);
         this.scrollableNodesPanel = getScrollableNodesPanel();
@@ -246,8 +250,11 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         titledBorder.setBorder(new LineBorder(Color.gray.darker()));
         scrollableKeysPanel.setBorder(titledBorder);
 
-        keysList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        keysList.addListSelectionListener(e -> showSelectedNodeContent(keysList));
+        keysList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        keysList.addListSelectionListener(e -> {
+            //            showSelectedNodeContent(keysList);
+            System.out.println("Hello");
+        });
 
         JPanel keysPanel = new JPanel(new BorderLayout());
         keysPanel.add(keysList, BorderLayout.WEST);
@@ -275,6 +282,17 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(this.debugTreeManager.getDebugTree());
         this.scrollableNodesPanel.setViewportView(panel);
+    }
+
+    @NotNull
+    private MouseAdapter getMouseAdapter(KeyPopup keyPopup) {
+        return new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    keyPopup.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        };
     }
 
 }
