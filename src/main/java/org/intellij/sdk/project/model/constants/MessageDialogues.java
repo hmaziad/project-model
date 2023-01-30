@@ -29,8 +29,8 @@ public class MessageDialogues {
         return Messages.showInputDialog(project, dialogueDescription, "Armadillo: Rename Session", null, newNodeName, new CustomInputValidator(), null, dialogueErrorMessage);
     }
 
-    public static @Nullable @NlsSafe String getEditDialogue(Project project, String nodeName, String currentDescription) {
-        String dialogueDescription = String.format("Enter description for session \"%s\"", nodeName);
+    public static @Nullable @NlsSafe String getDescriptionDialogue(Project project, String nodeNames, String currentDescription) {
+        String dialogueDescription = String.format("Enter description for saved session(s): %n%s%n", nodeNames);
         return Messages.showInputDialog(project, dialogueDescription, "Armadillo: Add Description", null, currentDescription, null, null, null);
     }
 

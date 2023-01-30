@@ -3,6 +3,7 @@ package org.intellij.sdk.project.model.components.handlers;
 import static org.intellij.sdk.project.model.constants.TextConstants.DELETE_SAVED_NODE;
 import static org.intellij.sdk.project.model.constants.TextConstants.DELETE_SAVED_NODES;
 import static org.intellij.sdk.project.model.constants.TextConstants.DELETE_SESSION;
+import static org.intellij.sdk.project.model.constants.TextConstants.EXPORT_SESSION;
 import static org.intellij.sdk.project.model.constants.TextConstants.GENERATED_SESSION_NAME;
 import static org.intellij.sdk.project.model.constants.TextConstants.NODE_DATE_FORMAT;
 
@@ -14,17 +15,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.intellij.sdk.project.model.constants.MessageDialogues;
 import org.intellij.sdk.project.model.tree.components.DebugNode;
 import org.intellij.sdk.project.model.tree.components.DebugNodeContainer;
+import org.jetbrains.annotations.NotNull;
 import com.intellij.json.JsonFileType;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
@@ -56,11 +61,8 @@ public class NodeHandler implements ReachServices {
         return String.format(GENERATED_SESSION_NAME, classPart, formattedTimestamp);
     }
 
-    public void delete(List<String> nodeNames, Project project) {
-        String sessionsMessage = nodeNames //
-            .stream() //
-            .map(nodeName -> String.format("%n - %s", nodeName)) //
-            .collect(Collectors.joining());
+    public boolean delete(List<String> nodeNames, Project project) {
+        String sessionsMessage = getNodesMessage(nodeNames);
         String message = String.format(DELETE_SAVED_NODE, sessionsMessage);
         boolean isSure = MessageDialogues.getYesNoMessageDialogue(message, DELETE_SESSION, project);
         if (isSure) {
@@ -68,13 +70,23 @@ public class NodeHandler implements ReachServices {
             COMPONENT_SERVICE.getDebugTreeManager().setRoot(null);
             COMPONENT_SERVICE.setNodeNameInWindow(null);
         }
+        return isSure;
     }
 
-    public void deleteAll(Project project) {
+    @NotNull
+    private String getNodesMessage(Collection<String> nodeNames) {
+        return nodeNames //
+            .stream() //
+            .map(nodeName -> String.format("%n - %s", nodeName)) //
+            .collect(Collectors.joining());
+    }
+
+    public boolean deleteAll(Project project) {
         boolean isSure = MessageDialogues.getYesNoMessageDialogue(DELETE_SAVED_NODES, DELETE_SESSION, project);
         if (isSure) {
             PERSISTENCY_SERVICE.getContainers().clear();
         }
+        return isSure;
     }
 
     public Optional<DebugNodeContainer> getNodeContainerByName(String nodeName) {
@@ -106,30 +118,50 @@ public class NodeHandler implements ReachServices {
         containers.put(to, fromContainer);
     }
 
-    public void export(String selectedKey, Project project) {
-        String path = project.getBasePath();
-        DebugNodeContainer nodeContainer = getNodeContainerByName(selectedKey).orElseThrow();
-        HashMap<String, DebugNodeContainer> namePerNode = new HashMap<>();
-        namePerNode.put("root", nodeContainer);
-        String nodeAsJson = COMPONENT_SERVICE.getNodeConverter().toString(namePerNode);
-        String fileName = selectedKey.replace(":", "-") + ".json";
-        Path pathWithDir = createDirectoryIfNotExists(path);
-        try {
+    public void export(@NotNull List<String> selectedKeys, Project project) {
+        Path pathWithDir = createDirectoryIfNotExists(project.getBasePath());
+        Map<String, File> filesToExport = new HashMap<>();
+        Set<String> unExported = new HashSet<>();
+        for (String selectedKey : selectedKeys) {
+            String fileName = selectedKey.replace(":", "-") + ".json";
             String fullPath = String.format("%s%s", pathWithDir.toUri().getPath(), fileName);
             File nodeAsFile = new File(fullPath);
-            if (nodeAsFile.createNewFile()) {
-                MessageDialogues.showInfoMessageDialogue("File created under path:\n" + fullPath, "Success");
+            if (nodeAsFile.exists()) {
+                unExported.add(selectedKey);
             } else {
-                String errorMessage =
-                    String.format("File with name \"%s\" already exists under directory:%n%s%nPlease rename session or move the existing file.", fileName, pathWithDir);
-                MessageDialogues.getErrorMessageDialogue(errorMessage, project);
+                filesToExport.put(selectedKey, nodeAsFile);
             }
-            FileWriter myWriter = new FileWriter(nodeAsFile);
-            myWriter.write(Objects.requireNonNull(nodeAsJson, "Session contains no data"));
-            myWriter.close();
+        }
+
+        if (!unExported.isEmpty()) {
+            String errorMessage = String.format("Please rename the sessions below because they already exists under directory:%n%s%n%s", pathWithDir, getNodesMessage(unExported));
+            MessageDialogues.getErrorMessageDialogue(errorMessage, project);
+            return;
+        }
+        boolean isSure =
+            MessageDialogues.getYesNoMessageDialogue(String.format("Are you sure you want to export sessions: %n%s", getNodesMessage(selectedKeys)), EXPORT_SESSION, project);
+        if (!isSure) {
+            return;
+        }
+
+        try {
+            for (var entry : filesToExport.entrySet()) {
+                String nodeName = entry.getKey();
+                File nodeAsFile = entry.getValue();
+                DebugNodeContainer nodeContainer = getNodeContainerByName(nodeName).orElseThrow();
+                HashMap<String, DebugNodeContainer> namePerNode = new HashMap<>();
+                namePerNode.put("root", nodeContainer);
+                String nodeAsJson = COMPONENT_SERVICE.getNodeConverter().toString(namePerNode);
+                FileWriter myWriter = new FileWriter(nodeAsFile);
+                myWriter.write(Objects.requireNonNull(nodeAsJson, "Session contains no data"));
+                myWriter.close();
+                nodeAsFile.createNewFile();
+            }
         } catch (IOException e) {
             throw new IllegalStateException("Could not export session", e);
         }
+        MessageDialogues
+            .showInfoMessageDialogue(String.format("Successfully exported the following file(s): %n%s%n%n under path: %s%n ", getNodesMessage(selectedKeys), pathWithDir), "Export Successful");
     }
 
     private Path createDirectoryIfNotExists(String path) {

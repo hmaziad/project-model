@@ -29,6 +29,8 @@ public class DiffNodesView extends DialogWrapper implements ReachServices {
     private final JButton diffButton = new JButton();
     private DebugTreeManager leftDebugTreeManager;
     private DebugTreeManager rightDebugTreeManager;
+    private JComboBox<String> leftDropdown;
+    private JComboBox<String> rightDropdown;
 
     public DiffNodesView(@NotNull Project project) {
         super(true); // use current window as parent
@@ -39,11 +41,19 @@ public class DiffNodesView extends DialogWrapper implements ReachServices {
         initButton();
     }
 
+    public void setSelectedNode(String nodeName, boolean isLeft) {
+        if (isLeft) {
+            this.leftDropdown.setSelectedItem(nodeName);
+        } else {
+            this.rightDropdown.setSelectedItem(nodeName);
+        }
+    }
+
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        JComboBox<String> leftDropdown = new ComboBox<>();
-        JComboBox<String> rightDropdown = new ComboBox<>();
+        this.leftDropdown = new ComboBox<>();
+        this.rightDropdown = new ComboBox<>();
         this.dropdownHandler.addNodesToDropdown(leftDropdown, COMPONENT_SERVICE.getLastSelectedLeft());
         this.dropdownHandler.addNodesToDropdown(rightDropdown, COMPONENT_SERVICE.getLastSelectedRight());
 

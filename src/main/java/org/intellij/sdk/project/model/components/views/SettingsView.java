@@ -3,12 +3,8 @@ package org.intellij.sdk.project.model.components.views;
 import static org.intellij.sdk.project.model.constants.TextConstants.HUMAN_DATE_FORMAT;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeListener;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Optional;
@@ -53,52 +49,9 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         JPanel dialogPanel = new JPanel(new GridBagLayout());
 
         String[] keyStrings = COMPONENT_SERVICE.getNodeHandler().getAllNodeNames().toArray(String[]::new);
-        JBList<String> keysList = new JBList<>(keyStrings);
-        this.keysList = keysList;
+        this.keysList = new JBList<>(keyStrings);
         KeyPopup keyPopup = new KeyPopup(this.keysList, this.project, resetIndex -> refreshView(this.keysList, resetIndex));
         keysList.addMouseListener(getMouseAdapter(keyPopup));
-
-        InputMap inputMap = this.keysList.getInputMap(JComponent.WHEN_FOCUSED);
-        //Ctrl-b to go backward one character
-        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK);
-        inputMap.put(key, "press");
-        this.keysList.getActionMap().put("press", new Action() {
-            @Override
-            public Object getValue(String key) {
-                return null;
-            }
-
-            @Override
-            public void putValue(String key, Object value) {
-                // nothing
-            }
-
-            @Override
-            public void setEnabled(boolean b) {
-                // nothing
-            }
-
-            @Override
-            public boolean isEnabled() {
-                return true;
-            }
-
-            @Override
-            public void addPropertyChangeListener(PropertyChangeListener listener) {
-                // nothing
-
-            }
-
-            @Override
-            public void removePropertyChangeListener(PropertyChangeListener listener) {
-                // nothing
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Diff sessions");
-            }
-        });
 
         new ListSpeedSearch<>(keysList);
         JScrollPane scrollableKeysPanel = getScrollableKeysPanel(keysList);
@@ -159,55 +112,6 @@ public class SettingsView extends DialogWrapper implements ReachServices {
             }
         }
     }
-
-    //    private JPanel getButtonsPanel(JBList<String> keysList) {
-    //        JPanel panel = new JPanel();
-    //        panel.setBorder(JBUI.Borders.empty(50, 5, 0, 5));
-    //        BoxLayout boxLayout = new BoxLayout(panel, BoxLayout.Y_AXIS);
-    //        panel.add(Box.createRigidArea(new Dimension(0, 5)));
-    //        panel.setLayout(boxLayout);
-    //        // rename button
-    //        JButton renameButton = new JButton("Rename");
-    //        renameButton.setToolTipText(RENAME_SESSION);
-    //        renameButton.addActionListener(e -> renameButton(keysList));
-    //        panel.add(renameButton);
-    //        // edit button
-    //        JButton editButton = new JButton("Describe");
-    //        editButton.setToolTipText(EDIT_SESSION);
-    //        editButton.addActionListener(e -> editButton(keysList));
-    //        panel.add(editButton);
-    //
-    //        // delete button
-    //        JButton deleteButton = new JButton("Delete");
-    //        deleteButton.setToolTipText(REMOVE_SESSION_FROM_STORAGE);
-    //        deleteButton.addActionListener(e -> deleteNode(keysList));
-    //        panel.add(deleteButton);
-    //        // load button
-    //        JButton loadButton = new JButton("Load");
-    //        loadButton.setToolTipText(LOAD_SESSION_INTO_TOOLBAR);
-    //        loadButton.addActionListener(e -> loadNode(keysList));
-    //        panel.add(loadButton);
-    //
-    //        // export button
-    //        JButton exportButton = new JButton("Export");
-    //        exportButton.setToolTipText(EXPORT_SESSION_JSON);
-    //        exportButton.addActionListener(e -> export(keysList));
-    //        panel.add(exportButton);
-    //        // import button
-    //        JButton importButton = new JButton("Import");
-    //        importButton.setToolTipText(IMPORT_FROM_FILE);
-    //        importButton.addActionListener(e -> _import(keysList));
-    //        panel.add(importButton);
-    //        // delete all button
-    //        JButton deleteAllButton = new JButton("Delete All");
-    //        deleteAllButton.setToolTipText(REMOVE_ALL_SESSIONS);
-    //        deleteAllButton.addActionListener(e -> deleteAll(keysList));
-    //        panel.add(deleteAllButton);
-    //        refreshView(keysList, true);
-    //        enableButtons(keysList.getItemsCount() != 0, exportButton, deleteButton, editButton, loadButton, deleteAllButton, renameButton);
-    //        keysList.addListSelectionListener(e -> enableButtons(keysList.getItemsCount() != 0, exportButton, deleteButton, editButton, loadButton, deleteAllButton));
-    //        return panel;
-    //    }
 
     private void refreshView(JBList<String> keysList, boolean resetIndex) {
         int currentIndex = keysList.getSelectedIndex();
