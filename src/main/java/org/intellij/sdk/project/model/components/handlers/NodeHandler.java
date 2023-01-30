@@ -56,11 +56,15 @@ public class NodeHandler implements ReachServices {
         return String.format(GENERATED_SESSION_NAME, classPart, formattedTimestamp);
     }
 
-    public void delete(String nodeName, Project project) {
-        String message = String.format(DELETE_SAVED_NODE, nodeName);
+    public void delete(List<String> nodeNames, Project project) {
+        String sessionsMessage = nodeNames //
+            .stream() //
+            .map(nodeName -> String.format("%n - %s", nodeName)) //
+            .collect(Collectors.joining());
+        String message = String.format(DELETE_SAVED_NODE, sessionsMessage);
         boolean isSure = MessageDialogues.getYesNoMessageDialogue(message, DELETE_SESSION, project);
         if (isSure) {
-            PERSISTENCY_SERVICE.getContainers().remove(nodeName);
+            nodeNames.forEach(PERSISTENCY_SERVICE.getContainers()::remove);
             COMPONENT_SERVICE.getDebugTreeManager().setRoot(null);
             COMPONENT_SERVICE.setNodeNameInWindow(null);
         }
@@ -146,12 +150,12 @@ public class NodeHandler implements ReachServices {
             String fileName = Objects.requireNonNull(chosenFile.getNameWithoutExtension(), "File is not valid");
             if (nodes.containsKey(fileName)) {
                 MessageDialogues.getErrorMessageDialogue(String.format("A session with name \"%s\" already exists", fileName), project);
-            }else {
-            CharSequence charsSequence = Objects.requireNonNull(FileDocumentManager.getInstance().getDocument(chosenFile), errorMessage).getCharsSequence();
-            String content = String.valueOf(charsSequence);
-            HashMap<String, DebugNodeContainer> nodeFromJson = COMPONENT_SERVICE.getNodeConverter().fromString(content);
-            DebugNodeContainer nodeContainer = Objects.requireNonNull(nodeFromJson, errorMessage).entrySet().iterator().next().getValue();
-            save(fileName, nodeContainer);
+            } else {
+                CharSequence charsSequence = Objects.requireNonNull(FileDocumentManager.getInstance().getDocument(chosenFile), errorMessage).getCharsSequence();
+                String content = String.valueOf(charsSequence);
+                HashMap<String, DebugNodeContainer> nodeFromJson = COMPONENT_SERVICE.getNodeConverter().fromString(content);
+                DebugNodeContainer nodeContainer = Objects.requireNonNull(nodeFromJson, errorMessage).entrySet().iterator().next().getValue();
+                save(fileName, nodeContainer);
             }
         }
     }

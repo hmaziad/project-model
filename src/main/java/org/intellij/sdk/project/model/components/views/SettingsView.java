@@ -10,7 +10,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeListener;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -19,7 +18,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
-import org.intellij.sdk.project.model.constants.MessageDialogues;
 import org.intellij.sdk.project.model.tree.components.DebugNodeContainer;
 import org.intellij.sdk.project.model.tree.components.DebugTreeManager;
 import org.jetbrains.annotations.NotNull;
@@ -57,7 +55,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         String[] keyStrings = COMPONENT_SERVICE.getNodeHandler().getAllNodeNames().toArray(String[]::new);
         JBList<String> keysList = new JBList<>(keyStrings);
         this.keysList = keysList;
-        KeyPopup keyPopup = new KeyPopup(this.keysList);
+        KeyPopup keyPopup = new KeyPopup(this.keysList, this.project, resetIndex -> refreshView(this.keysList, resetIndex));
         keysList.addMouseListener(getMouseAdapter(keyPopup));
 
         InputMap inputMap = this.keysList.getInputMap(JComponent.WHEN_FOCUSED);
@@ -210,66 +208,6 @@ public class SettingsView extends DialogWrapper implements ReachServices {
     //        keysList.addListSelectionListener(e -> enableButtons(keysList.getItemsCount() != 0, exportButton, deleteButton, editButton, loadButton, deleteAllButton));
     //        return panel;
     //    }
-
-    private void _import(JBList<String> keysList) {
-        COMPONENT_SERVICE.getNodeHandler().doImport(this.project);
-        refreshView(keysList, true);
-    }
-
-    private void export(JBList<String> keysList) {
-        String selectedKey = keysList.getSelectedValue();
-        COMPONENT_SERVICE.getNodeHandler().export(selectedKey, this.project);
-    }
-
-    private void loadNode(JBList<String> keysList) {
-        String selectedKey = keysList.getSelectedValue();
-        DebugNodeContainer nodeContainer = COMPONENT_SERVICE.getNodeHandler().getNodeContainerByName(selectedKey).orElseThrow();
-        COMPONENT_SERVICE.setNodeNameInWindow(selectedKey);
-        COMPONENT_SERVICE.getDebugTreeManager().setRoot(nodeContainer.getNode());
-    }
-
-    private void deleteAll(JBList<String> keysList) {
-        COMPONENT_SERVICE.getNodeHandler().deleteAll(this.project);
-        COMPONENT_SERVICE.getDebugTreeManager().setRoot(null);
-        COMPONENT_SERVICE.setNodeNameInWindow(null);
-        refreshView(keysList, true);
-    }
-
-    private void enableButtons(boolean enable, JButton... jButtons) {
-        Arrays.stream(jButtons).forEach(jButton -> jButton.setEnabled(enable));
-    }
-
-    private void renameButton(JBList<String> keysList) {
-        String selectedNodeName = keysList.getSelectedValue();
-        String newNodeName = MessageDialogues.getRenameDialogue(this.project, selectedNodeName, false);
-        while (COMPONENT_SERVICE.getNodeHandler().getAllContainersPerNames().containsKey(newNodeName)) {
-            newNodeName = MessageDialogues.getRenameDialogue(this.project, newNodeName, true);
-        }
-        if (Objects.nonNull(newNodeName)) {
-            newNodeName = newNodeName.replace(' ', '_');
-            COMPONENT_SERVICE.getNodeHandler().renameNode(selectedNodeName, newNodeName);
-            refreshView(keysList, false);
-        }
-    }
-
-    private void editButton(JBList<String> keysList) {
-        String selectedNodeName = keysList.getSelectedValue();
-        Optional<DebugNodeContainer> container = COMPONENT_SERVICE.getNodeHandler().getNodeContainerByName(selectedNodeName);
-        String currentDescription = null;
-        if (container.isPresent()) {
-            currentDescription = container.get().getDescription();
-        }
-        String description = MessageDialogues.getEditDialogue(this.project, selectedNodeName, currentDescription);
-        if (Objects.nonNull(description)) {
-            container.ifPresent(debugNodeContainer -> debugNodeContainer.setDescription(description));
-            refreshView(keysList, false);
-        }
-    }
-
-    private void deleteNode(JBList<String> keysList) {
-        COMPONENT_SERVICE.getNodeHandler().delete(keysList.getSelectedValue(), this.project);
-        refreshView(keysList, true);
-    }
 
     private void refreshView(JBList<String> keysList, boolean resetIndex) {
         int currentIndex = keysList.getSelectedIndex();
