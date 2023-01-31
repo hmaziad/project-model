@@ -18,7 +18,6 @@ public class MessageDialogues {
         Messages.showInfoMessage(message, title);
     }
 
-    // todo remove
     public static void getErrorMessageDialogue(String message, Project project) {
         Messages.showMessageDialog(project, message, "Error", Messages.getErrorIcon());
     }
@@ -30,7 +29,7 @@ public class MessageDialogues {
     }
 
     public static @Nullable @NlsSafe String getDescriptionDialogue(Project project, String nodeNames, String currentDescription) {
-        String dialogueDescription = String.format("Enter description for saved session(s): %n%s%n", nodeNames);
+        String dialogueDescription = String.format("Enter description for saved session(s): \n%s\n\n", nodeNames);
         return Messages.showInputDialog(project, dialogueDescription, "Armadillo: Add Description", null, currentDescription, null, null, null);
     }
 

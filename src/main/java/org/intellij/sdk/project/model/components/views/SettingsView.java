@@ -50,9 +50,9 @@ public class SettingsView extends DialogWrapper implements ReachServices {
 
         String[] keyStrings = COMPONENT_SERVICE.getNodeHandler().getAllNodeNames().toArray(String[]::new);
         this.keysList = new JBList<>(keyStrings);
+        this.keysList.setPreferredSize(new Dimension(200, 600));
         KeyPopup keyPopup = new KeyPopup(this.keysList, this.project, resetIndex -> refreshView(this.keysList, resetIndex));
         keysList.addMouseListener(getMouseAdapter(keyPopup));
-
         new ListSpeedSearch<>(keysList);
         JScrollPane scrollableKeysPanel = getScrollableKeysPanel(keysList);
         this.scrollableNodesPanel = getScrollableNodesPanel();
@@ -91,6 +91,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
 
         updateMetaData(keysList, timestampLabel, descriptionLabel);
         keysList.addListSelectionListener(e -> updateMetaData(keysList, timestampLabel, descriptionLabel));
+        refreshView(keysList, true);
         return dialogPanel;
     }
 
@@ -136,9 +137,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         scrollableKeysPanel.setBorder(titledBorder);
 
         keysList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        keysList.addListSelectionListener(e -> {
-            showSelectedNodeContent(keysList);
-        });
+        keysList.addListSelectionListener(e -> showSelectedNodeContent(keysList));
 
         JPanel keysPanel = new JPanel(new BorderLayout());
         keysPanel.add(keysList, BorderLayout.WEST);

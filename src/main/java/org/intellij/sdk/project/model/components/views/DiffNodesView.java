@@ -21,7 +21,9 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBScrollPane;
 
 import icons.SdkIcons;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public class DiffNodesView extends DialogWrapper implements ReachServices {
     private final Project project;
     private final DropdownHandler dropdownHandler;
@@ -58,12 +60,10 @@ public class DiffNodesView extends DialogWrapper implements ReachServices {
         this.dropdownHandler.addNodesToDropdown(rightDropdown, COMPONENT_SERVICE.getLastSelectedRight());
 
         leftDropdown.addActionListener(e -> {
-            this.leftDebugTreeManager.clearNodeColors();
             COMPONENT_SERVICE.setLastSelectedLeft(Optional.of(leftDropdown.getSelectedIndex()));
             doDiff(leftDropdown, rightDropdown, false);
         });
         rightDropdown.addActionListener(e -> {
-            this.rightDebugTreeManager.clearNodeColors();
             COMPONENT_SERVICE.setLastSelectedRight(Optional.of(rightDropdown.getSelectedIndex()));
             doDiff(leftDropdown, rightDropdown, false);
         });
@@ -130,12 +130,12 @@ public class DiffNodesView extends DialogWrapper implements ReachServices {
     }
 
     private void addDiffBtnListener(JComboBox<String> leftDropdown, JComboBox<String> rightDropdown) {
-        this.diffButton.addActionListener(e -> {
-            doDiff(leftDropdown, rightDropdown, true);
-        });
+        this.diffButton.addActionListener(e -> doDiff(leftDropdown, rightDropdown, true));
     }
 
     private void doDiff(JComboBox<String> leftDropdown, JComboBox<String> rightDropdown, boolean showDiffIntellij) {
+        this.leftDebugTreeManager.clearNodeColors();
+        this.rightDebugTreeManager.clearNodeColors();
         DebugNodeContainer leftNodeContainer = this.dropdownHandler.getSelectedContainer(leftDropdown);
         String leftNodeName = this.dropdownHandler.getSelectedNodeName(leftDropdown);
         DebugNodeContainer rightNodeContainer = this.dropdownHandler.getSelectedContainer(rightDropdown);
@@ -146,7 +146,8 @@ public class DiffNodesView extends DialogWrapper implements ReachServices {
         List<List<Integer>> deletions = changes.get(1);
         List<List<Integer>> modifications1 = changes.get(2);
         List<List<Integer>> modifications2 = changes.get(3);
-
+        LOG.debug("left node name: {}, right node name: {}", leftNodeName, rightNodeName);
+        LOG.debug("additions {} \n deletions {} \n modifications1 {} \n modifications2 {}", additions, deletions, modifications1, modifications2);
         this.leftDebugTreeManager.addDiffDeletions(deletions);
         this.leftDebugTreeManager.addDiffModifications(modifications1);
 

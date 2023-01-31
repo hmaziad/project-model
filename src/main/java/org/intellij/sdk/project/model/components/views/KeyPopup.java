@@ -162,7 +162,7 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
             if (container.isPresent()) {
                 currentDescription = container.get().getDescription();
             }
-            String description = MessageDialogues.getDescriptionDialogue(this.project, selectedNodeName, currentDescription);
+            String description = MessageDialogues.getDescriptionDialogue(this.project, "\n - " + selectedNodeName, currentDescription);
             if (Objects.nonNull(description)) {
                 container.ifPresent(debugNodeContainer -> debugNodeContainer.setDescription(description));
                 this.refreshViewWithReset.accept(false);
