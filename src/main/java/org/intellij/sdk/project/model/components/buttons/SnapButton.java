@@ -27,10 +27,14 @@ public class SnapButton extends IconWithTextAction implements ReachServices {
         if (optionalDebugNode.isEmpty()) {
             COMPONENT_SERVICE.getFeedbackMessage().setText("Weird, we cannot get a debug session. Try another way.");
         } else {
+//            MarkupModel markupModel = e.getSelectedTextEditor().getMarkupModel();
             DebugNodeContainer debugNodeContainer = optionalDebugNode.get();
             DebugNode debugNode = debugNodeContainer.getNode();
             COMPONENT_SERVICE.getNodeHandler().save(debugNodeContainer, e.getProject());
             COMPONENT_SERVICE.getDebugTreeManager().setRoot(debugNode);
+//            Editor editor = (Editor) e.getDataContext().getData("host.editor");
+//            MarkupModel markupModel = editor.getMarkupModel();
+
         }
     }
 

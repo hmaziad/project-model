@@ -6,8 +6,11 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -29,10 +32,16 @@ public class SettingsView extends DialogWrapper implements ReachServices {
     private JScrollPane scrollableNodesPanel;
     private final DebugTreeManager debugTreeManager = new DebugTreeManager(false);
     private JBList<String> keysList;
+    private Integer lineNumber;
 
     public SettingsView(@NotNull Project project) {
+        this(project, null);
+    }
+
+    public SettingsView(@NotNull Project project, Integer lineNumber) {
         super(true); // use current window as parent
         this.project = project;
+        this.lineNumber = lineNumber;
         setTitle("Armadillo: Manage Saved Sessions");
         init();
     }
@@ -48,8 +57,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         setSize(1100, 800);
         JPanel dialogPanel = new JPanel(new GridBagLayout());
 
-        String[] keyStrings = COMPONENT_SERVICE.getNodeHandler().getAllNodeNames().toArray(String[]::new);
-        this.keysList = new JBList<>(keyStrings);
+        this.keysList = new JBList<>(getKeyStringsFromPersistency().toArray(String[]::new));
         this.keysList.setPreferredSize(new Dimension(200, 600));
         KeyPopup keyPopup = new KeyPopup(this.keysList, this.project, resetIndex -> refreshView(this.keysList, resetIndex));
         keysList.addMouseListener(getMouseAdapter(keyPopup));
@@ -95,6 +103,20 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         return dialogPanel;
     }
 
+    private List<String> getKeyStringsFromPersistency() {
+        if (this.lineNumber == null) {
+            return COMPONENT_SERVICE.getNodeHandler().getAllNodeNames().stream().collect(Collectors.toList());
+        }
+        return COMPONENT_SERVICE //
+                .getNodeHandler() //
+                .getAllContainersPerNames() //
+                .entrySet() //
+                .stream() //
+                .filter(entry -> entry.getValue().getLineNumber() == this.lineNumber) //
+                .map(Map.Entry::getKey) //
+                .collect(Collectors.toList());
+    }
+
     private void updateMetaData(JBList<String> keysList, JLabel timestampLabel, JLabel descriptionLabel) {
         String selectedValue = keysList.getSelectedValue();
         Optional<DebugNodeContainer> optionalContainer = COMPONENT_SERVICE.getNodeHandler().getNodeContainerByName(selectedValue);
@@ -117,7 +139,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
     private void refreshView(JBList<String> keysList, boolean resetIndex) {
         int currentIndex = keysList.getSelectedIndex();
         DefaultListModel<String> model = new DefaultListModel<>();
-        model.addAll(COMPONENT_SERVICE.getNodeHandler().getAllNodeNames());
+        model.addAll(getKeyStringsFromPersistency());
         keysList.setModel(model);
         if (resetIndex) {
             currentIndex = Math.min(keysList.getItemsCount(), 0);

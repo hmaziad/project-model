@@ -1,5 +1,7 @@
 package org.intellij.sdk.project.model.components.handlers;
 
+import static org.intellij.sdk.project.model.util.HelperUtil.getPackageNameFromVfs;
+
 import java.awt.*;
 import java.util.Objects;
 import java.util.Optional;
@@ -8,9 +10,6 @@ import javax.swing.*;
 import org.intellij.sdk.project.model.tree.components.DebugNode;
 import org.intellij.sdk.project.model.tree.components.DebugNodeContainer;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiManager;
-import com.intellij.psi.impl.source.PsiJavaFileImpl;
 import com.intellij.ui.components.JBViewport;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
@@ -29,9 +28,6 @@ public class SnapHandler {
         if (!Objects.isNull(currentSession)) {
             XSourcePosition sourcePosition = currentSession.getCurrentStackFrame().getSourcePosition();
             int lineNumber = sourcePosition.getLine();
-            VirtualFile virtualFile = sourcePosition.getFile();
-            PsiJavaFileImpl fileImpl = (PsiJavaFileImpl) PsiManager.getInstance(project).findFile(virtualFile);
-            String packageName = fileImpl.getPackageName();
             LOG.info("Debugger session exists");
             XDebuggerTreeNode xRootNode = getDebugSessionTree(xDebuggerManager);
             LOG.debug("Debugger session retrieved: {}", xRootNode);
@@ -40,7 +36,7 @@ public class SnapHandler {
             DebugNodeContainer container = DebugNodeContainer.builder() //
                 .node(resultNode) //
                 .lineNumber(lineNumber) //
-                .packageName(packageName) //
+                .packageName(getPackageNameFromVfs(sourcePosition.getFile(), project).orElse(null)) //
                 .build();
 
             return Optional.of(container);
