@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.swing.*;
-import org.intellij.sdk.project.model.tree.components.DebugNode;
 import org.intellij.sdk.project.model.tree.components.DebugNodeContainer;
 import com.intellij.openapi.project.Project;
 
@@ -19,7 +18,7 @@ public class DropdownHandler implements ReachServices {
 
     public void addNodesToDropdown(JComboBox<String> nodesDropdown, Optional<Integer> optionalLastIndex) {
         List<String> allNodeNames = COMPONENT_SERVICE.getNodeHandler().getAllNodeNames();
-        Optional<DebugNode> currentSession = COMPONENT_SERVICE.getSnapHandler().getCurrentSession(this.project);
+        Optional<DebugNodeContainer> currentSession = COMPONENT_SERVICE.getSnapHandler().getCurrentSession(this.project);
         currentSession.ifPresent(node -> nodesDropdown.addItem(CURRENT_SESSION));
         allNodeNames.forEach(nodesDropdown::addItem);
         if (optionalLastIndex.isPresent() && optionalLastIndex.get() < nodesDropdown.getItemCount()) {

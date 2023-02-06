@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.intellij.sdk.project.model.tree.components.DebugNode;
+import org.intellij.sdk.project.model.tree.components.DebugNodeContainer;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.roots.ui.configuration.actions.IconWithTextAction;
@@ -22,12 +23,13 @@ public class SnapButton extends IconWithTextAction implements ReachServices {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        Optional<DebugNode> optionalDebugNode = COMPONENT_SERVICE.getSnapHandler().getCurrentSession(e.getProject());
+        Optional<DebugNodeContainer> optionalDebugNode = COMPONENT_SERVICE.getSnapHandler().getCurrentSession(e.getProject());
         if (optionalDebugNode.isEmpty()) {
             COMPONENT_SERVICE.getFeedbackMessage().setText("Weird, we cannot get a debug session. Try another way.");
         } else {
-            DebugNode debugNode = optionalDebugNode.get();
-            COMPONENT_SERVICE.getNodeHandler().save(debugNode, e.getProject());
+            DebugNodeContainer debugNodeContainer = optionalDebugNode.get();
+            DebugNode debugNode = debugNodeContainer.getNode();
+            COMPONENT_SERVICE.getNodeHandler().save(debugNodeContainer, e.getProject());
             COMPONENT_SERVICE.getDebugTreeManager().setRoot(debugNode);
         }
     }

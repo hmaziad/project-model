@@ -2,6 +2,7 @@ package org.intellij.sdk.project.model.actions;
 
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.intellij.sdk.project.model.tree.components.DebugNode;
+import org.intellij.sdk.project.model.tree.components.DebugNodeContainer;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.xdebugger.impl.ui.tree.actions.XDebuggerTreeActionBase;
@@ -12,7 +13,8 @@ public class SaveNodeAction extends XDebuggerTreeActionBase implements ReachServ
     protected void perform(XValueNodeImpl node, @NotNull String nodeName, AnActionEvent e) {
         DebugNode root = new DebugNode();
         root.add(new DebugNode(node));
-        COMPONENT_SERVICE.getNodeHandler().save(root, e.getProject());
+
+        COMPONENT_SERVICE.getNodeHandler().save(DebugNodeContainer.builder().node(root).build(), e.getProject());
         COMPONENT_SERVICE.getDebugTreeManager().setRoot(root);
     }
 }

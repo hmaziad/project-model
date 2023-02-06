@@ -6,9 +6,15 @@ import java.util.Optional;
 
 import javax.swing.*;
 import org.intellij.sdk.project.model.tree.components.DebugNode;
+import org.intellij.sdk.project.model.tree.components.DebugNodeContainer;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.impl.source.PsiJavaFileImpl;
 import com.intellij.ui.components.JBViewport;
+import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
+import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.impl.ui.tree.XDebuggerTree;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XDebuggerTreeNode;
 
@@ -17,15 +23,29 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class SnapHandler {
 
-    public Optional<DebugNode> getCurrentSession(Project project) {
+    public Optional<DebugNodeContainer> getCurrentSession(Project project) {
         XDebuggerManager xDebuggerManager = XDebuggerManager.getInstance(project);
-        if (!Objects.isNull(xDebuggerManager.getCurrentSession())) {
+        XDebugSession currentSession = xDebuggerManager.getCurrentSession();
+        if (!Objects.isNull(currentSession)) {
+            XSourcePosition sourcePosition = currentSession.getCurrentStackFrame().getSourcePosition();
+            int lineNumber = sourcePosition.getLine();
+            VirtualFile virtualFile = sourcePosition.getFile();
+            PsiJavaFileImpl fileImpl = (PsiJavaFileImpl) PsiManager.getInstance(project).findFile(virtualFile);
+            String packageName = fileImpl.getPackageName();
             LOG.info("Debugger session exists");
             XDebuggerTreeNode xRootNode = getDebugSessionTree(xDebuggerManager);
             LOG.debug("Debugger session retrieved: {}", xRootNode);
             DebugNode resultNode = new DebugNode(xRootNode);
-            return Optional.of(resultNode);
+
+            DebugNodeContainer container = DebugNodeContainer.builder() //
+                .node(resultNode) //
+                .lineNumber(lineNumber) //
+                .packageName(packageName) //
+                .build();
+
+            return Optional.of(container);
         }
+
         return Optional.empty();
     }
 

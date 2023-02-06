@@ -5,17 +5,23 @@ import java.time.LocalDateTime;
 import com.google.gson.annotations.Expose;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @AllArgsConstructor
 @Getter
+@Setter
+@Builder
 public class DebugNodeContainer {
     @Expose
-    private final LocalDateTime timestamp;
+    private LocalDateTime timestamp;
     @Expose
-    @Setter
     private String description;
+    @Expose
+    private String packageName;
+    @Expose
+    private int lineNumber;
     @Expose
     private final DebugNode node;
 }

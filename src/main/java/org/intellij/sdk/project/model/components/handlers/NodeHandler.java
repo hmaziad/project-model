@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.intellij.sdk.project.model.constants.MessageDialogues;
-import org.intellij.sdk.project.model.tree.components.DebugNode;
 import org.intellij.sdk.project.model.tree.components.DebugNodeContainer;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.json.JsonFileType;
@@ -42,11 +41,11 @@ import com.intellij.xdebugger.XSourcePosition;
 
 public class NodeHandler implements ReachServices {
 
-    public void save(DebugNode debugNode, Project project) {
+    public void save(DebugNodeContainer container, Project project) {
         LocalDateTime timestamp = LocalDateTime.now();
         String generatedName = getGenerateName(project, timestamp);
-        DebugNodeContainer nodeContainer = new DebugNodeContainer(timestamp, null, debugNode);
-        save(generatedName, nodeContainer);
+        container.setTimestamp(timestamp);
+        save(generatedName, container);
     }
 
     private void save(String generatedName, DebugNodeContainer nodeContainer) {
@@ -193,12 +192,10 @@ public class NodeHandler implements ReachServices {
     }
 
     public DebugNodeContainer getCurrentSession(Project project) {
-        DebugNode debugNode = COMPONENT_SERVICE //
+        return COMPONENT_SERVICE //
             .getSnapHandler() //
             .getCurrentSession(project) //
             .orElseThrow(() -> new IllegalStateException("Why you messing?"));
-
-        return new DebugNodeContainer(null, null, debugNode);
     }
 
 }
