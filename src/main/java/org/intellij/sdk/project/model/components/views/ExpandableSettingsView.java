@@ -78,6 +78,7 @@ public class ExpandableSettingsView extends DialogWrapper {
 
     public void setSplitPaneProperties(JSplitPane splitPane) {
         splitPane.setDividerSize(DIVIDER_SIZE);
+        splitPane.setContinuousLayout(true);
         splitPane.setUI(new BasicSplitPaneUI() {
             @Override
             public BasicSplitPaneDivider createDefaultDivider() {
