@@ -20,12 +20,14 @@ import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
 
 public class ExpandableSettingsView extends DialogWrapper {
-    private static final EmptyBorder EMPTY_BORDER = new EmptyBorder(0, 0, 0, 0);
+    private static final EmptyBorder EMPTY_BORDER = JBUI.Borders.empty();
     private static final Color BORDER_COLOR = JBUI.CurrentTheme.ToolWindow.borderColor();
     private static final Color DIVIDER_COLOR = JBUI.CurrentTheme.DefaultTabs.background();
     private static final BorderUIResource.LineBorderUIResource BORDER_UI_RESOURCE = new BorderUIResource.LineBorderUIResource(BORDER_COLOR);
-    static JPanel frame;
-    static JList jList;
+    private static final int DIVIDER_SIZE = 12;
+    private JList<String> jList;
+    private static final String LONG_TEXT =
+        "<html><xmp>Description<Hellooo> sa;Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of \"de Finibus Bonorum et Malorum\" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, \"Lorem ipsum dolor sit amet..\", comes from a line in section 1.10.32. The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from \"de Finibus Bonorum et Malorum\" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.</xmp></html>";
 
     public ExpandableSettingsView() {
         super(true); // use current window as parent
@@ -35,42 +37,28 @@ public class ExpandableSettingsView extends DialogWrapper {
 
     @Override
     protected @Nullable JComponent createCenterPanel() {
-        frame = new JPanel(new BorderLayout());
+        JPanel dialogPanel = new JPanel(new BorderLayout());
+        JSplitPane keysFrameSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, getKeysPanel(), getFramesPanel());
+        JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, keysFrameSplit, getTreePanel());
 
-        // create a object
-        //        solve s = new solve();
-
-        // create a panel
-        JPanel framesPanel = new JPanel();
-        JPanel contentPanel = new JPanel();
-
-        addTreeComponent(contentPanel);
-        addJFrames(framesPanel);
-
-        // create a splitpane
-        Component keysScrollPane = getKeysScrollPane();
-        JSplitPane keysFrameSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, keysScrollPane, framesPanel);
-        keysFrameSplit.setDividerSize(1);
-        JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, keysFrameSplit, contentPanel);
-        // add panel
-        String text =
-            "<html><xmp>Description<Hellooo> sa;Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of \"de Finibus Bonorum et Malorum\" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, \"Lorem ipsum dolor sit amet..\", comes from a line in section 1.10.32. The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from \"de Finibus Bonorum et Malorum\" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.</xmp></html>";
-        JLabel comp = new JLabel(text);
-        frame.add(new JLabel("Timestamp 2013m2130:43:12:34"), BorderLayout.NORTH);
-        frame.add(mainSplit, BorderLayout.CENTER);
-        jList.addListSelectionListener(e -> {
-            if (jList.getSelectedIndex() % 2 == 0) {
-                comp.setText("");
-            } else {
-                comp.setText(text);
-            }
-        });
-        frame.add(comp, BorderLayout.SOUTH);
+        JLabel description = new JLabel(LONG_TEXT);
+        this.jList.addListSelectionListener(e -> onKeySelection(description));
         // set the size of frame
-        frame.setSize(1100, 800);
+        dialogPanel.setSize(1100, 800);
         setSize(1100, 800);
 
 
+        invokeLater(keysFrameSplit, mainSplit);
+        setSplitPaneProperties(mainSplit);
+        setSplitPaneProperties(keysFrameSplit);
+        // add components in order
+        dialogPanel.add(new JLabel("Timestamp 2013m2130:43:12:34"), BorderLayout.NORTH);
+        dialogPanel.add(mainSplit, BorderLayout.CENTER);
+        dialogPanel.add(description, BorderLayout.SOUTH);
+        return dialogPanel;
+    }
+
+    private void invokeLater(JSplitPane keysFrameSplit, JSplitPane mainSplit) {
         SwingUtilities.invokeLater(() -> {
             keysFrameSplit.setDividerLocation(0.5);
             keysFrameSplit.setResizeWeight(0.5);
@@ -78,17 +66,19 @@ public class ExpandableSettingsView extends DialogWrapper {
             mainSplit.setResizeWeight(0.3);
 
         });
-        setSplitPaneProperties(mainSplit);
-        setSplitPaneProperties(keysFrameSplit);
+    }
 
-        return frame;
+    private void onKeySelection(JLabel description) {
+        if (this.jList.getSelectedIndex() % 2 == 0) {
+            description.setText("");
+        } else {
+            description.setText(LONG_TEXT);
+        }
     }
 
     public void setSplitPaneProperties(JSplitPane splitPane) {
-        splitPane.setDividerSize(12);
-
+        splitPane.setDividerSize(DIVIDER_SIZE);
         splitPane.setUI(new BasicSplitPaneUI() {
-
             @Override
             public BasicSplitPaneDivider createDefaultDivider() {
                 return new BasicSplitPaneDivider(this) {
@@ -105,11 +95,11 @@ public class ExpandableSettingsView extends DialogWrapper {
                 };
             }
         });
-
         splitPane.setBorder(null);
     }
 
-    private static void addJFrames(JPanel framesPanel) {
+    private JPanel getFramesPanel() {
+        JPanel framesPanel = new JPanel();
         framesPanel.setLayout(new BorderLayout());
         String[] strings = IntStream.range(1, 30).mapToObj(i -> "d.").collect(Collectors.toList()).toArray(String[]::new);
         JList<String> jList = new JBList<>(strings);
@@ -118,9 +108,11 @@ public class ExpandableSettingsView extends DialogWrapper {
         framesPanel.setBorder(BORDER_UI_RESOURCE);
         scrollPane.setBorder(EMPTY_BORDER);
         framesPanel.add(scrollPane, BorderLayout.CENTER);
+        return framesPanel;
     }
 
-    private static void addTreeComponent(JPanel contentPanel) {
+    private JPanel getTreePanel() {
+        JPanel contentPanel = new JPanel();
         contentPanel.setBorder(BORDER_UI_RESOURCE);
         contentPanel.setLayout(new BorderLayout());
         JTree jTree = new Tree();
@@ -132,16 +124,17 @@ public class ExpandableSettingsView extends DialogWrapper {
         scrollPane.setViewportView(jTree);
         scrollPane.setBorder(EMPTY_BORDER);
         contentPanel.add(scrollPane, BorderLayout.CENTER);
+        return contentPanel;
     }
 
-    private static Component getKeysScrollPane() {
+    private Component getKeysPanel() {
         String[] strings = IntStream.range(1, 30)
             .mapToObj(i -> "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ")
             .collect(Collectors.toList()).toArray(String[]::new);
         strings[0] = "Hussein";
-        jList = new JBList<>(strings);
+        this.jList = new JBList<>(strings);
         JScrollPane scrollPane = new JBScrollPane();
-        scrollPane.setViewportView(jList);
+        scrollPane.setViewportView(this.jList);
         scrollPane.setBorder(EMPTY_BORDER);
         JPanel jPanel = new JPanel(new BorderLayout());
         jPanel.add(scrollPane, BorderLayout.CENTER);
