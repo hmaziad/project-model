@@ -5,13 +5,17 @@ import static org.intellij.sdk.project.model.constants.TextConstants.HUMAN_DATE_
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.apache.commons.collections.CollectionUtils;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
+import org.intellij.sdk.project.model.tree.components.DebugFrame;
 import org.intellij.sdk.project.model.tree.components.DebugNode;
 import org.intellij.sdk.project.model.tree.components.DebugNodeContainer;
 import org.intellij.sdk.project.model.tree.components.DebugTreeManager;
@@ -27,6 +31,7 @@ public class KeySelectionListener implements ListSelectionListener, ReachService
     JLabel description;
     JLabel timestamp;
     DebugTreeManager debugTreeManager;
+    JBList<String> framesList;
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
@@ -34,17 +39,22 @@ public class KeySelectionListener implements ListSelectionListener, ReachService
         Optional<DebugNodeContainer> optionalNode = COMPONENT_SERVICE.getNodeHandler().getNodeContainerByName(selectedNodeName);
         if (optionalNode.isPresent()) {
             DebugNodeContainer nodeContainer = optionalNode.get();
-            updateViewNodeData(nodeContainer.getTimestamp(), nodeContainer.getDescription(), nodeContainer.getNode());
+            updateViewNodeData(nodeContainer.getTimestamp(), nodeContainer.getDescription(), nodeContainer.getNode(), nodeContainer.getFrames());
         } else {
-            updateViewNodeData(null, EMPTY_STRING, null);
+            updateViewNodeData(null, EMPTY_STRING, null, null);
         }
     }
 
-    private void updateViewNodeData(LocalDateTime timestamp, String description, DebugNode node) {
+    private void updateViewNodeData(LocalDateTime timestamp, String description, DebugNode node, List<DebugFrame> frames) {
         this.timestamp.setText(Objects.isNull(timestamp) ? EMPTY_STRING : timestamp.format(DATE_TIME_FORMATTER));
         String wrappedDescription = String.format("<html><xmp>%s</xmp></html>", description);
         this.description.setText(StringUtil.isEmpty(description) ? EMPTY_STRING : wrappedDescription);
         this.debugTreeManager.setRoot(node);
+        DefaultListModel<String> framesListModel = new DefaultListModel<>();
+        if (CollectionUtils.isNotEmpty(frames)) {
+            framesListModel.addAll(frames.stream().map(DebugFrame::toString).collect(Collectors.toList()));
+        }
+        this.framesList.setModel(framesListModel);
     }
 
 }

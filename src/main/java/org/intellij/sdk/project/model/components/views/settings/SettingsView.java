@@ -5,8 +5,6 @@ import static org.intellij.sdk.project.model.constants.TextConstants.SETTINGS_VI
 import java.awt.*;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -40,6 +38,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
     private final JLabel description = new JLabel();
     private JBList<String> keysList;
     private Integer lineNumber;
+    private JBList<String> framesList = new JBList<>();
 
     public SettingsView(Project project) {
         super(true);
@@ -61,7 +60,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         JSplitPane leftRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, keysFrameSplit, getTreePanel());
 
         // add listeners
-        KeySelectionListener keySelectionListener = new KeySelectionListener(this.keysList, this.description, this.timestamp, this.debugTreeManager);
+        KeySelectionListener keySelectionListener = new KeySelectionListener(this.keysList, this.description, this.timestamp, this.debugTreeManager, this.framesList);
         KeyMouseListener keyMouseListener = new KeyMouseListener(this.keysList, this.project, this.description);
         this.keysList.addListSelectionListener(keySelectionListener);
         this.keysList.addMouseListener(keyMouseListener);
@@ -123,10 +122,8 @@ public class SettingsView extends DialogWrapper implements ReachServices {
     private JPanel getFramesPanel() {
         JPanel framesPanel = new JPanel();
         framesPanel.setLayout(new BorderLayout());
-        String[] strings = IntStream.range(1, 30).mapToObj(i -> "dummy frame").collect(Collectors.toList()).toArray(String[]::new);
-        JList<String> framesList = new JBList<>(strings);
         JScrollPane scrollPane = new JBScrollPane();
-        scrollPane.setViewportView(framesList);
+        scrollPane.setViewportView(this.framesList);
         framesPanel.setBorder(BORDER_UI_RESOURCE);
         scrollPane.setBorder(EMPTY_BORDER);
         framesPanel.add(scrollPane, BorderLayout.CENTER);

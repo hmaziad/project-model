@@ -1,17 +1,14 @@
 package org.intellij.sdk.project.model.tree.components;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.google.gson.annotations.Expose;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@AllArgsConstructor
-@Getter
-@Setter
+@Data
 @Builder
 public class DebugNodeContainer {
     @Expose
@@ -22,6 +19,8 @@ public class DebugNodeContainer {
     private String packageName;
     @Expose
     private int lineNumber;
+    @Expose
+    private List<DebugFrame> frames;
     @Expose
     private final DebugNode node;
 }
