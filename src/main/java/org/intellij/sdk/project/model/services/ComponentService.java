@@ -14,18 +14,18 @@ import lombok.Setter;
 
 @Getter
 public class ComponentService {
-    private final AtomicBoolean snapIsEnabled = new AtomicBoolean(false);
-    private final AtomicBoolean clearIsEnabled = new AtomicBoolean(false);
-    private final DebugTreeManager debugTreeManager = new DebugTreeManager(false);
-    private final JLabel feedbackMessage = new JLabel("Let's get started...");
-    private final NodeHandler nodeHandler = new NodeHandler();
-    private final SnapHandler snapHandler = new SnapHandler();
-    private final DebugContainerConverter nodeConverter = new DebugContainerConverter();
+    private final AtomicBoolean snapIsEnabled = new AtomicBoolean(false); // must change
+    private final AtomicBoolean clearIsEnabled = new AtomicBoolean(false); // must change
+    private final DebugTreeManager debugTreeManager = new DebugTreeManager(false); // must change
+    private final JLabel feedbackMessage = new JLabel("Let's get started..."); // can be changed
+    private final NodeHandler nodeHandler = new NodeHandler(); // can be static
+    private final SnapHandler snapHandler = new SnapHandler(); // can be static
+    private final DebugContainerConverter nodeConverter = new DebugContainerConverter(); // can be static
 
     @Setter
-    private Optional<Integer> lastSelectedLeft = Optional.empty();
+    private Optional<Integer> lastSelectedLeft = Optional.empty(); // must change
     @Setter
-    private Optional<Integer> lastSelectedRight = Optional.empty();
+    private Optional<Integer> lastSelectedRight = Optional.empty(); // must change
     @Setter
-    private String nodeNameInWindow = null;
+    private String nodeNameInWindow = null; // must change
 }

@@ -34,18 +34,17 @@ public class KeySelectionListener implements ListSelectionListener, ReachService
         Optional<DebugNodeContainer> optionalNode = COMPONENT_SERVICE.getNodeHandler().getNodeContainerByName(selectedNodeName);
         if (optionalNode.isPresent()) {
             DebugNodeContainer nodeContainer = optionalNode.get();
-            updateMetaData(nodeContainer.getTimestamp(), nodeContainer.getDescription());
-            showSelectedNodeContent(nodeContainer.getNode());
+            updateViewNodeData(nodeContainer.getTimestamp(), nodeContainer.getDescription(), nodeContainer.getNode());
+        } else {
+            updateViewNodeData(null, EMPTY_STRING, null);
         }
     }
 
-    private void updateMetaData(LocalDateTime timestamp, String description) {
+    private void updateViewNodeData(LocalDateTime timestamp, String description, DebugNode node) {
         this.timestamp.setText(Objects.isNull(timestamp) ? EMPTY_STRING : timestamp.format(DATE_TIME_FORMATTER));
         String wrappedDescription = String.format("<html><xmp>%s</xmp></html>", description);
         this.description.setText(StringUtil.isEmpty(description) ? EMPTY_STRING : wrappedDescription);
-    }
-
-    private void showSelectedNodeContent(DebugNode node) {
         this.debugTreeManager.setRoot(node);
     }
+
 }
