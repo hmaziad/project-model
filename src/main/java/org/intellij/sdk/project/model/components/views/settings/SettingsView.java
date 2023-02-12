@@ -16,13 +16,10 @@ import org.intellij.sdk.project.model.components.handlers.NodeHandler;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.intellij.sdk.project.model.tree.components.DebugFrame;
 import org.intellij.sdk.project.model.tree.components.DebugTreeManager;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.ListSpeedSearch;
-import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
@@ -129,24 +126,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         framesPanel.setLayout(new BorderLayout());
         JScrollPane scrollPane = new JBScrollPane();
 
-        this.framesList.setCellRenderer(new ColoredListCellRenderer<DebugFrame>() {
-            @Override
-            protected void customizeCellRenderer(@NotNull JList<? extends DebugFrame> list, DebugFrame frame, int index, boolean selected, boolean hasFocus) {
-                frame.getMethodName();
-                frame.getLineNumber();
-
-                String packageWithName = frame.getPackageWithName();
-                int lastPointIndex = packageWithName.lastIndexOf('.');
-                // todo what if no package?
-                String fileName = packageWithName.substring(lastPointIndex + 1);
-                String packageName = packageWithName.substring(0, lastPointIndex);
-
-                String firstPart = "%s: %s, %s ";
-                String secondPart = "(%s)";
-                append(String.format(firstPart, frame.getMethodName(), frame.getLineNumber(), fileName), SimpleTextAttributes.REGULAR_ATTRIBUTES);
-                append(String.format(secondPart, packageName), SimpleTextAttributes.GRAY_ITALIC_ATTRIBUTES);
-            }
-        });
+        this.framesList.setCellRenderer(new DebugFrameCellRenderer());
 
         scrollPane.setViewportView(this.framesList);
         framesPanel.setBorder(BORDER_UI_RESOURCE);
