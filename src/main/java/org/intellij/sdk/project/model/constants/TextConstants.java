@@ -17,7 +17,7 @@ public class TextConstants {
     public static final String DELETE_SESSION = "Armadillo: Delete Session";
     public static final String EXPORT_SESSION = "Armadillo: Export Session(s)";
     public static final String NODE_DATE_FORMAT = "yyyy-MM-dd_hh:mm:ss.SSS";
-    public static final String HUMAN_DATE_FORMAT = "yyyy-MMM-dd hh:mm:ss";
+    public static final String HUMAN_DATE_FORMAT = "yyyy-MMM-dd_hh-mm-ss";
     public static final String GENERATED_SESSION_NAME = "%s_%s";
     public static final String DIFF_NODES = "Armadillo: Diff Sessions";
     public static final String REMOVE_SESSION_FROM_STORAGE = "Remove session from storage";
@@ -27,4 +27,7 @@ public class TextConstants {
     public static final String REMOVE_ALL_SESSIONS = "Remove all sessions from storage";
     public static final String EXPORT_SESSION_JSON = "Export session into json file";
     public static final String IMPORT_FROM_FILE = "Import and save session from json file";
+    public static final String SETTINGS_VIEW_TITLE = "Armadillo: Manage Saved Sessions";
+    public static final String EMPTY_STRING = "";
+
 }

@@ -17,6 +17,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
+import org.intellij.sdk.project.model.components.views.settings.KeyPopup;
 import org.intellij.sdk.project.model.tree.components.DebugNodeContainer;
 import org.intellij.sdk.project.model.tree.components.DebugTreeManager;
 import org.jetbrains.annotations.NotNull;
@@ -59,7 +60,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
 
         this.keysList = new JBList<>(getKeyStringsFromPersistency().toArray(String[]::new));
         this.keysList.setPreferredSize(new Dimension(200, 600));
-        KeyPopup keyPopup = new KeyPopup(this.keysList, this.project, resetIndex -> refreshView(this.keysList, resetIndex));
+        KeyPopup keyPopup = new KeyPopup(this.keysList, this.project, null);
         keysList.addMouseListener(getMouseAdapter(keyPopup));
         new ListSpeedSearch<>(keysList);
         JScrollPane scrollableKeysPanel = getScrollableKeysPanel(keysList);
@@ -105,7 +106,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
 
     private List<String> getKeyStringsFromPersistency() {
         if (this.lineNumber == null) {
-            return COMPONENT_SERVICE.getNodeHandler().getAllNodeNames().stream().collect(Collectors.toList());
+            return COMPONENT_SERVICE.getNodeHandler().getSortedNodeNames().stream().collect(Collectors.toList());
         }
         return COMPONENT_SERVICE //
                 .getNodeHandler() //
@@ -117,6 +118,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
                 .collect(Collectors.toList());
     }
 
+    //done
     private void updateMetaData(JBList<String> keysList, JLabel timestampLabel, JLabel descriptionLabel) {
         String selectedValue = keysList.getSelectedValue();
         Optional<DebugNodeContainer> optionalContainer = COMPONENT_SERVICE.getNodeHandler().getNodeContainerByName(selectedValue);

@@ -17,7 +17,7 @@ public class DropdownHandler implements ReachServices {
     private final Project project;
 
     public void addNodesToDropdown(JComboBox<String> nodesDropdown, Optional<Integer> optionalLastIndex) {
-        List<String> allNodeNames = COMPONENT_SERVICE.getNodeHandler().getAllNodeNames();
+        List<String> allNodeNames = COMPONENT_SERVICE.getNodeHandler().getSortedNodeNames();
         Optional<DebugNodeContainer> currentSession = COMPONENT_SERVICE.getSnapHandler().getCurrentSession(this.project);
         currentSession.ifPresent(node -> nodesDropdown.addItem(CURRENT_SESSION));
         allNodeNames.forEach(nodesDropdown::addItem);

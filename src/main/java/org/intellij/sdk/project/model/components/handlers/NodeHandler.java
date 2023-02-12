@@ -92,7 +92,7 @@ public class NodeHandler implements ReachServices {
         return Optional.ofNullable(PERSISTENCY_SERVICE.getContainers().get(nodeName));
     }
 
-    public List<String> getAllNodeNames() {
+    public List<String> getSortedNodeNames() {
         Comparator<Map.Entry<String, DebugNodeContainer>> debugComparator = Comparator.comparing(e1 -> {
             LocalDateTime timestamp = e1.getValue().getTimestamp();
             return timestamp == null ? LocalDateTime.now() : timestamp;

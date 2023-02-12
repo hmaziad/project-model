@@ -1,4 +1,6 @@
-package org.intellij.sdk.project.model.components.views;
+package org.intellij.sdk.project.model.components.views.settings;
+
+import static org.intellij.sdk.project.model.constants.TextConstants.EMPTY_STRING;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
@@ -6,22 +8,29 @@ import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.swing.*;
+import org.intellij.sdk.project.model.components.handlers.NodeHandler;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
+import org.intellij.sdk.project.model.components.views.DeleteAction;
+import org.intellij.sdk.project.model.components.views.DiffAction;
+import org.intellij.sdk.project.model.components.views.DiffNodesView;
 import org.intellij.sdk.project.model.constants.MessageDialogues;
 import org.intellij.sdk.project.model.tree.components.DebugNodeContainer;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.components.JBList;
 
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 public class KeyPopup extends JPopupMenu implements ReachServices {
+    private static final NodeHandler nodeHandler = COMPONENT_SERVICE.getNodeHandler();
     private final JBList<String> keysList;
-    private final Project project;
-    private final Consumer<Boolean> refreshViewWithReset;
+    private final transient Project project;
+    private final JLabel description;
     private final JMenuItem rename = new JMenuItem("Rename");
     private final JMenuItem describe = new JMenuItem("Describe");
     private final JSeparator separator1 = new JSeparator();
@@ -34,10 +43,16 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
     private final JMenuItem deleteAll = new JMenuItem("Delete All");
     private final JMenuItem diff = new JMenuItem("Diff Sessions");
 
-    public KeyPopup(JBList<String> keysList, Project project, Consumer<Boolean> refreshViewWithReset) {
+    public KeyPopup(JBList<String> keysList, Project project, JLabel description) {
         this.keysList = keysList;
         this.project = project;
-        this.refreshViewWithReset = refreshViewWithReset;
+        this.description = description;
+        addActionListeners();
+        addActions();
+        initKeyHandler();
+    }
+
+    private void addActionListeners() {
         this.rename.addActionListener(e -> rename(this.keysList));
         this.describe.addActionListener(e -> describe(this.keysList));
         this.delete.addActionListener(e -> delete(this.keysList));
@@ -46,7 +61,9 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
         this.doImport.addActionListener(e -> doImport());
         this.deleteAll.addActionListener(e -> deleteAll());
         this.diff.addActionListener(e -> diff(this.keysList));
+    }
 
+    private void addActions() {
         add(this.rename);
         add(this.describe);
         add(this.load);
@@ -58,8 +75,6 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
         add(this.separator2);
         add(this.delete);
         add(this.deleteAll);
-
-        initKeyHandler();
     }
 
     private void initKeyHandler() {
@@ -116,9 +131,24 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
     }
 
     private void doImport() {
-        COMPONENT_SERVICE.getNodeHandler().doImport(this.project);
-        this.refreshViewWithReset.accept(true);
+        nodeHandler.doImport(this.project);
+        reloadNodeNames();
     }
+
+    private void reloadNodeNames() {
+        LOG.info("Reloading node names");
+        int selectedIndex = this.keysList.getSelectedIndex();
+        DefaultListModel<String> updatedNodeNames = new DefaultListModel<>();
+        updatedNodeNames.addAll(COMPONENT_SERVICE.getNodeHandler().getSortedNodeNames());
+        this.keysList.setModel(updatedNodeNames);
+        int itemsCount = this.keysList.getItemsCount();
+        if (selectedIndex >= itemsCount && itemsCount > 0) {
+            this.keysList.setSelectedIndex(itemsCount - 1);
+        } else {
+            this.keysList.setSelectedIndex(selectedIndex);
+        }
+    }
+
 
     private void export(JBList<String> keysList) {
         COMPONENT_SERVICE.getNodeHandler().export(getSelectedItems(keysList), this.project);
@@ -136,7 +166,7 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
         if (isSure) {
             COMPONENT_SERVICE.getDebugTreeManager().setRoot(null);
             COMPONENT_SERVICE.setNodeNameInWindow(null);
-            this.refreshViewWithReset.accept(true);
+            reloadNodeNames();
         }
     }
 
@@ -149,36 +179,21 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
         if (Objects.nonNull(newNodeName)) {
             newNodeName = newNodeName.replace(' ', '_');
             COMPONENT_SERVICE.getNodeHandler().renameNode(selectedNodeName, newNodeName);
-            this.refreshViewWithReset.accept(false);
+            reloadNodeNames();
         }
     }
 
     private void describe(JBList<String> keysList) {
         List<String> selectedItems = getSelectedItems(keysList);
-        if (selectedItems.size() == 1) {
-            String selectedNodeName = keysList.getSelectedValue();
-            Optional<DebugNodeContainer> container = COMPONENT_SERVICE.getNodeHandler().getNodeContainerByName(selectedNodeName);
-            String currentDescription = null;
-            if (container.isPresent()) {
-                currentDescription = container.get().getDescription();
-            }
-            String description = MessageDialogues.getDescriptionDialogue(this.project, "\n - " + selectedNodeName, currentDescription);
-            if (Objects.nonNull(description)) {
-                container.ifPresent(debugNodeContainer -> debugNodeContainer.setDescription(description));
-                this.refreshViewWithReset.accept(false);
-            }
-        } else {
-            StringBuilder sessionsMessage = new StringBuilder();
-            selectedItems.forEach(item -> sessionsMessage.append("\n - ").append(item));
-
-            String description = MessageDialogues.getDescriptionDialogue(this.project, sessionsMessage.toString(), "");
-            if (Objects.nonNull(description)) {
-                selectedItems //
-                    .stream() //
-                    .map(nodeName -> COMPONENT_SERVICE.getNodeHandler().getNodeContainerByName(nodeName)) //
-                    .forEach(container -> container.ifPresent(debugNodeContainer -> debugNodeContainer.setDescription(description)));
-                this.refreshViewWithReset.accept(false);
-            }
+        StringBuilder sessionsMessage = new StringBuilder();
+        selectedItems.forEach(item -> sessionsMessage.append("\n - ").append(item));
+        String inputDescription = MessageDialogues.getDescriptionDialogue(this.project, sessionsMessage.toString(), EMPTY_STRING);
+        if (StringUtil.isNotEmpty(inputDescription)) {
+            selectedItems //
+                .stream() //
+                .map(nodeName -> COMPONENT_SERVICE.getNodeHandler().getNodeContainerByName(nodeName)) //
+                .forEach(container -> container.ifPresent(debugNodeContainer -> debugNodeContainer.setDescription(inputDescription)));
+            this.description.setText(inputDescription);
         }
     }
 
@@ -186,7 +201,7 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
         List<String> selectedValues = getSelectedItems(keysList);
         boolean isSure = COMPONENT_SERVICE.getNodeHandler().delete(selectedValues, this.project);
         if (isSure) {
-            this.refreshViewWithReset.accept(true);
+            reloadNodeNames();
         }
     }
 
