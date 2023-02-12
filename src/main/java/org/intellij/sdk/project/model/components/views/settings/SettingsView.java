@@ -63,7 +63,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
 
         // add listeners
         KeySelectionListener keySelectionListener = new KeySelectionListener(this.keysList, this.description, this.timestamp, this.debugTreeManager, this.framesList);
-        KeyMouseListener keyMouseListener = new KeyMouseListener(this.keysList, this.project, this.description);
+        KeyMouseListener keyMouseListener = new KeyMouseListener(this.keysList, this.project, this.description, this.lineNumber);
         this.keysList.addListSelectionListener(keySelectionListener);
         this.keysList.addMouseListener(keyMouseListener);
         new ListSpeedSearch<>(this.keysList);

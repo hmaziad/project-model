@@ -1,5 +1,7 @@
 package org.intellij.sdk.project.model.listeners;
 
+import static org.intellij.sdk.project.model.constants.TextConstants.SHOW_SNAPS_HERE;
+
 import javax.swing.*;
 import org.intellij.sdk.project.model.components.views.settings.SettingsView;
 import org.jetbrains.annotations.NotNull;
@@ -10,14 +12,14 @@ import com.intellij.openapi.editor.markup.GutterIconRenderer;
 
 import icons.SdkIcons;
 
-public class MyGutterIconRenderer extends GutterIconRenderer {
+public class DebugGutterIconRenderer extends GutterIconRenderer {
     private final Integer lineNumber;
 
     public int getLineNumber() {
         return lineNumber;
     }
 
-    public MyGutterIconRenderer(Integer lineNumber) {
+    public DebugGutterIconRenderer(Integer lineNumber) {
         super();
         this.lineNumber = lineNumber;
     }
@@ -39,7 +41,7 @@ public class MyGutterIconRenderer extends GutterIconRenderer {
 
     @Override
     public @Nullable String getTooltipText() {
-        return "Show snaps at this line";
+        return SHOW_SNAPS_HERE;
     }
 
     @Override

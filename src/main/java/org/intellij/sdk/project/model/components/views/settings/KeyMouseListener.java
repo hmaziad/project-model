@@ -10,8 +10,8 @@ import com.intellij.ui.components.JBList;
 public class KeyMouseListener extends MouseAdapter {
     private final KeyPopup keyPopup;
 
-    public KeyMouseListener(JBList<String> keysList, Project project, JLabel description){
-        this.keyPopup = new KeyPopup(keysList, project, description);
+    public KeyMouseListener(JBList<String> keysList, Project project, JLabel description, Integer lineNumber){
+        this.keyPopup = new KeyPopup(keysList, project, description, lineNumber);
     }
 
     @Override

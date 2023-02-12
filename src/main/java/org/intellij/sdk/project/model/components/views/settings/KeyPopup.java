@@ -31,6 +31,7 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
     private final JBList<String> keysList;
     private final transient Project project;
     private final JLabel description;
+    private final Integer lineNumber;
     private final JMenuItem rename = new JMenuItem("Rename");
     private final JMenuItem describe = new JMenuItem("Describe");
     private final JSeparator separator1 = new JSeparator();
@@ -43,10 +44,11 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
     private final JMenuItem deleteAll = new JMenuItem("Delete All");
     private final JMenuItem diff = new JMenuItem("Diff Sessions");
 
-    public KeyPopup(JBList<String> keysList, Project project, JLabel description) {
+    public KeyPopup(JBList<String> keysList, Project project, JLabel description, Integer lineNumber) {
         this.keysList = keysList;
         this.project = project;
         this.description = description;
+        this.lineNumber = lineNumber;
         addActionListeners();
         addActions();
         initKeyHandler();
@@ -138,7 +140,13 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
         LOG.info("Reloading node names");
         int selectedIndex = this.keysList.getSelectedIndex();
         DefaultListModel<String> updatedNodeNames = new DefaultListModel<>();
-        updatedNodeNames.addAll(nodeHandler.getSortedNodeNames());
+        List<String> sortedNodeNames;
+        if (Objects.nonNull(this.lineNumber)) {
+            sortedNodeNames = nodeHandler.getSortedNodeNames(this.lineNumber);
+        }else {
+            sortedNodeNames = nodeHandler.getSortedNodeNames();
+        }
+        updatedNodeNames.addAll(sortedNodeNames);
         this.keysList.setModel(updatedNodeNames);
         int itemsCount = this.keysList.getItemsCount();
         if (selectedIndex >= itemsCount && itemsCount > 0) {

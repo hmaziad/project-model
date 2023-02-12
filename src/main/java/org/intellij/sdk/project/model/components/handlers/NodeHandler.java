@@ -6,6 +6,7 @@ import static org.intellij.sdk.project.model.constants.TextConstants.DELETE_SESS
 import static org.intellij.sdk.project.model.constants.TextConstants.EXPORT_SESSION;
 import static org.intellij.sdk.project.model.constants.TextConstants.GENERATED_SESSION_NAME;
 import static org.intellij.sdk.project.model.constants.TextConstants.NODE_DATE_FORMAT;
+import static org.intellij.sdk.project.model.util.HelperUtil.getPackageNameForCurrentVfs;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -15,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -27,13 +29,19 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.intellij.sdk.project.model.constants.MessageDialogues;
+import org.intellij.sdk.project.model.listeners.DebugGutterIconRenderer;
 import org.intellij.sdk.project.model.tree.components.DebugNodeContainer;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.json.JsonFileType;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.markup.HighlighterLayer;
+import com.intellij.openapi.editor.markup.MarkupModel;
+import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.XDebuggerManager;
@@ -46,6 +54,7 @@ public class NodeHandler implements ReachServices {
         String generatedName = getGenerateName(project, timestamp);
         container.setTimestamp(timestamp);
         save(generatedName, container);
+        addGutterIconIfNotExisting(container.getLineNumber(), project);
     }
 
     private void save(String generatedName, DebugNodeContainer nodeContainer) {
@@ -66,10 +75,54 @@ public class NodeHandler implements ReachServices {
         boolean isSure = MessageDialogues.getYesNoMessageDialogue(message, DELETE_SESSION, project);
         if (isSure) {
             nodeNames.forEach(PERSISTENCY_SERVICE.getContainers()::remove);
+            clearNonExistingGutterIconsForCurrentFile(project);
             COMPONENT_SERVICE.getDebugTreeManager().setRoot(null);
             COMPONENT_SERVICE.setNodeNameInWindow(null);
         }
         return isSure;
+    }
+
+    private void clearNonExistingGutterIconsForCurrentFile(Project project) {
+        Optional<String> optionalFileName = getPackageNameForCurrentVfs(project);
+        if (optionalFileName.isPresent()) {
+            Set<Integer> existingLineNumbersForCurrentFile = getAllContainersPerNames() //
+                .values() //
+                .stream() //
+                .filter(container -> container.getPackageName().equals(optionalFileName.get())) //
+                .map(DebugNodeContainer::getLineNumber) //
+                .collect(Collectors.toSet());
+
+            Editor selectedTextEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+            if (Objects.nonNull(selectedTextEditor)) {
+                MarkupModel markupModel = selectedTextEditor.getMarkupModel();
+                Arrays.stream(markupModel.getAllHighlighters()) //
+                    .filter(highlighter -> highlighter.getGutterIconRenderer() instanceof DebugGutterIconRenderer) //
+                    .filter(highlighter -> !existingLineNumbersForCurrentFile.contains(((DebugGutterIconRenderer) highlighter.getGutterIconRenderer()).getLineNumber())) //
+                    .forEach(markupModel::removeHighlighter);
+            }
+        }
+    }
+
+    private void addGutterIconIfNotExisting(int lineNumber, Project project) {
+        Optional<String> optionalFileName = getPackageNameForCurrentVfs(project);
+        if (optionalFileName.isPresent()) {
+            Set<Integer> existingLineNumbersForCurrentFile = getAllContainersPerNames() //
+                .values() //
+                .stream() //
+                .filter(container -> container.getPackageName().equals(optionalFileName.get())) //
+                .map(DebugNodeContainer::getLineNumber) //
+                .collect(Collectors.toSet());
+
+            if (!existingLineNumbersForCurrentFile.contains(lineNumber)) {
+                Editor selectedTextEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+                if (Objects.nonNull(selectedTextEditor)) {
+                    MarkupModel markupModel = selectedTextEditor.getMarkupModel();
+                    DebugGutterIconRenderer renderer = new DebugGutterIconRenderer(lineNumber);
+                    RangeHighlighter rangeHighlighter = markupModel.addLineHighlighter(lineNumber, HighlighterLayer.FIRST, null);
+                    rangeHighlighter.setGutterIconRenderer(renderer);
+                }
+            }
+        }
     }
 
     @NotNull
@@ -174,7 +227,8 @@ public class NodeHandler implements ReachServices {
             throw new IllegalStateException("Could not export session", e);
         }
         MessageDialogues
-            .showInfoMessageDialogue(String.format("Successfully exported the following file(s): %n%s%n%n under path: %s%n ", getNodesMessage(selectedKeys), pathWithDir), "Export Successful");
+            .showInfoMessageDialogue(String.format("Successfully exported the following file(s): %n%s%n%n under path: %s%n ", getNodesMessage(selectedKeys), pathWithDir),
+                "Export Successful");
     }
 
     private Path createDirectoryIfNotExists(String path) {

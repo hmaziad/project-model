@@ -5,7 +5,6 @@ import static org.intellij.sdk.project.model.util.HelperUtil.getPackageNameFromV
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
@@ -30,25 +29,20 @@ public class IconGutterListener implements FileEditorManagerListener, ReachServi
             .values() //
             .stream() //
             .filter(container -> container.getPackageName().equals(optionalFileName.get())) //
-            .map(DebugNodeContainer::getLineNumber).collect(Collectors.toList());
+            .map(DebugNodeContainer::getLineNumber) //
+            .collect(Collectors.toSet());
 
         MarkupModel markupModel = event.getManager().getSelectedTextEditor().getMarkupModel();
 
-        Set<Integer> existingHighlighters = Arrays //
+        Arrays //
             .stream(markupModel.getAllHighlighters()) //
-            .map(RangeHighlighter::getGutterIconRenderer) //
-            .filter(MyGutterIconRenderer.class::isInstance) //
-            .map(MyGutterIconRenderer.class::cast) //
-            .map(MyGutterIconRenderer::getLineNumber) //
-            .collect(Collectors.toSet());
+            .filter(highlighter -> highlighter.getGutterIconRenderer() instanceof DebugGutterIconRenderer) //
+            .forEach(markupModel::removeHighlighter); //
 
         for (Integer lineNumber : lineNumbers) {
-            if (!existingHighlighters.contains(lineNumber)) {
-                MyGutterIconRenderer renderer = new MyGutterIconRenderer(lineNumber);
-                RangeHighlighter rangeHighlighter = markupModel.addLineHighlighter(lineNumber, HighlighterLayer.FIRST, null);
-                rangeHighlighter.setGutterIconRenderer(renderer);
-                existingHighlighters.add(lineNumber);
-            }
+            DebugGutterIconRenderer renderer = new DebugGutterIconRenderer(lineNumber);
+            RangeHighlighter rangeHighlighter = markupModel.addLineHighlighter(lineNumber, HighlighterLayer.FIRST, null);
+            rangeHighlighter.setGutterIconRenderer(renderer);
         }
     }
 
