@@ -1,7 +1,7 @@
 package org.intellij.sdk.project.model.listeners;
 
 import javax.swing.*;
-import org.intellij.sdk.project.model.components.views.SettingsView;
+import org.intellij.sdk.project.model.components.views.settings.SettingsView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.actionSystem.AnAction;

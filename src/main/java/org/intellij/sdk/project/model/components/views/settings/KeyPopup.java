@@ -79,7 +79,6 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
 
     private void initKeyHandler() {
         InputMap inputMap = this.keysList.getInputMap(JComponent.WHEN_FOCUSED);
-        //Ctrl-b to go backward one character
         KeyStroke diffKeys = KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK);
         KeyStroke deleteKeys = KeyStroke.getKeyStroke("DELETE");
         inputMap.put(diffKeys, "diff");
@@ -139,7 +138,7 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
         LOG.info("Reloading node names");
         int selectedIndex = this.keysList.getSelectedIndex();
         DefaultListModel<String> updatedNodeNames = new DefaultListModel<>();
-        updatedNodeNames.addAll(COMPONENT_SERVICE.getNodeHandler().getSortedNodeNames());
+        updatedNodeNames.addAll(nodeHandler.getSortedNodeNames());
         this.keysList.setModel(updatedNodeNames);
         int itemsCount = this.keysList.getItemsCount();
         if (selectedIndex >= itemsCount && itemsCount > 0) {
@@ -151,18 +150,18 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
 
 
     private void export(JBList<String> keysList) {
-        COMPONENT_SERVICE.getNodeHandler().export(getSelectedItems(keysList), this.project);
+        nodeHandler.export(getSelectedItems(keysList), this.project);
     }
 
     private void load(JBList<String> keysList) {
         String selectedKey = keysList.getSelectedValue();
-        DebugNodeContainer nodeContainer = COMPONENT_SERVICE.getNodeHandler().getNodeContainerByName(selectedKey).orElseThrow();
+        DebugNodeContainer nodeContainer = nodeHandler.getNodeContainerByName(selectedKey).orElseThrow();
         COMPONENT_SERVICE.setNodeNameInWindow(selectedKey);
         COMPONENT_SERVICE.getDebugTreeManager().setRoot(nodeContainer.getNode());
     }
 
     private void deleteAll() {
-        boolean isSure = COMPONENT_SERVICE.getNodeHandler().deleteAll(this.project);
+        boolean isSure = nodeHandler.deleteAll(this.project);
         if (isSure) {
             COMPONENT_SERVICE.getDebugTreeManager().setRoot(null);
             COMPONENT_SERVICE.setNodeNameInWindow(null);
@@ -173,12 +172,12 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
     private void rename(JBList<String> keysList) {
         String selectedNodeName = keysList.getSelectedValue();
         String newNodeName = MessageDialogues.getRenameDialogue(this.project, selectedNodeName, false);
-        while (COMPONENT_SERVICE.getNodeHandler().getAllContainersPerNames().containsKey(newNodeName)) {
+        while (nodeHandler.getAllContainersPerNames().containsKey(newNodeName)) {
             newNodeName = MessageDialogues.getRenameDialogue(this.project, newNodeName, true);
         }
         if (Objects.nonNull(newNodeName)) {
             newNodeName = newNodeName.replace(' ', '_');
-            COMPONENT_SERVICE.getNodeHandler().renameNode(selectedNodeName, newNodeName);
+            nodeHandler.renameNode(selectedNodeName, newNodeName);
             reloadNodeNames();
         }
     }
@@ -191,7 +190,7 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
         if (StringUtil.isNotEmpty(inputDescription)) {
             selectedItems //
                 .stream() //
-                .map(nodeName -> COMPONENT_SERVICE.getNodeHandler().getNodeContainerByName(nodeName)) //
+                .map(nodeHandler::getNodeContainerByName) //
                 .forEach(container -> container.ifPresent(debugNodeContainer -> debugNodeContainer.setDescription(inputDescription)));
             this.description.setText(inputDescription);
         }
@@ -199,7 +198,7 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
 
     private void delete(JBList<String> keysList) {
         List<String> selectedValues = getSelectedItems(keysList);
-        boolean isSure = COMPONENT_SERVICE.getNodeHandler().delete(selectedValues, this.project);
+        boolean isSure = nodeHandler.delete(selectedValues, this.project);
         if (isSure) {
             reloadNodeNames();
         }

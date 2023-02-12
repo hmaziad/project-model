@@ -4,6 +4,7 @@ import static org.intellij.sdk.project.model.constants.TextConstants.SETTINGS_VI
 
 import java.awt.*;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -13,6 +14,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
+import org.intellij.sdk.project.model.components.handlers.NodeHandler;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.intellij.sdk.project.model.tree.components.DebugTreeManager;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +25,7 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 
-public class ExpandableSettingsView extends DialogWrapper implements ReachServices {
+public class SettingsView extends DialogWrapper implements ReachServices {
     private static final EmptyBorder EMPTY_BORDER = JBUI.Borders.empty();
     private static final Color BORDER_COLOR = JBUI.CurrentTheme.ToolWindow.borderColor();
     private static final Color DIVIDER_COLOR = JBUI.CurrentTheme.DefaultTabs.background();
@@ -31,17 +33,24 @@ public class ExpandableSettingsView extends DialogWrapper implements ReachServic
     private static final int DIVIDER_SIZE = 12;
     private static final double KEYS_FRAMES_SPLIT_RATIO = 0.5;
     private static final double LEFT_RIGHT_SPLIT_RATIO = 0.3;
+    private static final NodeHandler nodeHandler = COMPONENT_SERVICE.getNodeHandler();
     private final DebugTreeManager debugTreeManager = new DebugTreeManager(false);
     private final JLabel timestamp = new JLabel();
     private final Project project;
     private final JLabel description = new JLabel();
     private JBList<String> keysList;
+    private Integer lineNumber;
 
-    public ExpandableSettingsView(Project project) {
+    public SettingsView(Project project) {
         super(true);
         setTitle(SETTINGS_VIEW_TITLE);
-        init();
         this.project = project;
+        init();
+    }
+    public SettingsView(Project project, Integer lineNumber) {
+        this(project);
+        this.lineNumber = lineNumber;
+        init();
     }
 
     @Override
@@ -152,7 +161,12 @@ public class ExpandableSettingsView extends DialogWrapper implements ReachServic
 
     private ListModel<String> getKeysList() {
         DefaultListModel<String> listModel = new DefaultListModel<>();
-        List<String> nodeNames = COMPONENT_SERVICE.getNodeHandler().getSortedNodeNames();
+        List<String> nodeNames;
+        if (Objects.isNull(this.lineNumber)) {
+            nodeNames = nodeHandler.getSortedNodeNames();
+        } else {
+            nodeNames = nodeHandler.getSortedNodeNames(this.lineNumber);
+        }
         listModel.addAll(nodeNames);
         return listModel;
     }

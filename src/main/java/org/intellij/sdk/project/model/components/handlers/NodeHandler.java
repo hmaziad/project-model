@@ -92,18 +92,32 @@ public class NodeHandler implements ReachServices {
         return Optional.ofNullable(PERSISTENCY_SERVICE.getContainers().get(nodeName));
     }
 
-    public List<String> getSortedNodeNames() {
-        Comparator<Map.Entry<String, DebugNodeContainer>> debugComparator = Comparator.comparing(e1 -> {
-            LocalDateTime timestamp = e1.getValue().getTimestamp();
-            return timestamp == null ? LocalDateTime.now() : timestamp;
-        }, Comparator.reverseOrder());
+    public List<String> getSortedNodeNames(Integer lineNumber) {
         return PERSISTENCY_SERVICE //
             .getContainers() //
             .entrySet() //
             .stream() //
-            .sorted(debugComparator)//
+            .sorted(getDebugContainerDateComparator())//
+            .filter(entry -> entry.getValue().getLineNumber() == lineNumber) //
             .map(Map.Entry::getKey) //
             .collect(Collectors.toList());
+    }
+
+    public List<String> getSortedNodeNames() {
+        return PERSISTENCY_SERVICE //
+            .getContainers() //
+            .entrySet() //
+            .stream() //
+            .sorted(getDebugContainerDateComparator())//
+            .map(Map.Entry::getKey) //
+            .collect(Collectors.toList());
+    }
+
+    private Comparator<Map.Entry<String, DebugNodeContainer>> getDebugContainerDateComparator() {
+        return Comparator.comparing(e1 -> {
+            LocalDateTime timestamp = e1.getValue().getTimestamp();
+            return timestamp == null ? LocalDateTime.now() : timestamp;
+        }, Comparator.reverseOrder());
     }
 
     public Map<String, DebugNodeContainer> getAllContainersPerNames() {
