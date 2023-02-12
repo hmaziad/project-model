@@ -8,7 +8,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -31,7 +30,7 @@ public class KeySelectionListener implements ListSelectionListener, ReachService
     JLabel description;
     JLabel timestamp;
     DebugTreeManager debugTreeManager;
-    JBList<String> framesList;
+    JBList<DebugFrame> framesList;
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
@@ -50,9 +49,9 @@ public class KeySelectionListener implements ListSelectionListener, ReachService
         String wrappedDescription = String.format("<html><xmp>%s</xmp></html>", description);
         this.description.setText(StringUtil.isEmpty(description) ? EMPTY_STRING : wrappedDescription);
         this.debugTreeManager.setRoot(node);
-        DefaultListModel<String> framesListModel = new DefaultListModel<>();
+        DefaultListModel<DebugFrame> framesListModel = new DefaultListModel<>();
         if (CollectionUtils.isNotEmpty(frames)) {
-            framesListModel.addAll(frames.stream().map(DebugFrame::toString).collect(Collectors.toList()));
+            framesListModel.addAll(frames);
         }
         this.framesList.setModel(framesListModel);
     }
