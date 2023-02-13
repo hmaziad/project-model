@@ -104,23 +104,17 @@ public class NodeHandler implements ReachServices {
     }
 
     private void addGutterIconIfNotExisting(int lineNumber, Project project) {
-        Optional<String> optionalFileName = getPackageNameForCurrentVfs(project);
-        if (optionalFileName.isPresent()) {
-            Set<Integer> existingLineNumbersForCurrentFile = getAllContainersPerNames() //
-                .values() //
-                .stream() //
-                .filter(container -> container.getPackageName().equals(optionalFileName.get())) //
-                .map(DebugNodeContainer::getLineNumber) //
-                .collect(Collectors.toSet());
-
-            if (!existingLineNumbersForCurrentFile.contains(lineNumber)) {
-                Editor selectedTextEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
-                if (Objects.nonNull(selectedTextEditor)) {
-                    MarkupModel markupModel = selectedTextEditor.getMarkupModel();
-                    DebugGutterIconRenderer renderer = new DebugGutterIconRenderer(lineNumber);
-                    RangeHighlighter rangeHighlighter = markupModel.addLineHighlighter(lineNumber, HighlighterLayer.FIRST, null);
-                    rangeHighlighter.setGutterIconRenderer(renderer);
-                }
+        Editor selectedTextEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+        if (Objects.nonNull(selectedTextEditor)) {
+            MarkupModel markupModel = selectedTextEditor.getMarkupModel();
+            boolean doesExist = Arrays //
+                .stream(markupModel.getAllHighlighters()) //
+                .filter(highlighter -> highlighter.getGutterIconRenderer() instanceof DebugGutterIconRenderer) //
+                .anyMatch(highlighter -> lineNumber == (((DebugGutterIconRenderer) highlighter.getGutterIconRenderer()).getLineNumber()));
+            if (!doesExist) {
+                DebugGutterIconRenderer renderer = new DebugGutterIconRenderer(lineNumber);
+                RangeHighlighter rangeHighlighter = markupModel.addLineHighlighter(lineNumber, HighlighterLayer.FIRST, null);
+                rangeHighlighter.setGutterIconRenderer(renderer);
             }
         }
     }
