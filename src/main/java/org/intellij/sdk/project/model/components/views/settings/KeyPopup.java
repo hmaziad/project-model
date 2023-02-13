@@ -6,6 +6,8 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -169,10 +171,9 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
     }
 
     private void deleteAll() {
-        boolean isSure = nodeHandler.deleteAll(this.project);
+        Enumeration<String> elements = ((DefaultListModel<String>) this.keysList.getModel()).elements();
+        boolean isSure = nodeHandler.delete(Collections.list(elements), this.project);
         if (isSure) {
-            COMPONENT_SERVICE.getDebugTreeManager().setRoot(null);
-            COMPONENT_SERVICE.setNodeNameInWindow(null);
             reloadNodeNames();
         }
     }
