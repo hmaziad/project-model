@@ -18,7 +18,7 @@ public class SelectionHandler {
         Integer selection;
         if (side == Side.LEFT) {
             selection = lastSelection.getLeftLastSelected();
-        }else {
+        } else {
             selection = lastSelection.getRightLastSelected();
         }
         return Optional.ofNullable(selection);
@@ -28,7 +28,7 @@ public class SelectionHandler {
         LastSelected lastSelection = getLastSelection(project);
         if (side == Side.LEFT) {
             lastSelection.setLeftLastSelected(value);
-        }else {
+        } else {
             lastSelection.setRightLastSelected(value);
         }
     }
