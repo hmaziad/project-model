@@ -32,4 +32,12 @@ public class TreeHandler {
     public DebugTreeManager getDebugTreeManager(Project project) {
         return getProjectConfig(project).getTreeManager();
     }
+
+    public String getNodeNameInWindow(Project project) {
+        return getProjectConfig(project).getNameInWindow();
+    }
+
+    public void setNodeNameInWindow(String nameInWindow, Project project) {
+        getProjectConfig(project).setNameInWindow(nameInWindow);
+    }
 }

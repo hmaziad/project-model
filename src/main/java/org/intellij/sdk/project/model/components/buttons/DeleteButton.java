@@ -16,8 +16,8 @@ public class DeleteButton extends IconWithTextAction implements ReachServices {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-//        String nodeNameInWindow = COMPONENT_SERVICE.getNodeNameInWindow();
-//        COMPONENT_SERVICE.getNodeHandler().delete(List.of(nodeNameInWindow),e.getProject());
+        String nodeNameInWindow = treeHandler.getNodeNameInWindow(e.getProject());
+        nodeHandler.quickDelete(nodeNameInWindow, e.getProject());
     }
 
     @Override

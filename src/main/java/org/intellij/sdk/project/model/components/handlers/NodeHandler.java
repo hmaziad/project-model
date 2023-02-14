@@ -51,12 +51,14 @@ import com.intellij.xdebugger.XSourcePosition;
 
 public class NodeHandler implements ReachServices {
     private static final PersistencyService persistencyService = ServiceManager.getService(PersistencyService.class);
-    public void save(DebugNodeContainer container, Project project) {
+
+    public String save(DebugNodeContainer container, Project project) {
         LocalDateTime timestamp = LocalDateTime.now();
         String generatedName = getGenerateName(project, timestamp);
         container.setTimestamp(timestamp);
         save(generatedName, container);
         addGutterIconIfNotExisting(container.getLineNumber(), project);
+        return generatedName;
     }
 
     private void save(String generatedName, DebugNodeContainer nodeContainer) {
@@ -80,6 +82,12 @@ public class NodeHandler implements ReachServices {
             treeHandler.getDebugTreeManager(project).setRoot(null);
         }
         return isSure;
+    }
+
+    public void quickDelete(String nodeName, Project project) {
+        persistencyService.getContainers().remove(nodeName);
+        clearNonExistingGutterIconsForCurrentFile(project);
+        treeHandler.getDebugTreeManager(project).setRoot(null);
     }
 
     private void clearNonExistingGutterIconsForCurrentFile(Project project) {

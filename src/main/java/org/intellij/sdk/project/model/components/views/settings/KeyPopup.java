@@ -164,7 +164,7 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
     private void load(JBList<String> keysList) {
         String selectedKey = keysList.getSelectedValue();
         DebugNodeContainer nodeContainer = nodeHandler.getNodeContainerByName(selectedKey).orElseThrow();
-//        COMPONENT_SERVICE.setNodeNameInWindow(selectedKey); need to be changed
+        treeHandler.setNodeNameInWindow(selectedKey, this.project);
         treeHandler.getDebugTreeManager(this.project).setRoot(nodeContainer.getNode());
     }
 

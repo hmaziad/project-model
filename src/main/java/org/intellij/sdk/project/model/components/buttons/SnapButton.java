@@ -31,8 +31,9 @@ public class SnapButton extends IconWithTextAction implements ReachServices {
         } else {
             DebugNodeContainer debugNodeContainer = optionalDebugNode.get();
             DebugNode debugNode = debugNodeContainer.getNode();
-            nodeHandler.save(debugNodeContainer, e.getProject());
+            String nodeName = nodeHandler.save(debugNodeContainer, e.getProject());
             treeHandler.getDebugTreeManager(e.getProject()).setRoot(debugNode);
+            treeHandler.setNodeNameInWindow(nodeName, e.getProject());
         }
     }
 

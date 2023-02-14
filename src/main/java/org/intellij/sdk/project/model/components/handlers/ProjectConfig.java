@@ -14,6 +14,8 @@ public class ProjectConfig {
     private boolean isSnapEnabled = false;
     @Setter
     private boolean isClearEnabled = false;
+    @Setter
+    private String nameInWindow;
 
     public ProjectConfig(Project project) {
         this.treeManager.setProject(project);
