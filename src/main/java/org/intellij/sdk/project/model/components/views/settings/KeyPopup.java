@@ -16,7 +16,7 @@ import javax.swing.*;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.intellij.sdk.project.model.components.views.DeleteAction;
 import org.intellij.sdk.project.model.components.views.DiffAction;
-import org.intellij.sdk.project.model.components.views.DiffNodesView;
+import org.intellij.sdk.project.model.components.views.DiffView;
 import org.intellij.sdk.project.model.constants.MessageDialogues;
 import org.intellij.sdk.project.model.tree.components.DebugNodeContainer;
 import org.jetbrains.annotations.NotNull;
@@ -220,7 +220,7 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
     }
 
     private void diff(JBList<String> keysList) {
-        DiffNodesView diffView = new DiffNodesView(this.project);
+        DiffView diffView = new DiffView(this.project);
         List<String> selectedItems = getSelectedItems(keysList);
         if (selectedItems.size() == 2) {
             diffView.setSelectedNode(selectedItems.get(0), true);

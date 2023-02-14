@@ -25,7 +25,7 @@ import icons.SdkIcons;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-public class DiffNodesView extends DialogWrapper implements ReachServices {
+public class DiffView extends DialogWrapper implements ReachServices {
     private final Project project;
     private final DropdownHandler dropdownHandler;
     private final DiffHandler diffHandler = new DiffHandler();
@@ -35,7 +35,7 @@ public class DiffNodesView extends DialogWrapper implements ReachServices {
     private JComboBox<String> leftDropdown;
     private JComboBox<String> rightDropdown;
 
-    public DiffNodesView(@NotNull Project project) {
+    public DiffView(@NotNull Project project) {
         super(true); // use current window as parent
         this.project = project;
         this.dropdownHandler = new DropdownHandler(project);
@@ -57,15 +57,15 @@ public class DiffNodesView extends DialogWrapper implements ReachServices {
     protected JComponent createCenterPanel() {
         this.leftDropdown = new ComboBox<>();
         this.rightDropdown = new ComboBox<>();
-        this.dropdownHandler.addNodesToDropdown(leftDropdown, selectionHandler.getLastSelected(LEFT,this.project));
-        this.dropdownHandler.addNodesToDropdown(rightDropdown, selectionHandler.getLastSelected(RIGHT,this.project));
+        this.dropdownHandler.addNodesToDropdown(leftDropdown, selectionHandler.getLastSelected(LEFT, this.project));
+        this.dropdownHandler.addNodesToDropdown(rightDropdown, selectionHandler.getLastSelected(RIGHT, this.project));
 
         leftDropdown.addActionListener(e -> {
             selectionHandler.setLastSelected(leftDropdown.getSelectedIndex(), LEFT, this.project);
             doDiff(leftDropdown, rightDropdown, false);
         });
         rightDropdown.addActionListener(e -> {
-            selectionHandler.setLastSelected(rightDropdown.getSelectedIndex(), LEFT, this.project);
+            selectionHandler.setLastSelected(rightDropdown.getSelectedIndex(), RIGHT, this.project);
             doDiff(leftDropdown, rightDropdown, false);
         });
 
