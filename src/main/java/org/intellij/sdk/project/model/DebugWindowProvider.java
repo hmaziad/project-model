@@ -17,7 +17,7 @@ public class DebugWindowProvider implements ToolWindowFactory {
 
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         LOG.info("Starting Tool Window");
-        DebugWindow myToolWindow = new DebugWindow();
+        DebugWindow myToolWindow = new DebugWindow(project);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(myToolWindow.getDebuggerWindowContent(), "  Session", false);
         content.setIcon(SdkIcons.SNAP_ICON);

@@ -33,7 +33,7 @@ public class SnapHandler {
 
     public Optional<DebugNodeContainer> getCurrentSession(Project project) {
         XDebuggerManager xDebuggerManager = XDebuggerManager.getInstance(project);
-        XDebugSession currentSession = xDebuggerManager.getCurrentSession(); // todo filer session by project
+        XDebugSession currentSession = xDebuggerManager.getCurrentSession();
         if (!Objects.isNull(currentSession)) {
             XSourcePosition sourcePosition = currentSession.getCurrentStackFrame().getSourcePosition();
             int lineNumber = sourcePosition.getLine();

@@ -35,7 +35,7 @@ public class KeySelectionListener implements ListSelectionListener, ReachService
     @Override
     public void valueChanged(ListSelectionEvent e) {
         String selectedNodeName = this.keysList.getSelectedValue();
-        Optional<DebugNodeContainer> optionalNode = COMPONENT_SERVICE.getNodeHandler().getNodeContainerByName(selectedNodeName);
+        Optional<DebugNodeContainer> optionalNode = nodeHandler.getNodeContainerByName(selectedNodeName);
         if (optionalNode.isPresent()) {
             DebugNodeContainer nodeContainer = optionalNode.get();
             updateViewNodeData(nodeContainer.getTimestamp(), nodeContainer.getDescription(), nodeContainer.getNode(), nodeContainer.getFrames());

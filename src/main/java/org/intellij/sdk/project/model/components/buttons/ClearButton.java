@@ -16,11 +16,11 @@ public class ClearButton extends IconWithTextAction implements ReachServices {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        COMPONENT_SERVICE.getDebugTreeManager().setRoot(null);
+        treeHandler.getDebugTreeManager(e.getProject()).setRoot(null);
     }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(COMPONENT_SERVICE.getClearIsEnabled().get());
+        e.getPresentation().setEnabled(treeHandler.isClearEnabled(e.getProject()));
     }
 }

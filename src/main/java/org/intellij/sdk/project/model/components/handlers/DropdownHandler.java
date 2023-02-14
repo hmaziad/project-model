@@ -16,9 +16,10 @@ public class DropdownHandler implements ReachServices {
     private int index = 0;
     private final Project project;
 
+
     public void addNodesToDropdown(JComboBox<String> nodesDropdown, Optional<Integer> optionalLastIndex) {
-        List<String> allNodeNames = COMPONENT_SERVICE.getNodeHandler().getSortedNodeNames();
-        Optional<DebugNodeContainer> currentSession = COMPONENT_SERVICE.getSnapHandler().getCurrentSession(this.project);
+        List<String> allNodeNames = nodeHandler.getSortedNodeNames();
+        Optional<DebugNodeContainer> currentSession = snapHandler.getCurrentSession(this.project);
         currentSession.ifPresent(node -> nodesDropdown.addItem(CURRENT_SESSION));
         allNodeNames.forEach(nodesDropdown::addItem);
         if (optionalLastIndex.isPresent() && optionalLastIndex.get() < nodesDropdown.getItemCount()) {
@@ -32,9 +33,9 @@ public class DropdownHandler implements ReachServices {
     public DebugNodeContainer getSelectedContainer(JComboBox<String> nodesDropdown) {
         String selectedItem = (String) nodesDropdown.getSelectedItem();
         if (CURRENT_SESSION.equals(selectedItem)) {
-            return COMPONENT_SERVICE.getNodeHandler().getCurrentSession(this.project);
+            return nodeHandler.getCurrentSession(this.project);
         } else {
-            return COMPONENT_SERVICE.getNodeHandler().getNodeContainerByName(selectedItem).orElseThrow();
+            return nodeHandler.getNodeContainerByName(selectedItem).orElseThrow();
         }
     }
 

@@ -10,6 +10,7 @@ import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.intellij.sdk.project.model.components.toolbar.DebuggerWindowContent;
 import org.intellij.sdk.project.model.tree.components.DebugTreeManager;
 import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBScrollPane;
 
 import lombok.Getter;
@@ -21,9 +22,9 @@ public class DebugWindow implements ReachServices {
 
     private JPanel debuggerWindowContent;
 
-    public DebugWindow() {
+    public DebugWindow(Project project) {
         this.debuggerWindowContent = new DebuggerWindowContent(true);
-        DebugTreeManager debugTreeManager = COMPONENT_SERVICE.getDebugTreeManager();
+        DebugTreeManager debugTreeManager = treeHandler.getDebugTreeManager(project);
         debugTreeManager.addClearButtonListener();
         JTree debugTree = debugTreeManager.getDebugTree();
         JScrollPane scrollPane = getScrollPane(debugTree);

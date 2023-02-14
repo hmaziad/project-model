@@ -8,12 +8,12 @@ public class SessionStartedListener implements DebuggerManagerListener, ReachSer
 
     @Override
     public void sessionAttached(DebuggerSession session) {
-        COMPONENT_SERVICE.getSnapIsEnabled().set(true);
+        treeHandler.setSnapEnabled(true, session.getProject());
     }
 
     @Override
     public void sessionDetached(DebuggerSession session) {
-        COMPONENT_SERVICE.getSnapIsEnabled().set(false);
+        treeHandler.setSnapEnabled(false, session.getProject());
     }
 
 }

@@ -6,8 +6,15 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeModel;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
+import com.intellij.openapi.project.Project;
 
 public class DebuggerTreeModelListener implements TreeModelListener, ReachServices {
+
+    private final Project project;
+
+    public DebuggerTreeModelListener(Project project) {
+        this.project = project;
+    }
 
     @Override
     public void treeNodesChanged(TreeModelEvent e) {
@@ -29,9 +36,9 @@ public class DebuggerTreeModelListener implements TreeModelListener, ReachServic
         DefaultTreeModel treeModel = (DefaultTreeModel) e.getSource();
         boolean isRootNull = Objects.isNull(treeModel.getRoot());
         if (isRootNull) {
-            COMPONENT_SERVICE.getClearIsEnabled().set(false);
+            treeHandler.setClearEnabled(false, this.project);
         } else {
-            COMPONENT_SERVICE.getClearIsEnabled().set(true);
+            treeHandler.setClearEnabled(true, this.project);
         }
     }
 }

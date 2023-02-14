@@ -14,7 +14,7 @@ public class SaveNodeAction extends XDebuggerTreeActionBase implements ReachServ
         DebugNode root = new DebugNode();
         root.add(new DebugNode(node));
 
-        COMPONENT_SERVICE.getNodeHandler().save(DebugNodeContainer.builder().node(root).build(), e.getProject());
-        COMPONENT_SERVICE.getDebugTreeManager().setRoot(root);
+        nodeHandler.save(DebugNodeContainer.builder().node(root).build(), e.getProject());
+        treeHandler.getDebugTreeManager(e.getProject()).setRoot(root);
     }
 }

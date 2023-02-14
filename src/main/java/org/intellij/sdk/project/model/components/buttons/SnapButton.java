@@ -13,8 +13,10 @@ import com.intellij.openapi.roots.ui.configuration.actions.IconWithTextAction;
 
 import icons.SdkIcons;
 import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 
 @Getter
+@Log4j2
 public class SnapButton extends IconWithTextAction implements ReachServices {
 
     public SnapButton() {
@@ -23,23 +25,19 @@ public class SnapButton extends IconWithTextAction implements ReachServices {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        Optional<DebugNodeContainer> optionalDebugNode = COMPONENT_SERVICE.getSnapHandler().getCurrentSession(e.getProject());
+        Optional<DebugNodeContainer> optionalDebugNode = snapHandler.getCurrentSession(e.getProject());
         if (optionalDebugNode.isEmpty()) {
-            COMPONENT_SERVICE.getFeedbackMessage().setText("Weird, we cannot get a debug session. Try another way.");
+            LOG.warn("Weird, we cannot get a debug session. Try another way.");
         } else {
-//            MarkupModel markupModel = e.getSelectedTextEditor().getMarkupModel();
             DebugNodeContainer debugNodeContainer = optionalDebugNode.get();
             DebugNode debugNode = debugNodeContainer.getNode();
-            COMPONENT_SERVICE.getNodeHandler().save(debugNodeContainer, e.getProject());
-            COMPONENT_SERVICE.getDebugTreeManager().setRoot(debugNode);
-//            Editor editor = (Editor) e.getDataContext().getData("host.editor");
-//            MarkupModel markupModel = editor.getMarkupModel();
-
+            nodeHandler.save(debugNodeContainer, e.getProject());
+            treeHandler.getDebugTreeManager(e.getProject()).setRoot(debugNode);
         }
     }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(COMPONENT_SERVICE.getSnapIsEnabled().get());
+        e.getPresentation().setEnabled(treeHandler.isSnapEnabled(e.getProject()));
     }
 }

@@ -1,10 +1,11 @@
 package org.intellij.sdk.project.model.components.views;
 
+import static org.intellij.sdk.project.model.components.handlers.Side.LEFT;
+import static org.intellij.sdk.project.model.components.handlers.Side.RIGHT;
 import static org.intellij.sdk.project.model.constants.TextConstants.DIFF_NODES;
 
 import java.awt.*;
 import java.util.List;
-import java.util.Optional;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -56,15 +57,15 @@ public class DiffNodesView extends DialogWrapper implements ReachServices {
     protected JComponent createCenterPanel() {
         this.leftDropdown = new ComboBox<>();
         this.rightDropdown = new ComboBox<>();
-        this.dropdownHandler.addNodesToDropdown(leftDropdown, COMPONENT_SERVICE.getLastSelectedLeft());
-        this.dropdownHandler.addNodesToDropdown(rightDropdown, COMPONENT_SERVICE.getLastSelectedRight());
+        this.dropdownHandler.addNodesToDropdown(leftDropdown, selectionHandler.getLastSelected(LEFT,this.project));
+        this.dropdownHandler.addNodesToDropdown(rightDropdown, selectionHandler.getLastSelected(RIGHT,this.project));
 
         leftDropdown.addActionListener(e -> {
-            COMPONENT_SERVICE.setLastSelectedLeft(Optional.of(leftDropdown.getSelectedIndex()));
+            selectionHandler.setLastSelected(leftDropdown.getSelectedIndex(), LEFT, this.project);
             doDiff(leftDropdown, rightDropdown, false);
         });
         rightDropdown.addActionListener(e -> {
-            COMPONENT_SERVICE.setLastSelectedRight(Optional.of(rightDropdown.getSelectedIndex()));
+            selectionHandler.setLastSelected(rightDropdown.getSelectedIndex(), LEFT, this.project);
             doDiff(leftDropdown, rightDropdown, false);
         });
 

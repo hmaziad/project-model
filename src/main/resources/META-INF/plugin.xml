@@ -35,9 +35,6 @@
         <toolWindow id=" Armadillo" secondary="true" icon="SdkIcons.SNAP_ICON" anchor="bottom"
                     factoryClass="org.intellij.sdk.project.model.DebugWindowProvider" />
         <applicationService serviceImplementation="org.intellij.sdk.project.model.services.PersistencyService" serviceInterface="org.intellij.sdk.project.model.services.PersistencyService"/>
-        <applicationService
-                serviceInterface="org.intellij.sdk.project.model.services.ComponentService"
-                serviceImplementation="org.intellij.sdk.project.model.services.ComponentService"/>
     </extensions>
     <projectListeners>
         <listener

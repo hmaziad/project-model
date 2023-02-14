@@ -30,9 +30,11 @@ import java.util.stream.Collectors;
 
 import org.intellij.sdk.project.model.constants.MessageDialogues;
 import org.intellij.sdk.project.model.listeners.DebugGutterIconRenderer;
+import org.intellij.sdk.project.model.services.PersistencyService;
 import org.intellij.sdk.project.model.tree.components.DebugNodeContainer;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.json.JsonFileType;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.HighlighterLayer;
 import com.intellij.openapi.editor.markup.MarkupModel;
@@ -48,7 +50,7 @@ import com.intellij.xdebugger.XDebuggerManager;
 import com.intellij.xdebugger.XSourcePosition;
 
 public class NodeHandler implements ReachServices {
-
+    private static final PersistencyService persistencyService = ServiceManager.getService(PersistencyService.class);
     public void save(DebugNodeContainer container, Project project) {
         LocalDateTime timestamp = LocalDateTime.now();
         String generatedName = getGenerateName(project, timestamp);
@@ -58,8 +60,7 @@ public class NodeHandler implements ReachServices {
     }
 
     private void save(String generatedName, DebugNodeContainer nodeContainer) {
-        COMPONENT_SERVICE.setNodeNameInWindow(generatedName);
-        PERSISTENCY_SERVICE.getContainers().put(generatedName, nodeContainer);
+        persistencyService.getContainers().put(generatedName, nodeContainer);
     }
 
     private String getGenerateName(Project project, LocalDateTime timestamp) {
@@ -74,10 +75,9 @@ public class NodeHandler implements ReachServices {
         String message = String.format(DELETE_SAVED_NODE, sessionsMessage);
         boolean isSure = MessageDialogues.getYesNoMessageDialogue(message, DELETE_SESSION, project);
         if (isSure) {
-            nodeNames.forEach(PERSISTENCY_SERVICE.getContainers()::remove);
+            nodeNames.forEach(persistencyService.getContainers()::remove);
             clearNonExistingGutterIconsForCurrentFile(project);
-            COMPONENT_SERVICE.getDebugTreeManager().setRoot(null);
-            COMPONENT_SERVICE.setNodeNameInWindow(null);
+            treeHandler.getDebugTreeManager(project).setRoot(null);
         }
         return isSure;
     }
@@ -130,17 +130,17 @@ public class NodeHandler implements ReachServices {
     public boolean deleteAll(Project project) {
         boolean isSure = MessageDialogues.getYesNoMessageDialogue(DELETE_SAVED_NODES, DELETE_SESSION, project);
         if (isSure) {
-            PERSISTENCY_SERVICE.getContainers().clear();
+            persistencyService.getContainers().clear();
         }
         return isSure;
     }
 
     public Optional<DebugNodeContainer> getNodeContainerByName(String nodeName) {
-        return Optional.ofNullable(PERSISTENCY_SERVICE.getContainers().get(nodeName));
+        return Optional.ofNullable(persistencyService.getContainers().get(nodeName));
     }
 
     public List<String> getSortedNodeNames(Integer lineNumber) {
-        return PERSISTENCY_SERVICE //
+        return persistencyService //
             .getContainers() //
             .entrySet() //
             .stream() //
@@ -151,7 +151,7 @@ public class NodeHandler implements ReachServices {
     }
 
     public List<String> getSortedNodeNames() {
-        return PERSISTENCY_SERVICE //
+        return persistencyService //
             .getContainers() //
             .entrySet() //
             .stream() //
@@ -168,11 +168,11 @@ public class NodeHandler implements ReachServices {
     }
 
     public Map<String, DebugNodeContainer> getAllContainersPerNames() {
-        return PERSISTENCY_SERVICE.getContainers();
+        return persistencyService.getContainers();
     }
 
     public void renameNode(String from, String to) {
-        Map<String, DebugNodeContainer> containers = PERSISTENCY_SERVICE.getContainers();
+        Map<String, DebugNodeContainer> containers = persistencyService.getContainers();
         DebugNodeContainer fromContainer = containers.get(from);
         containers.remove(from);
         containers.put(to, fromContainer);
@@ -211,7 +211,7 @@ public class NodeHandler implements ReachServices {
                 DebugNodeContainer nodeContainer = getNodeContainerByName(nodeName).orElseThrow();
                 HashMap<String, DebugNodeContainer> namePerNode = new HashMap<>();
                 namePerNode.put("root", nodeContainer);
-                String nodeAsJson = COMPONENT_SERVICE.getNodeConverter().toString(namePerNode);
+                String nodeAsJson = nodeConverter.toString(namePerNode);
                 FileWriter myWriter = new FileWriter(nodeAsFile);
                 myWriter.write(Objects.requireNonNull(nodeAsJson, "Session contains no data"));
                 myWriter.close();
@@ -239,14 +239,14 @@ public class NodeHandler implements ReachServices {
         VirtualFile chosenFile = FileChooser.chooseFile(jsonOnly, project, null);
         if (Objects.nonNull(chosenFile)) {
             String errorMessage = chosenFile.getName() + " file is empty";
-            Map<String, DebugNodeContainer> nodes = PERSISTENCY_SERVICE.getContainers();
+            Map<String, DebugNodeContainer> nodes = persistencyService.getContainers();
             String fileName = Objects.requireNonNull(chosenFile.getNameWithoutExtension(), "File is not valid");
             if (nodes.containsKey(fileName)) {
                 MessageDialogues.getErrorMessageDialogue(String.format("A session with name \"%s\" already exists", fileName), project);
             } else {
                 CharSequence charsSequence = Objects.requireNonNull(FileDocumentManager.getInstance().getDocument(chosenFile), errorMessage).getCharsSequence();
                 String content = String.valueOf(charsSequence);
-                HashMap<String, DebugNodeContainer> nodeFromJson = COMPONENT_SERVICE.getNodeConverter().fromString(content);
+                HashMap<String, DebugNodeContainer> nodeFromJson = nodeConverter.fromString(content);
                 DebugNodeContainer nodeContainer = Objects.requireNonNull(nodeFromJson, errorMessage).entrySet().iterator().next().getValue();
                 save(fileName, nodeContainer);
             }
@@ -254,8 +254,8 @@ public class NodeHandler implements ReachServices {
     }
 
     public DebugNodeContainer getCurrentSession(Project project) {
-        return COMPONENT_SERVICE //
-            .getSnapHandler() //
+        SnapHandler snapHandler = new SnapHandler();
+        return snapHandler //
             .getCurrentSession(project) //
             .orElseThrow(() -> new IllegalStateException("Why you messing?"));
     }

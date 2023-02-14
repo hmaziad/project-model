@@ -23,8 +23,7 @@ public class IconGutterListener implements FileEditorManagerListener, ReachServi
         if (optionalFileName.isEmpty()) {
             return;
         }
-        Collection<Integer> lineNumbers = COMPONENT_SERVICE //
-            .getNodeHandler() //
+        Collection<Integer> lineNumbers = nodeHandler //
             .getAllContainersPerNames() //
             .values() //
             .stream() //

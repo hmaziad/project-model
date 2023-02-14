@@ -14,6 +14,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.TreeSpeedSearch;
 import com.intellij.ui.treeStructure.Tree;
 
@@ -22,6 +23,7 @@ import lombok.Getter;
 public class DebugTreeManager {
     @Getter
     private final JTree debugTree = new Tree();
+    private Project project;
 
     public DebugTreeManager(boolean allowColors) {
         this.debugTree.setRootVisible(false);
@@ -32,7 +34,7 @@ public class DebugTreeManager {
     }
 
     public void addClearButtonListener() {
-        this.debugTree.getModel().addTreeModelListener(new DebuggerTreeModelListener());
+        this.debugTree.getModel().addTreeModelListener(new DebuggerTreeModelListener(this.project));
     }
 
     public void setRoot(DebugNode debugNode) {
@@ -108,6 +110,10 @@ public class DebugTreeManager {
         for (DebugNode child : rootNode.getMyChildren()) {
             clearNodeColors(child);
         }
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 
     private class TreePopup extends JPopupMenu {

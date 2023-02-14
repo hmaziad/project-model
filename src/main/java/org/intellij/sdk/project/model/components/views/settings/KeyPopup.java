@@ -13,7 +13,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.swing.*;
-import org.intellij.sdk.project.model.components.handlers.NodeHandler;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.intellij.sdk.project.model.components.views.DeleteAction;
 import org.intellij.sdk.project.model.components.views.DiffAction;
@@ -29,7 +28,6 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public class KeyPopup extends JPopupMenu implements ReachServices {
-    private static final NodeHandler nodeHandler = COMPONENT_SERVICE.getNodeHandler();
     private final JBList<String> keysList;
     private final transient Project project;
     private final JLabel description;
@@ -166,8 +164,8 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
     private void load(JBList<String> keysList) {
         String selectedKey = keysList.getSelectedValue();
         DebugNodeContainer nodeContainer = nodeHandler.getNodeContainerByName(selectedKey).orElseThrow();
-        COMPONENT_SERVICE.setNodeNameInWindow(selectedKey);
-        COMPONENT_SERVICE.getDebugTreeManager().setRoot(nodeContainer.getNode());
+//        COMPONENT_SERVICE.setNodeNameInWindow(selectedKey); need to be changed
+        treeHandler.getDebugTreeManager(this.project).setRoot(nodeContainer.getNode());
     }
 
     private void deleteAll() {

@@ -12,7 +12,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
-import org.intellij.sdk.project.model.components.handlers.NodeHandler;
 import org.intellij.sdk.project.model.components.handlers.ReachServices;
 import org.intellij.sdk.project.model.tree.components.DebugFrame;
 import org.intellij.sdk.project.model.tree.components.DebugTreeManager;
@@ -32,7 +31,6 @@ public class SettingsView extends DialogWrapper implements ReachServices {
     private static final int DIVIDER_SIZE = 12;
     private static final double KEYS_FRAMES_SPLIT_RATIO = 0.5;
     private static final double LEFT_RIGHT_SPLIT_RATIO = 0.3;
-    private static final NodeHandler nodeHandler = COMPONENT_SERVICE.getNodeHandler();
     private final DebugTreeManager debugTreeManager = new DebugTreeManager(false);
     private final JLabel timestamp = new JLabel();
     private final Project project;
