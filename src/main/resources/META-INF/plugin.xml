@@ -4,10 +4,10 @@
 <idea-plugin>
 
     <!-- Unique id for this plugin. Must stay constant for the life of the plugin. -->
-    <id>org.intellij.sdk.project.model</id>
+    <id>org.armadillo.core</id>
 
     <!-- Text to display as name on Preferences/Settings | Plugin page -->
-    <name>SDK: Project Model Sample</name>
+    <name>Armadillo</name>
 
     <!-- Product and plugin compatibility requirements -->
     <depends>com.intellij.modules.platform</depends>
@@ -33,19 +33,19 @@
     <vendor url="https://plugins.jetbrains.com">IntelliJ Platform SDK</vendor>
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id=" Armadillo" secondary="true" icon="SdkIcons.SNAP_ICON" anchor="bottom"
-                    factoryClass="org.intellij.sdk.project.model.DebugWindowProvider" />
-        <applicationService serviceImplementation="org.intellij.sdk.project.model.services.PersistencyService" serviceInterface="org.intellij.sdk.project.model.services.PersistencyService"/>
+                    factoryClass="org.armadillo.core.DebugWindowProvider" />
+        <applicationService serviceImplementation="org.armadillo.core.services.PersistencyService" serviceInterface="org.armadillo.core.services.PersistencyService"/>
     </extensions>
     <projectListeners>
         <listener
-                class="org.intellij.sdk.project.model.listeners.SessionStartedListener"
+                class="org.armadillo.core.listeners.SessionStartedListener"
                 topic="com.intellij.debugger.impl.DebuggerManagerListener"/>
         <listener
-                class="org.intellij.sdk.project.model.listeners.IconGutterListener"
+                class="org.armadillo.core.listeners.IconGutterListener"
                 topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
     </projectListeners>
     <actions>
-        <action id="saveNodeAction" class="org.intellij.sdk.project.model.actions.SaveNodeAction" text="Save in Armadillo" description="Save debug session" icon="SdkIcons.SNAP_ICON">
+        <action id="saveNodeAction" class="org.armadillo.core.actions.SaveNodeAction" text="Save in Armadillo" description="Save debug session" icon="SdkIcons.SNAP_ICON">
             <add-to-group group-id="XDebugger.ValueGroup" anchor="after" relative-to-action="XDebugger.CopyName"/>
         </action>
     </actions>
