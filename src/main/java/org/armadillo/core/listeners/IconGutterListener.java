@@ -4,6 +4,7 @@ import static org.armadillo.core.util.HelperUtil.getPackageNameFromVfs;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -27,7 +28,7 @@ public class IconGutterListener implements FileEditorManagerListener, ReachServi
             .getAllContainersPerNames() //
             .values() //
             .stream() //
-            .filter(container -> container.getPackageName().equals(optionalFileName.get())) //
+            .filter(container -> Objects.nonNull(container.getPackageName()) && container.getPackageName().equals(optionalFileName.get())) //
             .map(DebugNodeContainer::getLineNumber) //
             .collect(Collectors.toSet());
 
