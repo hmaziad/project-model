@@ -43,7 +43,7 @@ dependencies {
 patchPluginXml {
   version = project.version
   sinceBuild = '211'
-  untilBuild = '213.*'
+  untilBuild = '223.*'
 }
 
 runIde {
