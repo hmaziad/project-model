@@ -49,7 +49,7 @@
                 topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
     </projectListeners>
     <actions>
-        <action id="saveNodeAction" class="org.armadillo.core.actions.SaveNodeAction" text="Save in Armadillo" description="Save debug session" icon="SdkIcons.ARMADILLO">
+        <action id="saveNodeAction" class="org.armadillo.core.actions.SaveNodeAction" text="Save in Armadillo" description="Save debug session" icon="SdkIcons.ARMADILLO_18">
             <add-to-group group-id="XDebugger.ValueGroup" anchor="after" relative-to-action="XDebugger.CopyName"/>
         </action>
     </actions>
