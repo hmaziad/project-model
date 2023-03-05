@@ -35,7 +35,7 @@ public class DebugGutterIconRenderer extends GutterIconRenderer {
 
     @Override
     public @NotNull Icon getIcon() {
-        return SdkIcons.VIEW_NODES_ICON_SMALL;
+        return SdkIcons.ARMADILLO_13;
     }
 
     @Override

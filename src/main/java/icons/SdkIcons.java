@@ -16,10 +16,11 @@ public class SdkIcons {
     public static final Icon DIFF_ICON = IconLoader.getIcon("/icons/diff/diff_dark.svg", SdkIcons.class);
     public static final Icon DELETE_ICON = AllIcons.Actions.GC;
     public static final Icon CLEAR_ICON = AllIcons.Debugger.Db_invalid_breakpoint;
+    public static final Icon FLOW_ICON = AllIcons.Vcs.Branch;
     public static final Icon VIEW_NODES_ICON = IconLoader.getIcon("/icons/view_saved_nodes/manageDataSources_dark.svg", SdkIcons.class);
     public static final Icon VIEW_NODES_ICON_SMALL = IconLoader.getIcon("/icons/view_saved_nodes/manageDataSources_dark_2.svg", SdkIcons.class);
     public static final Icon DIFF_SCALED = IconLoader.getIcon("/icons/diff/diff_dark_scaled.svg", SdkIcons.class);
-    public static final Icon ARMADILLO = IconLoader.getIcon("/icons/armadillo/armadillo-icon-only.svg", SdkIcons.class);
-    public static final Icon ARMADILLO_18 = IconLoader.getIcon("/icons/armadillo/18px.svg", SdkIcons.class);
+    public static final Icon ARMADILLO_18 = IconLoader.getIcon("/icons/armadillo/17px.svg", SdkIcons.class);
+    public static final Icon ARMADILLO_13 = IconLoader.getIcon("/icons/armadillo/13px.svg", SdkIcons.class);
 
 }

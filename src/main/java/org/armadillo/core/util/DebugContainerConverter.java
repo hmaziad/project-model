@@ -26,11 +26,16 @@ public class DebugContainerConverter extends Converter<HashMap<String, DebugNode
             DebugNodeContainer entryValue = entry.getValue();
             DebugNodeContainer container = DebugNodeContainer //
                 .builder() //
-                .frames(entryValue.getFrames()) //
+                .name(entryValue.getName()) //
                 .timestamp(entryValue.getTimestamp()) //
+                .flowTimestamp(entryValue.getFlowTimestamp()) //
                 .description(entryValue.getDescription()) //
                 .lineNumber(entryValue.getLineNumber()) //
+                .lineIndexDebugged(entryValue.getLineIndexDebugged()) //
                 .packageName(entryValue.getPackageName()) //
+                .flowId(entryValue.getFlowId()) //
+                .textBlock(entryValue.getTextBlock()) //
+                .frames(entryValue.getFrames()) //
                 .node(new DebugNode(entry.getValue().getNode())) //
                 .build();
 

@@ -3,6 +3,7 @@ package org.armadillo.core.services;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.armadillo.core.license.CheckLicense;
 import org.armadillo.core.tree.components.DebugNodeContainer;
 import org.armadillo.core.util.DebugContainerConverter;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -24,7 +25,12 @@ public class PersistencyService implements PersistentStateComponent<PersistencyS
     Map<String, DebugNodeContainer> containers;
 
     public PersistencyService() {
-        containers = new HashMap<>();
+        final Boolean isLicensed = CheckLicense.isLicensed();
+        if (Boolean.TRUE.equals(isLicensed)) {
+            this.containers = new HashMap<>();
+        } else {
+            this.containers = new HashMap<>(8);
+        }
         LOG.debug("Persistency Service Constructed");
     }
 

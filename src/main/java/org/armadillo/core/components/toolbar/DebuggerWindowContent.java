@@ -4,6 +4,7 @@ import javax.swing.*;
 import org.armadillo.core.components.buttons.ClearButton;
 import org.armadillo.core.components.buttons.DeleteButton;
 import org.armadillo.core.components.buttons.DiffButton;
+import org.armadillo.core.components.buttons.FlowButton;
 import org.armadillo.core.components.buttons.SettingsButton;
 import org.armadillo.core.components.buttons.SnapButton;
 import com.intellij.openapi.actionSystem.ActionManager;
@@ -24,12 +25,14 @@ public class DebuggerWindowContent extends SimpleToolWindowPanel {
         IconWithTextAction deleteButton = new DeleteButton();
         IconWithTextAction clearButton = new ClearButton();
         IconWithTextAction diffButton = new DiffButton();
+        IconWithTextAction flowButton = new FlowButton();
         IconWithTextAction settingsButton = new SettingsButton();
 
         actionGroup.add(snapButton);
         actionGroup.add(clearButton);
         actionGroup.addSeparator();
         actionGroup.add(diffButton);
+        actionGroup.add(flowButton);
         actionGroup.addSeparator();
         actionGroup.add(settingsButton);
         actionGroup.addSeparator();

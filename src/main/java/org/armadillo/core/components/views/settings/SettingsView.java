@@ -33,6 +33,8 @@ public class SettingsView extends DialogWrapper implements ReachServices {
     private static final double LEFT_RIGHT_SPLIT_RATIO = 0.3;
     private final DebugTreeManager debugTreeManager = new DebugTreeManager(false);
     private final JLabel timestamp = new JLabel();
+    private final JLabel flowName = new JLabel();
+    private final JLabel className = new JLabel();
     private final Project project;
     private final JLabel description = new JLabel();
     private JBList<String> keysList;
@@ -60,7 +62,7 @@ public class SettingsView extends DialogWrapper implements ReachServices {
         JSplitPane leftRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, keysFrameSplit, getTreePanel());
 
         // add listeners
-        KeySelectionListener keySelectionListener = new KeySelectionListener(this.keysList, this.description, this.timestamp, this.debugTreeManager, this.framesList);
+        KeySelectionListener keySelectionListener = new KeySelectionListener(this.keysList, this.description, this.timestamp, this.debugTreeManager, this.framesList, this.flowName, this.className);
         KeyMouseListener keyMouseListener = new KeyMouseListener(this.keysList, this.project, this.description, this.lineNumber);
         this.keysList.addListSelectionListener(keySelectionListener);
         this.keysList.addMouseListener(keyMouseListener);
@@ -81,8 +83,12 @@ public class SettingsView extends DialogWrapper implements ReachServices {
     private void setDialogueProperties(JPanel dialogPanel, JSplitPane leftRightSplit) {
         dialogPanel.setSize(1100, 800);
         setSize(1100, 800);
-
-        dialogPanel.add(this.timestamp, BorderLayout.NORTH);
+        JPanel metaDataPanel = new JPanel(new GridLayout(3, 1));
+        metaDataPanel.add(this.timestamp);
+        metaDataPanel.add(this.flowName);
+        metaDataPanel.add(this.className);
+        metaDataPanel.setBorder(new EmptyBorder(0, 3, 10, 0));
+        dialogPanel.add(metaDataPanel, BorderLayout.NORTH);
         dialogPanel.add(leftRightSplit, BorderLayout.CENTER);
         dialogPanel.add(this.description, BorderLayout.SOUTH);
     }

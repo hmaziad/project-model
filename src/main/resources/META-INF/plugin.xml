@@ -8,6 +8,8 @@
 
     <!-- Text to display as name on Preferences/Settings | Plugin page -->
     <name>Armadillo</name>
+    <version>2023.1.2</version>
+    <product-descriptor code="PARMADILLO" release-date="20230423" release-version="20231" optional="true"/>
 
     <!-- Product and plugin compatibility requirements -->
     <depends>com.intellij.modules.platform</depends>
@@ -16,29 +18,32 @@
     <!-- Text to display as description on Preferences/Settings | Plugin page -->
     <description>
         <![CDATA[
-      Make debugging a little bit easier and have the below tools in your possession.
+Armadillo is a valuable tool for debugging, documentation, analysis, and testing. By capturing the values of variables at different points in your code, you can gain crucial insights into the behavior of your program:
       <ul>
-        <li>Save debugger variables & stack frame into a session</li>
-        <li>Import/Export sessions</li>
-        <li>Diff two sessions</li>
-        <li>View sessions saved on a single line</li>
+        <li><strong>Better visibility into complex scenarios:</strong> In complex scenarios, reviewing the values of variables that were captured during a debugging session, can help you identify the source of the problem</li>
+        <li><strong>Collaboration:</strong> Saving debugger sessions can help you share debugging information, handing over, or collaborating with other team members.</li>
+        <li><strong>Documentation:</strong> By including the values of variables in your code comments or documentation, you can provide additional context and information that can help others understand how your code works.</li>
+        <li><strong>Reproducing issues:</strong> Saving debugger sessions can help you recreate the exact conditions that led to the problem. This can help you identify the root cause of the issue and develop a solution more quickly.</li>
+        <li><strong>Testing:</strong> By using saved variables as inputs to your tests, you can ensure that your code behaves correctly under different conditions.</li>
       </ul>
     ]]>
     </description>
     <change-notes>
         <![CDATA[
       <ul>
-        <li><b>1.0.0</b>First Release</li>
+        <li><b>1.0.1</b> Bug issued fixed for Android Studio</li>
+        <li><b>1.0.0</b> First Release</li>
       </ul>
     ]]>
     </change-notes>
 
     <!-- Text to display as company information on Preferences/Settings | Plugin page -->
-    <vendor>Armadillo</vendor>
+    <vendor email="armadillo.developers@gmail.com" url="">Armadillo</vendor>
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id=" Armadillo" secondary="true" icon="SdkIcons.ARMADILLO_18" anchor="bottom"
                     factoryClass="org.armadillo.core.DebugWindowProvider"/>
-        <applicationService serviceImplementation="org.armadillo.core.services.PersistencyService" serviceInterface="org.armadillo.core.services.PersistencyService"/>
+        <applicationService serviceImplementation="org.armadillo.core.services.PersistencyService"
+                            serviceInterface="org.armadillo.core.services.PersistencyService"/>
     </extensions>
     <projectListeners>
         <listener
@@ -49,8 +54,14 @@
                 topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
     </projectListeners>
     <actions>
-        <action id="saveNodeAction" class="org.armadillo.core.actions.SaveNodeAction" text="Save in Armadillo" description="Save debug session" icon="SdkIcons.ARMADILLO_18">
+        <action id="saveNodeAction" class="org.armadillo.core.actions.SaveNodeAction" text="Save in Armadillo"
+                description="Save debug session" icon="SdkIcons.ARMADILLO_18">
             <add-to-group group-id="XDebugger.ValueGroup" anchor="after" relative-to-action="XDebugger.CopyName"/>
+        </action>
+        <action id="SnapButtonId" class="org.armadillo.core.components.buttons.SnapButton"
+                text="SnapButton"
+                description="Save snap">
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl a" second-keystroke="ctrl s"/>
         </action>
     </actions>
 </idea-plugin>

@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.swing.*;
@@ -17,6 +18,7 @@ import org.armadillo.core.components.handlers.ReachServices;
 import org.armadillo.core.components.views.DeleteAction;
 import org.armadillo.core.components.views.DiffAction;
 import org.armadillo.core.components.views.DiffView;
+import org.armadillo.core.components.views.code.MethodBlockView;
 import org.armadillo.core.constants.MessageDialogues;
 import org.armadillo.core.tree.components.DebugNodeContainer;
 import org.jetbrains.annotations.NotNull;
@@ -32,17 +34,19 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
     private final transient Project project;
     private final JLabel description;
     private final Integer lineNumber;
-    private final JMenuItem rename = new JMenuItem("Rename");
+    private final JMenuItem renameSession = new JMenuItem("Rename Session");
+    private final JMenuItem renameFlow = new JMenuItem("Rename Flow");
     private final JMenuItem describe = new JMenuItem("Comment");
     private final JSeparator separator1 = new JSeparator();
     private final JSeparator separator2 = new JSeparator();
     private final JSeparator separator3 = new JSeparator();
-    private final JMenuItem delete = new JMenuItem("Delete");
+    private final JMenuItem delete = new JMenuItem("Delete (Del)");
     private final JMenuItem load = new JMenuItem("Load");
     private final JMenuItem export = new JMenuItem("Export");
     private final JMenuItem doImport = new JMenuItem("Import");
     private final JMenuItem deleteAll = new JMenuItem("Delete All");
-    private final JMenuItem diff = new JMenuItem("Diff Sessions");
+    private final JMenuItem diff = new JMenuItem("Diff Sessions (Ctrl-D)");
+    private final JMenuItem showMethod = new JMenuItem("Show Method Block");
 
     public KeyPopup(JBList<String> keysList, Project project, JLabel description, Integer lineNumber) {
         this.keysList = keysList;
@@ -55,7 +59,8 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
     }
 
     private void addActionListeners() {
-        this.rename.addActionListener(e -> rename(this.keysList));
+        this.renameSession.addActionListener(e -> renameSession(this.keysList));
+        this.renameFlow.addActionListener(e -> renameFlow(this.keysList));
         this.describe.addActionListener(e -> describe(this.keysList));
         this.delete.addActionListener(e -> delete(this.keysList));
         this.load.addActionListener(e -> load(this.keysList));
@@ -63,12 +68,15 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
         this.doImport.addActionListener(e -> doImport());
         this.deleteAll.addActionListener(e -> deleteAll());
         this.diff.addActionListener(e -> diff(this.keysList));
+        this.showMethod.addActionListener(e -> showMethod(this.keysList));
     }
 
     private void addActions() {
-        add(this.rename);
+        add(this.renameSession);
+        add(this.renameFlow);
         add(this.describe);
         add(this.load);
+        add(this.showMethod);
         add(this.separator1);
         add(this.diff);
         add(this.separator3);
@@ -94,7 +102,7 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
         int totalSelectedKeys = keysList.getSelectedIndices().length;
         int allKeys = keysList.getItemsCount();
 
-        this.rename.setVisible(false);
+        this.renameSession.setVisible(false);
         this.describe.setVisible(false);
         this.separator1.setVisible(false);
         this.load.setVisible(false);
@@ -104,6 +112,8 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
         this.deleteAll.setVisible(false);
         this.diff.setVisible(false);
         this.separator3.setVisible(false);
+        this.renameFlow.setVisible(false);
+        this.showMethod.setVisible(false);
 
         this.doImport.setVisible(true);
         if (allKeys > 0) {
@@ -119,8 +129,10 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
         }
 
         if (totalSelectedKeys == 1) {
-            this.rename.setVisible(true);
+            this.renameSession.setVisible(true);
+            this.renameFlow.setVisible(true);
             this.load.setVisible(true);
+            this.showMethod.setVisible(true);
         }
 
         if (totalSelectedKeys == 2) {
@@ -168,6 +180,12 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
         treeHandler.getDebugTreeManager(this.project).setRoot(nodeContainer.getNode());
     }
 
+    private void showMethod(JBList<String> keysList) {
+        String selectedKey = keysList.getSelectedValue();
+        DebugNodeContainer nodeContainer = nodeHandler.getNodeContainerByName(selectedKey).orElseThrow();
+        new MethodBlockView(nodeContainer).showAndGet();
+    }
+
     private void deleteAll() {
         Enumeration<String> elements = ((DefaultListModel<String>) this.keysList.getModel()).elements();
         boolean isSure = nodeHandler.delete(Collections.list(elements), this.project);
@@ -176,7 +194,7 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
         }
     }
 
-    private void rename(JBList<String> keysList) {
+    private void renameSession(JBList<String> keysList) {
         String selectedNodeName = keysList.getSelectedValue();
         String newNodeName = MessageDialogues.getRenameDialogue(this.project, selectedNodeName, false);
         while (nodeHandler.getAllContainersPerNames().containsKey(newNodeName)) {
@@ -189,11 +207,30 @@ public class KeyPopup extends JPopupMenu implements ReachServices {
         }
     }
 
+    private void renameFlow(JBList<String> keysList) {
+        String selectedNodeName = keysList.getSelectedValue();
+        DebugNodeContainer selectedContainer = nodeHandler
+            .getNodeContainerByName(selectedNodeName)
+            .orElseThrow(() -> new IllegalStateException(String.format("Could not find node with name %s", selectedNodeName)));
+        String flowId = selectedContainer.getFlowId();
+        String newFlowId = MessageDialogues.getRenameDialogue(this.project, flowId, false);
+        if (Objects.nonNull(newFlowId)) {
+            newFlowId = newFlowId.replace(' ', '_');
+            nodeHandler.renameFlowId(flowId, newFlowId);
+            reloadNodeNames();
+        }
+    }
+
     private void describe(JBList<String> keysList) {
         List<String> selectedItems = getSelectedItems(keysList);
         StringBuilder sessionsMessage = new StringBuilder();
         selectedItems.forEach(item -> sessionsMessage.append("\n - ").append(item));
-        String inputDescription = MessageDialogues.getDescriptionDialogue(this.project, sessionsMessage.toString(), EMPTY_STRING);
+        Optional<DebugNodeContainer> optionalDebugNodeContainer = nodeHandler.getNodeContainerByName(selectedItems.get(0));
+        String currentDescription = EMPTY_STRING;
+        if (optionalDebugNodeContainer.isPresent()) {
+            currentDescription = optionalDebugNodeContainer.get().getDescription();
+        }
+        String inputDescription = MessageDialogues.getDescriptionDialogue(this.project, sessionsMessage.toString(), currentDescription);
         if (StringUtil.isNotEmpty(inputDescription)) {
             selectedItems //
                 .stream() //

@@ -1,17 +1,19 @@
 package org.armadillo.core.tree.components;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.swing.*;
+import javax.swing.Icon;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
+
 import org.jetbrains.annotations.VisibleForTesting;
+
 import com.google.gson.annotations.Expose;
-import com.intellij.openapi.util.IconLoader;
+import com.intellij.ui.IconTestUtil;
 import com.intellij.ui.LayeredIcon;
 import com.intellij.ui.SimpleColoredText;
 import com.intellij.ui.SimpleTextAttributes;
@@ -22,6 +24,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
+@SuppressWarnings("ALL")
 @Getter
 @NoArgsConstructor(force = true)
 @Log4j2
@@ -61,10 +64,7 @@ public class DebugNode extends DefaultMutableTreeNode {
         }
 
         try {
-            IconLoader.CachedImageIcon icon = (IconLoader.CachedImageIcon) xNode.getIcon();
-            if (Objects.nonNull(icon)) {
-                this.iconPath = icon.getOriginalPath(); // e.g. nodes/parameter.svg
-            }
+            this.iconPath = IconTestUtil.getIconPath(xNode.getIcon());
         } catch (Exception e) {
             LOG.error("Could not get icon path: {}", e.toString());
         }
@@ -96,10 +96,21 @@ public class DebugNode extends DefaultMutableTreeNode {
                     return path;
                 }
             }
-        } else if (icon instanceof IconLoader.CachedImageIcon) {
-            IconLoader.CachedImageIcon imageIcon = (IconLoader.CachedImageIcon) icon;
-            if (Objects.nonNull(imageIcon)) {
-                return Optional.of(imageIcon.getOriginalPath()); // e.g. nodes/parameter.svg
+        } else if(Objects.nonNull(icon)) {
+            try {
+                var input = icon.toString();
+                int start = input.indexOf("path='") + 6;
+                int end = input.indexOf("'", start);
+                if (start == -1) {
+                    start = input.indexOf("path=") + 5;
+                    end = input.indexOf(")", start);
+                }
+                String path = input.substring(start, end);
+                if (path != null && !path.isBlank()) {
+                    return Optional.of(path);
+                }
+            } catch (Exception e) {
+                return Optional.empty();
             }
         }
         LOG.error("Could not get Icon path for icon class {}", icon);
