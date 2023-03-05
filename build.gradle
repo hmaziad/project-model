@@ -37,15 +37,25 @@ dependencies {
     implementation 'org.apache.logging.log4j:log4j-slf4j18-impl:2.14.0'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.1.0'
     implementation group: 'com.google.guava', name: 'guava', version: '11.0.2'
-
+    implementation 'org.jetbrains:marketplace-zip-signer:0.1.8'
 }
 
 patchPluginXml {
   version = project.version
   sinceBuild = '211'
-  untilBuild = '213.*'
+  untilBuild = '223.*'
 }
 
 runIde {
   jvmArgs '--add-exports', 'java.base/jdk.internal.vm=ALL-UNNAMED'
+}
+
+signPlugin {
+    certificateChain = System.getenv("CERTIFICATE_CHAIN")
+    privateKey = System.getenv("PRIVATE_KEY")
+    password = System.getenv("PRIVATE_KEY_PASSWORD")
+}
+
+publishPlugin{
+    token = System.getenv("PUBLISH_TOKEN")
 }

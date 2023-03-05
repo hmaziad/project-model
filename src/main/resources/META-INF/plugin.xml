@@ -4,10 +4,10 @@
 <idea-plugin>
 
     <!-- Unique id for this plugin. Must stay constant for the life of the plugin. -->
-    <id>org.intellij.sdk.project.model</id>
+    <id>org.armadillo.core</id>
 
     <!-- Text to display as name on Preferences/Settings | Plugin page -->
-    <name>SDK: Project Model Sample</name>
+    <name>Armadillo</name>
 
     <!-- Product and plugin compatibility requirements -->
     <depends>com.intellij.modules.platform</depends>
@@ -16,32 +16,41 @@
     <!-- Text to display as description on Preferences/Settings | Plugin page -->
     <description>
         <![CDATA[
-      Demonstrates various aspects of interacting with project model.<br>Adds menu items to
-      <b>Tools</b> and <b>Editor Context</b> menus.
+      Make debugging a little bit easier and have the below tools in your possession.
+      <ul>
+        <li>Save debugger variables & stack frame into a session</li>
+        <li>Import/Export sessions</li>
+        <li>Diff two sessions</li>
+        <li>View sessions saved on a single line</li>
+      </ul>
     ]]>
     </description>
     <change-notes>
         <![CDATA[
       <ul>
-        <li><b>2.0.0</b> Convert to Gradle-based plugin, change plugin ID</li>
-        <li><b>1.0.0</b> Release 2018.3 and earlier.</li>
+        <li><b>1.0.0</b>First Release</li>
       </ul>
     ]]>
     </change-notes>
 
     <!-- Text to display as company information on Preferences/Settings | Plugin page -->
-    <vendor url="https://plugins.jetbrains.com">IntelliJ Platform SDK</vendor>
+    <vendor>Armadillo</vendor>
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="Armadillo" secondary="true" icon="AllIcons.General.Modified" anchor="bottom"
-                    factoryClass="org.intellij.sdk.project.model.DebugWindowProvider"/>
-        <applicationService serviceImplementation="org.intellij.sdk.project.model.services.PersistencyService" serviceInterface="org.intellij.sdk.project.model.services.PersistencyService"/>
-        <applicationService
-                serviceInterface="org.intellij.sdk.project.model.services.ComponentService"
-                serviceImplementation="org.intellij.sdk.project.model.services.ComponentService"/>
+        <toolWindow id=" Armadillo" secondary="true" icon="SdkIcons.ARMADILLO_18" anchor="bottom"
+                    factoryClass="org.armadillo.core.DebugWindowProvider"/>
+        <applicationService serviceImplementation="org.armadillo.core.services.PersistencyService" serviceInterface="org.armadillo.core.services.PersistencyService"/>
     </extensions>
     <projectListeners>
         <listener
-                class="org.intellij.sdk.project.model.listeners.SessionStartedListener"
+                class="org.armadillo.core.listeners.SessionStartedListener"
                 topic="com.intellij.debugger.impl.DebuggerManagerListener"/>
+        <listener
+                class="org.armadillo.core.listeners.IconGutterListener"
+                topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
     </projectListeners>
+    <actions>
+        <action id="saveNodeAction" class="org.armadillo.core.actions.SaveNodeAction" text="Save in Armadillo" description="Save debug session" icon="SdkIcons.ARMADILLO_18">
+            <add-to-group group-id="XDebugger.ValueGroup" anchor="after" relative-to-action="XDebugger.CopyName"/>
+        </action>
+    </actions>
 </idea-plugin>
