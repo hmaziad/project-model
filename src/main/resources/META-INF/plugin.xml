@@ -36,7 +36,7 @@
     <!-- Text to display as company information on Preferences/Settings | Plugin page -->
     <vendor>Armadillo</vendor>
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id=" Armadillo" secondary="true" icon="SdkIcons.SNAP_ICON" anchor="bottom"
+        <toolWindow id=" Armadillo" secondary="true" icon="SdkIcons.ARMADILLO_18" anchor="bottom"
                     factoryClass="org.armadillo.core.DebugWindowProvider"/>
         <applicationService serviceImplementation="org.armadillo.core.services.PersistencyService" serviceInterface="org.armadillo.core.services.PersistencyService"/>
     </extensions>
@@ -49,7 +49,7 @@
                 topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
     </projectListeners>
     <actions>
-        <action id="saveNodeAction" class="org.armadillo.core.actions.SaveNodeAction" text="Save in Armadillo" description="Save debug session" icon="SdkIcons.SNAP_ICON">
+        <action id="saveNodeAction" class="org.armadillo.core.actions.SaveNodeAction" text="Save in Armadillo" description="Save debug session" icon="SdkIcons.ARMADILLO">
             <add-to-group group-id="XDebugger.ValueGroup" anchor="after" relative-to-action="XDebugger.CopyName"/>
         </action>
     </actions>
