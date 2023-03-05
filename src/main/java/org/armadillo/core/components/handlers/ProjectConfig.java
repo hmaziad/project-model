@@ -16,7 +16,8 @@ public class ProjectConfig {
     private boolean isClearEnabled = false;
     @Setter
     private String nameInWindow;
-
+    @Setter
+    private String flowId;
     public ProjectConfig(Project project) {
         this.treeManager.setProject(project);
     }

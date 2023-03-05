@@ -1,9 +1,14 @@
 package org.armadillo.core.components.buttons;
 
+import static org.armadillo.core.constants.TextConstants.GET_PAID_VERSION;
+import static org.armadillo.core.constants.TextConstants.REGISTER_PLUGIN;
+
 import java.util.Optional;
 
 import org.armadillo.core.components.handlers.ReachServices;
+import org.armadillo.core.constants.MessageDialogues;
 import org.armadillo.core.constants.TextConstants;
+import org.armadillo.core.license.CheckLicense;
 import org.armadillo.core.tree.components.DebugNode;
 import org.armadillo.core.tree.components.DebugNodeContainer;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +29,12 @@ public class SnapButton extends IconWithTextAction implements ReachServices {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        if (Boolean.FALSE.equals(CheckLicense.isLicensed()) && nodeHandler.getAllContainersPerNames().size() >= 8) {
+            MessageDialogues.getErrorMessageDialogue(GET_PAID_VERSION, e.getProject());
+            CheckLicense.requestLicense(REGISTER_PLUGIN);
+            return;
+        }
+
         Optional<DebugNodeContainer> optionalDebugNode = snapHandler.getCurrentSession(e.getProject());
         if (optionalDebugNode.isEmpty()) {
             LOG.warn("Weird, we cannot get a debug session. Try another way.");

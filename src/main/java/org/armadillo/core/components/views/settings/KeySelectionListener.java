@@ -31,6 +31,8 @@ public class KeySelectionListener implements ListSelectionListener, ReachService
     JLabel timestamp;
     DebugTreeManager debugTreeManager;
     JBList<DebugFrame> framesList;
+    JLabel flowName;
+    JLabel className;
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
@@ -38,14 +40,22 @@ public class KeySelectionListener implements ListSelectionListener, ReachService
         Optional<DebugNodeContainer> optionalNode = nodeHandler.getNodeContainerByName(selectedNodeName);
         if (optionalNode.isPresent()) {
             DebugNodeContainer nodeContainer = optionalNode.get();
-            updateViewNodeData(nodeContainer.getTimestamp(), nodeContainer.getDescription(), nodeContainer.getNode(), nodeContainer.getFrames());
+            updateViewNodeData(nodeContainer.getTimestamp(), nodeContainer.getDescription(), nodeContainer.getFlowId(),
+                nodeContainer.getPackageName(), nodeContainer.getNode(), nodeContainer.getFrames());
         } else {
-            updateViewNodeData(null, EMPTY_STRING, null, null);
+            updateViewNodeData(null, EMPTY_STRING, null, null, null, null);
         }
     }
 
-    private void updateViewNodeData(LocalDateTime timestamp, String description, DebugNode node, List<DebugFrame> frames) {
-        this.timestamp.setText(Objects.isNull(timestamp) ? EMPTY_STRING : timestamp.format(DATE_TIME_FORMATTER));
+    private void updateViewNodeData(LocalDateTime timestamp, String description, String flowName, String className,
+        DebugNode node, List<DebugFrame> frames) {
+
+        this.timestamp.setText("Timestamp: " + (Objects.isNull(timestamp) ? EMPTY_STRING : timestamp.format(DATE_TIME_FORMATTER)));
+        this.flowName.setText("Flow: " + (Objects.isNull(flowName) ? EMPTY_STRING : flowName));
+        this.className.setText("Class: " + (Objects.isNull(className) ?
+            EMPTY_STRING :
+            className.substring(0, className.lastIndexOf('.'))));
+
         String wrappedDescription = String.format("<html><xmp>%s</xmp></html>", description);
         this.description.setText(StringUtil.isEmpty(description) ? EMPTY_STRING : wrappedDescription);
         this.debugTreeManager.setRoot(node);

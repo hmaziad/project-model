@@ -1,7 +1,5 @@
 package org.armadillo.core.components.handlers;
 
-import static org.armadillo.core.util.HelperUtil.getPackageNameForCurrentVfs;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -24,11 +22,12 @@ import java.util.stream.Collectors;
 
 import org.armadillo.core.constants.MessageDialogues;
 import org.armadillo.core.constants.TextConstants;
+import org.armadillo.core.license.CheckLicense;
 import org.armadillo.core.listeners.DebugGutterIconRenderer;
 import org.armadillo.core.services.PersistencyService;
 import org.armadillo.core.tree.components.DebugNodeContainer;
 import org.jetbrains.annotations.NotNull;
-import com.intellij.json.JsonFileType;
+
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.HighlighterLayer;
@@ -40,17 +39,27 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectUtil;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.XDebuggerManager;
 import com.intellij.xdebugger.XSourcePosition;
 
-public class NodeHandler implements ReachServices {
+import static org.armadillo.core.constants.TextConstants.GET_PAID_VERSION_IMPORT;
+import static org.armadillo.core.constants.TextConstants.REGISTER_PLUGIN;
+import static org.armadillo.core.util.HelperUtil.getPackageNameForCurrentVfs;
+
+public class NodeHandler implements ReachSomeServices {
     private static final PersistencyService persistencyService = ServiceManager.getService(PersistencyService.class);
+    private LocalDateTime flowDate;
 
     public String save(DebugNodeContainer container, Project project) {
         LocalDateTime timestamp = LocalDateTime.now();
         String generatedName = getGenerateName(project, timestamp);
+        container.setName(generatedName);
         container.setTimestamp(timestamp);
+        container.setFlowTimestamp(this.flowDate);
+        container.setFlowId(treeHandler.getFlowId(project));
         save(generatedName, container);
         addGutterIconIfNotExisting(container.getLineNumber(), project);
         return generatedName;
@@ -58,6 +67,18 @@ public class NodeHandler implements ReachServices {
 
     private void save(String generatedName, DebugNodeContainer nodeContainer) {
         persistencyService.getContainers().put(generatedName, nodeContainer);
+    }
+
+    public List<Pair<String, List<DebugNodeContainer>>> getSortedFlowContainers() {
+        return getAllContainersPerNames()
+            .values()
+            .stream()
+            .collect(Collectors.groupingBy(DebugNodeContainer::getFlowId, Collectors.toList()))
+            .entrySet()
+            .stream()
+            .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
+            .sorted(Comparator.comparing(e -> e.getSecond().get(0).getFlowTimestamp(), Comparator.reverseOrder()))
+            .collect(Collectors.toList());
     }
 
     private String getGenerateName(Project project, LocalDateTime timestamp) {
@@ -91,7 +112,7 @@ public class NodeHandler implements ReachServices {
             Set<Integer> existingLineNumbersForCurrentFile = getAllContainersPerNames() //
                 .values() //
                 .stream() //
-                .filter(container -> container.getPackageName().equals(optionalFileName.get())) //
+                .filter(container -> Objects.equals(container.getPackageName(), optionalFileName.get())) //
                 .map(DebugNodeContainer::getLineNumber) //
                 .collect(Collectors.toSet());
 
@@ -164,8 +185,15 @@ public class NodeHandler implements ReachServices {
     }
 
     private Comparator<Map.Entry<String, DebugNodeContainer>> getDebugContainerDateComparator() {
-        return Comparator.comparing(e1 -> {
-            LocalDateTime timestamp = e1.getValue().getTimestamp();
+        return Comparator.comparing(entry -> {
+            LocalDateTime timestamp = entry.getValue().getTimestamp();
+            return timestamp == null ? LocalDateTime.now() : timestamp;
+        }, Comparator.reverseOrder());
+    }
+
+    public Comparator<DebugNodeContainer> getDebugContainerNodeDateComparator() {
+        return Comparator.comparing(item -> {
+            LocalDateTime timestamp = item.getTimestamp();
             return timestamp == null ? LocalDateTime.now() : timestamp;
         }, Comparator.reverseOrder());
     }
@@ -178,6 +206,7 @@ public class NodeHandler implements ReachServices {
         Map<String, DebugNodeContainer> containers = persistencyService.getContainers();
         DebugNodeContainer fromContainer = containers.get(from);
         containers.remove(from);
+        fromContainer.setName(to);
         containers.put(to, fromContainer);
     }
 
@@ -238,20 +267,41 @@ public class NodeHandler implements ReachServices {
     }
 
     public void doImport(Project project) {
-        FileChooserDescriptor jsonOnly = FileChooserDescriptorFactory.createSingleFileDescriptor(JsonFileType.INSTANCE);
-        VirtualFile chosenFile = FileChooser.chooseFile(jsonOnly, project, null);
-        if (Objects.nonNull(chosenFile)) {
-            String errorMessage = chosenFile.getName() + " file is empty";
-            Map<String, DebugNodeContainer> nodes = persistencyService.getContainers();
-            String fileName = Objects.requireNonNull(chosenFile.getNameWithoutExtension(), "File is not valid");
-            if (nodes.containsKey(fileName)) {
-                MessageDialogues.getErrorMessageDialogue(String.format("A session with name \"%s\" already exists", fileName), project);
-            } else {
-                CharSequence charsSequence = Objects.requireNonNull(FileDocumentManager.getInstance().getDocument(chosenFile), errorMessage).getCharsSequence();
-                String content = String.valueOf(charsSequence);
-                HashMap<String, DebugNodeContainer> nodeFromJson = nodeConverter.fromString(content);
-                DebugNodeContainer nodeContainer = Objects.requireNonNull(nodeFromJson, errorMessage).entrySet().iterator().next().getValue();
-                save(fileName, nodeContainer);
+        FileChooserDescriptor jsonOnlyDescriptor = FileChooserDescriptorFactory.createMultipleFilesNoJarsDescriptor();
+        jsonOnlyDescriptor.setRoots(ProjectUtil.guessProjectDir(project));
+        VirtualFile @NotNull [] chosenFiles = FileChooser.chooseFiles(jsonOnlyDescriptor, project, null);
+
+        if (Boolean.FALSE.equals(CheckLicense.isLicensed()) && chosenFiles.length + getAllContainersPerNames().size() >= 8) {
+            MessageDialogues.getErrorMessageDialogue(GET_PAID_VERSION_IMPORT, project);
+            CheckLicense.requestLicense(REGISTER_PLUGIN);
+            return;
+        }
+
+        boolean containsNonJson =
+            Arrays.stream(chosenFiles).anyMatch(chosenFile -> !chosenFile.getName().endsWith(".json"));
+        if (containsNonJson) {
+            MessageDialogues.getErrorMessageDialogue("One of the imported files is not a json file", project);
+            return;
+        }
+
+        for (VirtualFile chosenFile : chosenFiles) {
+            if (Objects.nonNull(chosenFile)) {
+                String errorMessage = chosenFile.getName() + " file is empty";
+                Map<String, DebugNodeContainer> nodes = persistencyService.getContainers();
+                String fileName = Objects.requireNonNull(chosenFile.getNameWithoutExtension(), "File is not valid");
+                if (nodes.containsKey(fileName)) {
+                    MessageDialogues.getErrorMessageDialogue(
+                        String.format("A session with name \"%s\" already exists", fileName), project);
+                } else {
+                    CharSequence charsSequence = Objects
+                        .requireNonNull(FileDocumentManager.getInstance().getDocument(chosenFile), errorMessage)
+                        .getCharsSequence();
+                    String content = String.valueOf(charsSequence);
+                    HashMap<String, DebugNodeContainer> nodeFromJson = nodeConverter.fromString(content);
+                    DebugNodeContainer nodeContainer =
+                        Objects.requireNonNull(nodeFromJson, errorMessage).entrySet().iterator().next().getValue();
+                    save(fileName, nodeContainer);
+                }
             }
         }
     }
@@ -263,4 +313,16 @@ public class NodeHandler implements ReachServices {
             .orElseThrow(() -> new IllegalStateException("Why you messing?"));
     }
 
+    public void renameFlowId(String from, String to) {
+        persistencyService
+            .getContainers()
+            .entrySet()
+            .stream()
+            .filter(e -> from.equals(e.getValue().getFlowId()))
+            .forEach(e -> e.getValue().setFlowId(to));
+    }
+
+    public void setFlowDate(LocalDateTime flowDate) {
+        this.flowDate = flowDate;
+    }
 }

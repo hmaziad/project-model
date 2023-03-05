@@ -77,7 +77,7 @@ public class DiffView extends DialogWrapper implements ReachServices {
 
     @NotNull
     private JPanel createDiffPanel(JComboBox<String> leftDropdown, JComboBox<String> rightDropdown) {
-        setSize(1300, 1100);
+        setSize(1100, 800);
         JPanel dialogPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         this.leftDebugTreeManager = new DebugTreeManager(true);

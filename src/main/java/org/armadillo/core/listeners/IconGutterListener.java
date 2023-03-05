@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.armadillo.core.components.handlers.ReachServices;
 import org.armadillo.core.tree.components.DebugNodeContainer;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.HighlighterLayer;
 import com.intellij.openapi.editor.markup.MarkupModel;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
@@ -28,22 +29,26 @@ public class IconGutterListener implements FileEditorManagerListener, ReachServi
             .getAllContainersPerNames() //
             .values() //
             .stream() //
-            .filter(container -> Objects.nonNull(container.getPackageName()) && container.getPackageName().equals(optionalFileName.get())) //
+            .filter(container -> Objects.nonNull(container.getPackageName()) && container
+                .getPackageName()
+                .equals(optionalFileName.get())) //
             .map(DebugNodeContainer::getLineNumber) //
             .collect(Collectors.toSet());
 
-        MarkupModel markupModel = event.getManager().getSelectedTextEditor().getMarkupModel();
+        Editor selectedTextEditor = event.getManager().getSelectedTextEditor();
+        if (Objects.nonNull(selectedTextEditor)) {
+            MarkupModel markupModel = selectedTextEditor.getMarkupModel();
+            Arrays //
+                .stream(markupModel.getAllHighlighters()) //
+                .filter(highlighter -> highlighter.getGutterIconRenderer() instanceof DebugGutterIconRenderer) //
+                .forEach(markupModel::removeHighlighter); //
 
-        Arrays //
-            .stream(markupModel.getAllHighlighters()) //
-            .filter(highlighter -> highlighter.getGutterIconRenderer() instanceof DebugGutterIconRenderer) //
-            .forEach(markupModel::removeHighlighter); //
-
-        for (Integer lineNumber : lineNumbers) {
-            DebugGutterIconRenderer renderer = new DebugGutterIconRenderer(lineNumber);
-            RangeHighlighter rangeHighlighter = markupModel.addLineHighlighter(lineNumber, HighlighterLayer.FIRST, null);
-            rangeHighlighter.setGutterIconRenderer(renderer);
+            for (Integer lineNumber : lineNumbers) {
+                DebugGutterIconRenderer renderer = new DebugGutterIconRenderer(lineNumber);
+                RangeHighlighter rangeHighlighter =
+                    markupModel.addLineHighlighter(lineNumber, HighlighterLayer.FIRST, null);
+                rangeHighlighter.setGutterIconRenderer(renderer);
+            }
         }
     }
-
 }

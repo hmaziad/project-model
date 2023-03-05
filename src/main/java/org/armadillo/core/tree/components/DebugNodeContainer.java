@@ -12,6 +12,8 @@ import lombok.Data;
 @Builder
 public class DebugNodeContainer {
     @Expose
+    private String name;
+    @Expose
     private LocalDateTime timestamp;
     @Expose
     private String description;
@@ -19,6 +21,14 @@ public class DebugNodeContainer {
     private String packageName;
     @Expose
     private int lineNumber;
+    @Expose
+    private int lineIndexDebugged;
+    @Expose
+    private String flowId;
+    @Expose
+    private LocalDateTime flowTimestamp;
+    @Expose
+    private String textBlock;
     @Expose
     private List<DebugFrame> frames;
     @Expose

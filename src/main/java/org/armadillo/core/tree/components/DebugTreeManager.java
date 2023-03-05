@@ -92,7 +92,8 @@ public class DebugTreeManager {
         for (List<Integer> range : modifications) {
             int start = range.get(0);
             int end = range.get(1);
-            for (int row = start; row < end; row++) {
+            int rowCount = this.debugTree.getRowCount();
+            for (int row = start; row < Math.min(end, rowCount); row++) {
                 TreePath path = this.debugTree.getPathForRow(row);
                 DebugNode debugNode = (DebugNode) path.getLastPathComponent();
                 debugNode.setColor(BLUE);
