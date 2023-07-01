@@ -57,6 +57,17 @@ publishPlugin{
     token = System.getenv("PUBLISH_TOKEN")
 }
 
+def dependsDir = "${buildDir}/libs/dependencies/"
+
+task copyDepends(type: Copy) {
+    configurations.each {
+        if (it.isCanBeResolved())
+            from it into "${dependsDir}"
+    }
+    from buildscript.configurations.classpath into "${dependsDir}"
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 buildPlugin{
 
 }

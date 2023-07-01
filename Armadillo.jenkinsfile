@@ -8,3 +8,24 @@ pipeline {
         }
     }
 }
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'Add-Jenkins-Pipeline',
+                url: 'https://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@github.com/hmaziad/project-model.git'
+            }
+        }
+
+       stage('Build') {
+            steps {
+                // Run the Gradle build using 'gradlew'
+                // Make sure 'gradlew' is present in the repository
+                bat './gradlew buildPlugin'
+            }
+        }
+    }
+}
