@@ -1,16 +1,5 @@
 pipeline {
     agent any
-    stages {
-        stage('Hello') {
-            steps {
-                echo 'Hello World here'
-            }
-        }
-    }
-}
-
-pipeline {
-    agent any
 
     stages {
         stage('Checkout') {
@@ -20,11 +9,26 @@ pipeline {
             }
         }
 
-       stage('Build') {
+        stage('Build') {
             steps {
-                // Run the Gradle build using 'gradlew'
-                // Make sure 'gradlew' is present in the repository
                 bat './gradlew buildPlugin'
+            }
+        }
+
+        stage('unzip') {
+            steps {
+                bat 'tar -xf build\\distributions\\project_model.zip'
+            }
+        }
+
+        stage('obfuscate') {
+            steps {
+                bat 'gradle copyDepends'
+                echo 'Copied dependencies'
+                bat 'java -jar D:\\devtools\\proguard-7.3.2\\lib\\proguard.jar @armadillo.pro'
+                echo 'Obfuscated project model jar'
+                bat 'copy project_model.jar project_model\\lib /b/v/y'
+                bat '7z a project_model.zip project_model'
             }
         }
     }
